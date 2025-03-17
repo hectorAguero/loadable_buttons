@@ -1,5 +1,5 @@
 name: loadable_buttons
-description: "A new Flutter package project."
+description: "Provides enhanced buttons with built-in loading states, async functionality and customizable transitions."
 version: 0.0.1
 homepage: https://hectoraguero.dev/
 repository: https://github.com/hectorAguero/loadable_buttons
