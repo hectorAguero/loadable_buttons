@@ -1,8 +1,9 @@
 name: loadable_buttons
 description: "A new Flutter package project."
 version: 0.0.1
-homepage:
-publish_to: none
+homepage: https://hectoraguero.dev/
+repository: https://github.com/hectorAguero/loadable_buttons
+issue_tracker: https://github.com/hectorAguero/loadable_buttons/issues
 
 environment:
   sdk: ^3.7.0
