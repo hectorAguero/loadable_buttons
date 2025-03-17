@@ -5,8 +5,8 @@ homepage:
 publish_to: none
 
 environment:
-  sdk: ^3.8.0-70.0.dev
-  flutter: ">=1.17.0"
+  sdk: ^3.7.0
+  flutter: ">=3.29.0"
 
 dependencies:
   flutter:
@@ -15,8 +15,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  solid_lints: ^0.3.0
-  very_good_analysis: ^7.0.0
+  flutter_lints: ^5.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

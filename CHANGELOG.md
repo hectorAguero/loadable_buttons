@@ -1,3 +1,3 @@
 ## 0.0.1
 
-* TODO: Describe initial release.
+* Add initial version of the package with AsyncElevatedButton and AsyncElevatedButton.icon implementations
