@@ -2,16 +2,21 @@ part of 'async_elevated_button.dart';
 
 class _AsyncElevatedButtonWithIcon extends AsyncElevatedButton {
   _AsyncElevatedButtonWithIcon({
-    required this.label,
-    required this.icon,
+    required Widget label,
+    required Widget icon,
     required super.onPressed,
     required super.loading,
     required super.loadingChild,
+    super.key,
     super.style,
     IconAlignment? iconAlignment,
     bool? autofocus,
     super.clipBehavior,
     super.statesController,
+    super.animationDuration,
+    super.minimumChildOpacity,
+    super.transitionType,
+    super.customBuilder,
   }) : super(
          autofocus: autofocus ?? false,
          child: _ElevatedButtonWithIconChild(
@@ -21,37 +26,6 @@ class _AsyncElevatedButtonWithIcon extends AsyncElevatedButton {
            iconAlignment: iconAlignment,
          ),
        );
-
-  final Widget label;
-  final Widget icon;
-
-  @override
-  State<_AsyncElevatedButtonWithIcon> createState() =>
-      __AsyncElevatedButtonWithIconState();
-}
-
-class __AsyncElevatedButtonWithIconState
-    extends State<_AsyncElevatedButtonWithIcon> {
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton.icon(
-      onPressed: widget.onPressed,
-      icon: widget.icon,
-      label:
-          widget.loading
-              ? widget.child
-              : widget.loadingChild ??
-                  _DefaultLoadingIndicator(style: widget.style),
-      onLongPress: widget.onLongPress,
-      onHover: widget.onHover,
-      onFocusChange: widget.onFocusChange,
-      style: widget.style,
-      focusNode: widget.focusNode,
-      autofocus: widget.autofocus,
-      clipBehavior: widget.clipBehavior,
-      statesController: widget.statesController,
-    );
-  }
 }
 
 /// Copy of ElevatedButton.icon with the loading animation

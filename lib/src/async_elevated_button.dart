@@ -9,7 +9,11 @@ typedef AsyncVoidCallback = Future<void> Function();
 
 /// Builder to allow a custom transition between the child and the loadingChild
 typedef CustomTransitionBuilder =
-    Widget Function({bool loading, Widget child, Widget? loadingChild});
+    Widget Function({
+      required bool loading,
+      required Widget child,
+      Widget? loadingChild,
+    });
 
 /// Enum to define the type of loading animation
 enum TransitionAnimationType {
@@ -48,7 +52,11 @@ class AsyncElevatedButton extends StatefulWidget {
     this.transitionType = TransitionAnimationType.stack,
     this.customBuilder,
     super.key,
-  });
+  }) : assert(
+         transitionType != TransitionAnimationType.customBuilder ||
+             customBuilder != null,
+         'customBuilder must be provided when transitionType is customBuilder',
+       );
 
   /// AsyncElevatedButton.icon is a custom widget that allows to load a child
   /// and an icon
@@ -68,6 +76,10 @@ class AsyncElevatedButton extends StatefulWidget {
     Widget? loadingChild,
     bool loading = false,
     bool autofocus = false,
+    Duration animationDuration = Durations.medium1,
+    double minimumChildOpacity = 0.0,
+    TransitionAnimationType transitionType = TransitionAnimationType.stack,
+    CustomTransitionBuilder? customBuilder,
   }) {
     if (icon == null) {
       return AsyncElevatedButton(
@@ -83,21 +95,30 @@ class AsyncElevatedButton extends StatefulWidget {
         onHover: onHover,
         onFocusChange: onFocusChange,
         key: key,
+        animationDuration: animationDuration,
+        minimumChildOpacity: minimumChildOpacity,
+        transitionType: transitionType,
+        customBuilder: customBuilder,
         child: label,
       );
     }
 
     return _AsyncElevatedButtonWithIcon(
+      key: key,
       label: label,
       icon: icon,
       style: style,
       onPressed: onPressed,
       loading: loading,
       autofocus: autofocus,
-      clipBehavior: clipBehavior,
+      clipBehavior: clipBehavior ?? Clip.none,
       statesController: statesController,
       iconAlignment: iconAlignment,
       loadingChild: loadingChild,
+      animationDuration: animationDuration,
+      minimumChildOpacity: minimumChildOpacity,
+      transitionType: transitionType,
+      customBuilder: customBuilder,
     );
   }
 
@@ -197,7 +218,10 @@ class _AsyncElevatedButtonState extends State<AsyncElevatedButton> {
           AnimatedOpacity(
             opacity: _isLoading ? 1.0 : 0.0,
             duration: widget.animationDuration,
-            child: _DefaultLoadingIndicator(style: widget.style),
+            child: Visibility(
+              visible: _isLoading,
+              child: _DefaultLoadingIndicator(style: widget.style),
+            ),
           ),
         ],
       ),
