@@ -1,39 +1,99 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# loadable_buttons
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/tools/pub/writing-package-pages).
-
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/to/develop-packages).
--->
-
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+A Flutter package that provides enhanced buttons with built-in loading states and async functionality.
 
 ## Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
-
-## Getting started
-
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+- 🔄 Built-in loading states for ElevatedButton
+- ⚡ Async callback support
+- 🎨 Multiple transition animations
+- 🎯 Icon support with customizable alignment
+- 📱 Maintains all standard ElevatedButton properties
+- ✨ Customizable loading indicators
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
-
+### Basic Usage
 ```dart
-const like = 'sample';
+AsyncElevatedButton(
+  onPressed: () async {
+    // Your async operation here
+    await Future.delayed(const Duration(seconds: 2));
+  },
+  child: const Text('Click Me'),
+);
 ```
 
-## Additional information
+### Custom Loading Child
+```dart
+AsyncElevatedButton(
+  onPressed: () async {
+    await Future.delayed(const Duration(seconds: 2));
+  },
+  child: const Text('Submit'),
+  loadingChild: const Text('Loading...'),
+);
+```
 
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+### Transition Types
+
+The package supports three types of transitions:
+
+1. Stack (Default) : Maintains the size of the button while loading
+```dart
+AsyncElevatedButton(
+  // transitionType: TransitionAnimationType.stack,
+  onPressed: () async => await yourAsyncFunction(),
+  child: const Text('Stack Transition'),
+);
+```
+
+2. AnimatedSwitcher : Animates the size of the button while loading
+```dart
+AsyncElevatedButton(
+  transitionType: TransitionAnimationType.animatedSwitcher,
+  onPressed: () async => await yourAsyncFunction(),
+  child: const Text('AnimatedSwitcher Transition'),
+);
+```
+
+3. CustomBuilder : Allows you to define your own custom transition
+```dart
+AsyncElevatedButton(
+  transitionType: TransitionAnimationType.customBuilder,
+  onPressed: () async => await yourAsyncFunction(),
+  child: const Text('Custom Transition'),
+  loadingChild: const Text('Loading...'),
+  customBuilder: ({
+    required bool loading,
+    required Widget child,
+    Widget? loadingChild,
+  }) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+      child: loading
+          ? loadingChild!
+          : child,
+    );
+  },
+);
+```
+
+## Additional Features
+- Customize animation duration
+- Control minimum opacity during loading state
+- Full access to ElevatedButton styling
+- Manual loading state control
+- Icon alignment customization
+
+### Properties
+| Property | Type | Description |
+|----------|------|-------------|
+| `onPressed` | `AsyncVoidCallback?` | The callback that is called when the button is tapped |
+| `child` | `Widget` | The primary content of the button |
+| `loadingChild` | `Widget?` | Widget to show during loading state |
+| `loading` | `bool` | Manual control of loading state |
+| `transitionType` | `TransitionAnimationType` | Type of loading animation |
+| `animationDuration` | `Duration` | Duration of the loading animation |
+| `minimumChildOpacity` | `double` | Minimum opacity of child during loading |
