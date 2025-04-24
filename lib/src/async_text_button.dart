@@ -8,13 +8,13 @@ import 'package:flutter/material.dart';
 
 import 'transition_animation_type.dart';
 
-part 'async_elevated_button_with_icon.dart';
+part 'async_text_button_with_icon.dart';
 
-/// AsyncElevatedButton is a custom widget that allows to load a child.
-class AsyncElevatedButton extends StatefulWidget {
+/// AsyncTextButton is a custom widget that allows to load a child.
+class AsyncTextButton extends StatefulWidget {
   /// General constructor that allows both sync and async callbacks.
   /// At least one callback must be non-null.
-  const AsyncElevatedButton({
+  const AsyncTextButton({
     required this.child,
     required this.onPressed,
     this.loadingChild,
@@ -38,9 +38,9 @@ class AsyncElevatedButton extends StatefulWidget {
          'customBuilder must be provided when transitionType is customBuilder',
        );
 
-  /// AsyncElevatedButton.icon is a custom widget that allows to load a child
+  /// AsyncTextButton.icon is a custom widget that allows to load a child
   /// and an icon.
-  factory AsyncElevatedButton.icon({
+  factory AsyncTextButton.icon({
     required FutureOr<void> Function()? onPressed,
     required Widget label,
     Key? key,
@@ -63,7 +63,7 @@ class AsyncElevatedButton extends StatefulWidget {
     customBuilder,
   }) {
     if (icon == null) {
-      return AsyncElevatedButton(
+      return AsyncTextButton(
         child: label,
         onPressed: onPressed,
         loadingChild: loadingChild,
@@ -84,7 +84,7 @@ class AsyncElevatedButton extends StatefulWidget {
       );
     }
 
-    return _AsyncElevatedButtonWithIcon(
+    return _AsyncTextButtonWithIcon(
       key: key,
       label: label,
       icon: icon,
@@ -103,7 +103,7 @@ class AsyncElevatedButton extends StatefulWidget {
     );
   }
 
-  /// The child of the button, same a the [ElevatedButton.child].
+  /// The child of the button, same a the [TextButton.child].
   final Widget child;
 
   /// The child that be show when the button is loading.
@@ -118,25 +118,25 @@ class AsyncElevatedButton extends StatefulWidget {
   /// The onLongPress callback of the button.
   final void Function()? onLongPress;
 
-  /// The onHover callback of the button, ElevatedButton property.
+  /// The onHover callback of the button, TextButton property.
   final ValueChanged<bool>? onHover;
 
-  /// The onFocusChange callback of the button, ElevatedButton property.
+  /// The onFocusChange callback of the button, TextButton property.
   final ValueChanged<bool>? onFocusChange;
 
-  /// The style of the button, ElevatedButton property.
+  /// The style of the button, TextButton property.
   final ButtonStyle? style;
 
-  /// The focusNode of the button, ElevatedButton property.
+  /// The focusNode of the button, TextButton property.
   final FocusNode? focusNode;
 
-  /// The autofocus of the button, ElevatedButton property.
+  /// The autofocus of the button, TextButton property.
   final bool autofocus;
 
-  /// The clipBehavior of the button, ElevatedButton property.
+  /// The clipBehavior of the button, TextButton property.
   final Clip? clipBehavior;
 
-  /// The statesController of the button, ElevatedButton property.
+  /// The statesController of the button, TextButton property.
   final MaterialStatesController? statesController;
 
   /// The animationDuration of the transition.
@@ -155,10 +155,10 @@ class AsyncElevatedButton extends StatefulWidget {
   customBuilder;
 
   @override
-  State<AsyncElevatedButton> createState() => _AsyncElevatedButtonState();
+  State<AsyncTextButton> createState() => _AsyncTextButtonState();
 }
 
-class _AsyncElevatedButtonState extends State<AsyncElevatedButton> {
+class _AsyncTextButtonState extends State<AsyncTextButton> {
   late bool _isLoading = widget.loading;
 
   Future<void> _handlePressed() async {
@@ -178,7 +178,7 @@ class _AsyncElevatedButtonState extends State<AsyncElevatedButton> {
   }
 
   @override
-  void didUpdateWidget(covariant AsyncElevatedButton oldWidget) {
+  void didUpdateWidget(covariant AsyncTextButton oldWidget) {
     super.didUpdateWidget(oldWidget);
     // If the loading state changes, update the state.
     if (oldWidget.loading != widget.loading) {
@@ -187,7 +187,7 @@ class _AsyncElevatedButtonState extends State<AsyncElevatedButton> {
   }
 
   @override
-  Widget build(BuildContext context) => ElevatedButton(
+  Widget build(BuildContext context) => TextButton(
     key: widget.key,
     onPressed: _isLoading ? null : () => _handlePressed(),
     onLongPress: widget.onLongPress,
@@ -228,10 +228,11 @@ class _AsyncElevatedButtonState extends State<AsyncElevatedButton> {
       TransitionAnimationType.customBuilder =>
         widget.customBuilder != null
             ? widget.customBuilder?.call(
-              _isLoading,
-              widget.child,
-              widget.loadingChild,
-            )
+                  _isLoading,
+                  widget.child,
+                  widget.loadingChild,
+                ) ??
+                widget.child
             : widget.child,
     },
   );

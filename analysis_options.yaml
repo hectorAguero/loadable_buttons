@@ -1,4 +1,24 @@
-include: package:flutter_lints/flutter.yaml
+# include: package:very_good_analysis/analysis_options.yaml
+analyzer:
+  language:
+    strict-inference: true
+    strict-raw-types: true
+  plugins:
+    - dart_code_linter
 
-# Additional information about this file can be found at
-# https://dart.dev/guides/language/analysis-options
+dart_code_linter:
+  extends:
+    - package:dart_code_linter/presets/all.yaml
+  metrics:
+    cyclomatic-complexity: 20
+    number-of-parameters: 4
+    maximum-nesting-level: 5
+  rules:
+    - prefer-single-widget-per-file:
+        ignore-private-widgets: true
+    - avoid-late-keyword:
+        allow-initialized: true
+    - avoid-non-null-assertion:
+        skip-checked-fields: true
+  metrics-exclude:
+    - test/**

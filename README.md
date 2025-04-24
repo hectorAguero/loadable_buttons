@@ -2,16 +2,33 @@
 
 A Flutter package that provides enhanced buttons with built-in loading states and async functionality.
 
+![](https://raw.githubusercontent.com/hectorAguero/loadable_buttons/main/screenshots/preview.gif 'loadable_buttons')
+
 ## Features
 
-- 🔄 Built-in loading states for ElevatedButton
+- 🔄 Built-in loading states for:
+  - ElevatedButton -> AsyncElevatedButton
+  - FilledButton -> AsyncFilledButton
+  - TextButton -> AsyncTextButton
+  - OutlinedButton -> AsyncOutlinedButton
 - ⚡ Async callback support
 - 🎨 Multiple transition animations
 - 🎯 Icon support with customizable alignment
-- 📱 Maintains all standard ElevatedButton properties
+- 📱 Maintains all standard properties
 - ✨ Customizable loading indicators
 
 ## Usage
+
+### Installation
+Add the following to your `pubspec.yaml` or run:
+```bash
+flutter pub add loadable_buttons
+```
+
+### Importing
+```dart
+import 'package:loadable_buttons/loadable_buttons.dart';
+```
 
 ### Basic Usage
 ```dart
@@ -90,7 +107,7 @@ AsyncElevatedButton(
 ### Properties
 | Property | Type | Description |
 |----------|------|-------------|
-| `onPressed` | `AsyncVoidCallback?` | The callback that is called when the button is tapped |
+| `onPressed` | `FutureOr<void> Function()?` | The callback that is called when the button is tapped |
 | `child` | `Widget` | The primary content of the button |
 | `loadingChild` | `Widget?` | Widget to show during loading state |
 | `loading` | `bool` | Manual control of loading state |

@@ -5,11 +5,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:loadable_buttons/loadable_buttons.dart';
 
 void main() {
-  group('AsyncElevatedButton', () {
+  group('AsyncFilledButton', () {
     testWidgets('renders child correctly', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: AsyncElevatedButton(
+          home: AsyncFilledButton(
             child: const Text('Test Button'),
             onPressed: () {
               log('Button pressed');
@@ -24,7 +24,7 @@ void main() {
     testWidgets('shows loading indicator when pressed', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: AsyncElevatedButton(
+          home: AsyncFilledButton(
             child: const Text('Test Button'),
             onPressed: () async {
               await Future<void>.delayed(const Duration(seconds: 1));
@@ -38,7 +38,7 @@ void main() {
       expect(find.text('Test Button'), findsOneWidget);
 
       // Tap the button.
-      await tester.tap(find.byType(AsyncElevatedButton));
+      await tester.tap(find.byType(AsyncFilledButton));
       // Pump the frame to show loading state.
       await tester.pump();
 
@@ -58,7 +58,7 @@ void main() {
     testWidgets('handles different transition types', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: AsyncElevatedButton(
+          home: AsyncFilledButton(
             child: const Text('Test Button'),
             onPressed: () {
               log('Button pressed');
@@ -78,7 +78,7 @@ void main() {
       final Key iconButtonKey = UniqueKey();
       await tester.pumpWidget(
         MaterialApp(
-          home: AsyncElevatedButton.icon(
+          home: AsyncFilledButton.icon(
             onPressed: () {
               log('Button pressed');
             },
@@ -94,10 +94,51 @@ void main() {
       expect(find.text('label'), findsOneWidget);
     });
 
+    testWidgets('tonal variant renders correctly', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: AsyncFilledButton.tonal(
+            child: const Text('Test Button'),
+            onPressed: () {
+              log('Button pressed');
+            },
+          ),
+        ),
+      );
+
+      expect(find.text('Test Button'), findsOneWidget);
+      // Verify it's a FilledButton.tonal internally
+      expect(find.byType(FilledButton), findsOneWidget);
+    });
+
+    testWidgets('tonal icon variant renders correctly', (tester) async {
+      const colorScheme = ColorScheme.light();
+      final theme = ThemeData.from(colorScheme: colorScheme);
+      final Key iconButtonKey = UniqueKey();
+      await tester.pumpWidget(
+        MaterialApp(
+          home: AsyncFilledButton.tonalIcon(
+            onPressed: () {
+              log('Button pressed');
+            },
+            label: const Text('label'),
+            key: iconButtonKey,
+            icon: const Icon(Icons.add),
+          ),
+          theme: theme,
+        ),
+      );
+
+      expect(find.byIcon(Icons.add), findsOneWidget);
+      expect(find.text('label'), findsOneWidget);
+      // Verify it's a FilledButton.tonal internally
+      expect(find.byType(FilledButton), findsOneWidget);
+    });
+
     testWidgets('custom builder works correctly', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: AsyncElevatedButton(
+          home: AsyncFilledButton(
             child: const Text('Test Button'),
             onPressed: () {
               log('Button pressed');
@@ -120,7 +161,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: AsyncElevatedButton(
+          home: AsyncFilledButton(
             child: const Text('Test Button'),
             onPressed: () {
               wasPressed = true;
@@ -130,7 +171,7 @@ void main() {
         ),
       );
 
-      await tester.tap(find.byType(AsyncElevatedButton));
+      await tester.tap(find.byType(AsyncFilledButton));
       await tester.pump();
 
       expect(wasPressed, isFalse);
@@ -141,7 +182,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: AsyncElevatedButton(
+          home: AsyncFilledButton(
             child: const Text('Test Button'),
             onPressed: () {
               log('Button pressed');
@@ -153,7 +194,7 @@ void main() {
         ),
       );
 
-      await tester.longPress(find.byType(AsyncElevatedButton));
+      await tester.longPress(find.byType(AsyncFilledButton));
       await tester.pump();
 
       expect(wasLongPressed, isTrue);

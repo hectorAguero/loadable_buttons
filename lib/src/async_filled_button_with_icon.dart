@@ -1,10 +1,10 @@
 // To support lower versions than 3.22.0 for MaterialState.
 // ignore_for_file: deprecated_member_use
 
-part of 'async_elevated_button.dart';
+part of 'async_filled_button.dart';
 
-class _AsyncElevatedButtonWithIcon extends AsyncElevatedButton {
-  _AsyncElevatedButtonWithIcon({
+class _AsyncFilledButtonWithIcon extends AsyncFilledButton {
+  _AsyncFilledButtonWithIcon({
     super.key,
     required Widget label,
     required Widget icon,
@@ -22,7 +22,37 @@ class _AsyncElevatedButtonWithIcon extends AsyncElevatedButton {
     super.customBuilder,
   }) : super(
          autofocus: autofocus ?? false,
-         child: _ElevatedButtonWithIconChild(
+         child: _FilledButtonWithIconChild(
+           label: label,
+           icon: icon,
+           buttonStyle: style,
+           iconAlignment: iconAlignment,
+         ),
+       );
+
+  _AsyncFilledButtonWithIcon.tonal({
+    super.key,
+    required super.onPressed,
+    super.onLongPress,
+    super.onHover,
+    super.onFocusChange,
+    super.style,
+    super.focusNode,
+    bool? autofocus,
+    super.clipBehavior,
+    super.statesController,
+    required Widget icon,
+    required Widget label,
+    IconAlignment? iconAlignment,
+    super.loading,
+    super.loadingChild,
+    super.animationDuration,
+    super.minimumChildOpacity,
+    super.transitionType,
+    super.customBuilder,
+  }) : super.tonal(
+         autofocus: autofocus ?? false,
+         child: _FilledButtonWithIconChild(
            label: label,
            icon: icon,
            buttonStyle: style,
@@ -31,9 +61,9 @@ class _AsyncElevatedButtonWithIcon extends AsyncElevatedButton {
        );
 }
 
-/// Copy of ElevatedButton.icon with the loading animation.
-class _ElevatedButtonWithIconChild extends StatelessWidget {
-  const _ElevatedButtonWithIconChild({
+/// Copy of FilledButton.icon with the loading animation.
+class _FilledButtonWithIconChild extends StatelessWidget {
+  const _FilledButtonWithIconChild({
     required this.label,
     required this.icon,
     required this.buttonStyle,
@@ -58,7 +88,7 @@ class _ElevatedButtonWithIconChild extends StatelessWidget {
         ) -
         1.0;
     final gap = lerpDouble(8, 4, scale) ?? 6;
-    final elevatedButtonTheme = ElevatedButtonTheme.of(context);
+    final elevatedButtonTheme = FilledButtonTheme.of(context);
     final effectiveIconAlignment =
         iconAlignment ??
         elevatedButtonTheme.style?.iconAlignment ??

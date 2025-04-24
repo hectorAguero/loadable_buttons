@@ -1,10 +1,10 @@
 // To support lower versions than 3.22.0 for MaterialState.
 // ignore_for_file: deprecated_member_use
 
-part of 'async_elevated_button.dart';
+part of 'async_text_button.dart';
 
-class _AsyncElevatedButtonWithIcon extends AsyncElevatedButton {
-  _AsyncElevatedButtonWithIcon({
+class _AsyncTextButtonWithIcon extends AsyncTextButton {
+  _AsyncTextButtonWithIcon({
     super.key,
     required Widget label,
     required Widget icon,
@@ -22,7 +22,7 @@ class _AsyncElevatedButtonWithIcon extends AsyncElevatedButton {
     super.customBuilder,
   }) : super(
          autofocus: autofocus ?? false,
-         child: _ElevatedButtonWithIconChild(
+         child: _TextButtonWithIconChild(
            label: label,
            icon: icon,
            buttonStyle: style,
@@ -31,9 +31,9 @@ class _AsyncElevatedButtonWithIcon extends AsyncElevatedButton {
        );
 }
 
-/// Copy of ElevatedButton.icon with the loading animation.
-class _ElevatedButtonWithIconChild extends StatelessWidget {
-  const _ElevatedButtonWithIconChild({
+/// Copy of TextButton.icon with the loading animation.
+class _TextButtonWithIconChild extends StatelessWidget {
+  const _TextButtonWithIconChild({
     required this.label,
     required this.icon,
     required this.buttonStyle,
@@ -58,7 +58,7 @@ class _ElevatedButtonWithIconChild extends StatelessWidget {
         ) -
         1.0;
     final gap = lerpDouble(8, 4, scale) ?? 6;
-    final elevatedButtonTheme = ElevatedButtonTheme.of(context);
+    final elevatedButtonTheme = TextButtonTheme.of(context);
     final effectiveIconAlignment =
         iconAlignment ??
         elevatedButtonTheme.style?.iconAlignment ??
