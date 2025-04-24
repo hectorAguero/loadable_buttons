@@ -107,7 +107,7 @@ void main() {
       );
 
       expect(find.text('Test Button'), findsOneWidget);
-      // Verify it's a FilledButton.tonal internally
+      // Verify it's a FilledButton.tonal internally.
       expect(find.byType(FilledButton), findsOneWidget);
     });
 
@@ -131,7 +131,7 @@ void main() {
 
       expect(find.byIcon(Icons.add), findsOneWidget);
       expect(find.text('label'), findsOneWidget);
-      // Verify it's a FilledButton.tonal internally
+      // Verify it's a FilledButton.tonal internally.
       expect(find.byType(FilledButton), findsOneWidget);
     });
 
