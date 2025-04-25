@@ -21,14 +21,14 @@ class _AsyncOutlinedButtonWithIcon extends AsyncOutlinedButton {
     super.transitionType,
     super.customBuilder,
   }) : super(
-         autofocus: autofocus ?? false,
-         child: _OutlinedButtonWithIconChild(
-           label: label,
-           icon: icon,
-           buttonStyle: style,
-           iconAlignment: iconAlignment,
-         ),
-       );
+          autofocus: autofocus ?? false,
+          child: _OutlinedButtonWithIconChild(
+            label: label,
+            icon: icon,
+            buttonStyle: style,
+            iconAlignment: iconAlignment,
+          ),
+        );
 }
 
 /// Copy of OutlinedButton.icon with the loading animation.
@@ -49,9 +49,8 @@ class _OutlinedButtonWithIconChild extends StatelessWidget {
   Widget build(BuildContext context) {
     final defaultFontSize =
         buttonStyle?.textStyle?.resolve(const <MaterialState>{})?.fontSize ??
-        14.0;
-    final scale =
-        clampDouble(
+            14.0;
+    final scale = clampDouble(
           MediaQuery.textScalerOf(context).scale(defaultFontSize) / 14.0,
           1,
           2,
@@ -59,18 +58,16 @@ class _OutlinedButtonWithIconChild extends StatelessWidget {
         1.0;
     final gap = lerpDouble(8, 4, scale) ?? 6;
     final elevatedButtonTheme = OutlinedButtonTheme.of(context);
-    final effectiveIconAlignment =
-        iconAlignment ??
+    final effectiveIconAlignment = iconAlignment ??
         elevatedButtonTheme.style?.iconAlignment ??
         buttonStyle?.iconAlignment ??
         IconAlignment.start;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
-      children:
-          effectiveIconAlignment == IconAlignment.start
-              ? <Widget>[icon, SizedBox(width: gap), Flexible(child: label)]
-              : <Widget>[Flexible(child: label), SizedBox(width: gap), icon],
+      children: effectiveIconAlignment == IconAlignment.start
+          ? <Widget>[icon, SizedBox(width: gap), Flexible(child: label)]
+          : <Widget>[Flexible(child: label), SizedBox(width: gap), icon],
     );
   }
 }

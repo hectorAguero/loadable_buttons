@@ -1,3 +1,8 @@
+## 0.2.0
+
+* Add support for AsyncIconButton
+* Add support for AsyncFloatingActionButton
+
 ## 0.1.0
 
 * Add support for AsyncFilledButton and AsyncFilledButton.icon

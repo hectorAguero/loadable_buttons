@@ -33,10 +33,10 @@ class AsyncElevatedButton extends StatefulWidget {
     this.customBuilder,
     super.key,
   }) : assert(
-         transitionType != TransitionAnimationType.customBuilder ||
-             customBuilder != null,
-         'customBuilder must be provided when transitionType is customBuilder',
-       );
+          transitionType != TransitionAnimationType.customBuilder ||
+              customBuilder != null,
+          'customBuilder must be provided when transitionType is customBuilder',
+        );
 
   /// AsyncElevatedButton.icon is a custom widget that allows to load a child
   /// and an icon.
@@ -60,7 +60,7 @@ class AsyncElevatedButton extends StatefulWidget {
     double minimumChildOpacity = 0.0,
     TransitionAnimationType transitionType = TransitionAnimationType.stack,
     Widget Function(bool loading, Widget child, Widget? loadingChild)?
-    customBuilder,
+        customBuilder,
   }) {
     if (icon == null) {
       return AsyncElevatedButton(
@@ -152,7 +152,7 @@ class AsyncElevatedButton extends StatefulWidget {
   /// The custom builder of the loading animation,
   /// when TransitionAnimationType.customBuilder is selected.
   final Widget Function(bool loading, Widget child, Widget? loadingChild)?
-  customBuilder;
+      customBuilder;
 
   @override
   State<AsyncElevatedButton> createState() => _AsyncElevatedButtonState();
@@ -188,58 +188,56 @@ class _AsyncElevatedButtonState extends State<AsyncElevatedButton> {
 
   @override
   Widget build(BuildContext context) => ElevatedButton(
-    key: widget.key,
-    onPressed: _isLoading ? null : () => _handlePressed(),
-    onLongPress: widget.onLongPress,
-    onHover: widget.onHover,
-    onFocusChange: widget.onFocusChange,
-    style: widget.style,
-    focusNode: widget.focusNode,
-    autofocus: widget.autofocus,
-    clipBehavior: widget.clipBehavior,
-    statesController: widget.statesController,
-    child: switch (widget.transitionType) {
-      TransitionAnimationType.stack => Stack(
-        alignment: Alignment.center,
-        children: [
-          AnimatedOpacity(
-            child: widget.child,
-            opacity: _isLoading ? widget.minimumChildOpacity : 1.0,
-            duration: widget.animationDuration,
-          ),
-          AnimatedOpacity(
-            child: Visibility(
-              child: _DefaultLoadingIndicator(style: widget.style),
-              visible: _isLoading,
+        key: widget.key,
+        onPressed: _isLoading ? null : () => _handlePressed(),
+        onLongPress: widget.onLongPress,
+        onHover: widget.onHover,
+        onFocusChange: widget.onFocusChange,
+        style: widget.style,
+        focusNode: widget.focusNode,
+        autofocus: widget.autofocus,
+        clipBehavior: widget.clipBehavior,
+        statesController: widget.statesController,
+        child: switch (widget.transitionType) {
+          TransitionAnimationType.stack => Stack(
+              alignment: Alignment.center,
+              children: [
+                AnimatedOpacity(
+                  child: widget.child,
+                  opacity: _isLoading ? widget.minimumChildOpacity : 1.0,
+                  duration: widget.animationDuration,
+                ),
+                AnimatedOpacity(
+                  child: Visibility(
+                    child: _DefaultLoadingIndicator(style: widget.style),
+                    visible: _isLoading,
+                  ),
+                  opacity: _isLoading ? 1.0 : 0.0,
+                  duration: widget.animationDuration,
+                ),
+              ],
             ),
-            opacity: _isLoading ? 1.0 : 0.0,
-            duration: widget.animationDuration,
-          ),
-        ],
-      ),
-      TransitionAnimationType.animatedSwitcher => AnimatedSwitcher(
-        child:
-            !_isLoading
-                ? IgnorePointer(ignoring: _isLoading, child: widget.child)
-                : widget.loadingChild ??
-                    _DefaultLoadingIndicator(style: widget.style),
-        duration: widget.animationDuration,
-      ),
-      TransitionAnimationType.customBuilder =>
-        widget.customBuilder != null
-            ? widget.customBuilder?.call(
-              _isLoading,
-              widget.child,
-              widget.loadingChild,
-            )
-            : widget.child,
-    },
-  );
+          TransitionAnimationType.animatedSwitcher => AnimatedSwitcher(
+              child: !_isLoading
+                  ? IgnorePointer(ignoring: _isLoading, child: widget.child)
+                  : widget.loadingChild ??
+                      _DefaultLoadingIndicator(style: widget.style),
+              duration: widget.animationDuration,
+            ),
+          TransitionAnimationType.customBuilder => widget.customBuilder != null
+              ? widget.customBuilder?.call(
+                  _isLoading,
+                  widget.child,
+                  widget.loadingChild,
+                )
+              : widget.child,
+        },
+      );
 }
 
 class _DefaultLoadingIndicator extends StatelessWidget {
   const _DefaultLoadingIndicator({required ButtonStyle? style})
-    : _style = style;
+      : _style = style;
 
   static const double _defaultStrokeWidth = 3.0;
 
