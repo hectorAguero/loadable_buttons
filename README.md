@@ -81,11 +81,7 @@ AsyncElevatedButton(
   onPressed: () async => await yourAsyncFunction(),
   child: const Text('Custom Transition'),
   loadingChild: const Text('Loading...'),
-  customBuilder: ({
-    required bool loading,
-    required Widget child,
-    Widget? loadingChild,
-  }) {
+  customBuilder: (bool loading, Widget child, Widget? loadingChild) {
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 500),
       curve: Curves.easeInOut,
