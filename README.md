@@ -11,6 +11,8 @@ A Flutter package that provides enhanced buttons with built-in loading states an
   - FilledButton -> AsyncFilledButton
   - TextButton -> AsyncTextButton
   - OutlinedButton -> AsyncOutlinedButton
+  - IconButton -> AsyncIconButton
+  - FloatingActionButton -> AsyncFloatingActionButton
 - ⚡ Async callback support
 - 🎨 Multiple transition animations
 - 🎯 Icon support with customizable alignment
