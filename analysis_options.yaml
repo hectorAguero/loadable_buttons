@@ -20,5 +20,6 @@ dart_code_linter:
         allow-initialized: true
     - avoid-non-null-assertion:
         skip-checked-fields: true
+    - no-object-declaration: false
   metrics-exclude:
     - test/**

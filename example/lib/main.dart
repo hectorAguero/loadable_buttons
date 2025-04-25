@@ -21,30 +21,40 @@ class MyApp extends StatelessWidget {
           dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
         ),
       ),
-      home: const HomePage(),
+      home: const _HomePage(),
     );
   }
 }
 
 /// HomePage is a StatefulWidget that represents the main application page.
-class HomePage extends StatefulWidget {
+class _HomePage extends StatefulWidget {
   /// Creates a HomePage widget.
-  const HomePage({super.key});
+  const _HomePage();
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<_HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<_HomePage> {
   var transitionType = TransitionAnimationType.stack;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _switchTransitionAnimationType,
-        label: Text(transitionType.name.capitalize()),
-        icon: Icon(Icons.animation),
+      floatingActionButton: Row(
+        mainAxisSize: MainAxisSize.min,
+        spacing: 8,
+        children: [
+          AsyncFloatingActionButton(
+            onPressed: () => Future.delayed(const Duration(seconds: 2)),
+            child: Text('Click me', textAlign: TextAlign.center),
+          ),
+          AsyncFloatingActionButton.extended(
+            onPressed: _switchTransitionAnimationType,
+            label: Text(transitionType.name.capitalize()),
+            icon: Icon(Icons.animation),
+          ),
+        ],
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -54,7 +64,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               Text(
                 "AsyncElevatedButton",
-                style: Theme.of(context).textTheme.titleLarge,
+                style: TextTheme.of(context).titleLarge,
               ),
               Wrap(
                 spacing: 8,
@@ -65,7 +75,7 @@ class _HomePageState extends State<HomePage> {
                     transitionType: transitionType,
                     child: Text('Click me'),
                     onPressed: () async {
-                      await Future.delayed(const Duration(seconds: 2));
+                      await Future<void>.delayed(const Duration(seconds: 2));
                     },
                   ),
                   AsyncElevatedButton.icon(
@@ -73,14 +83,14 @@ class _HomePageState extends State<HomePage> {
                     label: Text('Click me'),
                     icon: Icon(Icons.add),
                     onPressed: () async {
-                      await Future.delayed(const Duration(seconds: 2));
+                      await Future<void>.delayed(const Duration(seconds: 2));
                     },
                   ),
                 ],
               ),
               Text(
                 "AsyncFilledButton",
-                style: Theme.of(context).textTheme.titleLarge,
+                style: TextTheme.of(context).titleLarge,
               ),
               Wrap(
                 spacing: 8,
@@ -91,7 +101,7 @@ class _HomePageState extends State<HomePage> {
                     transitionType: transitionType,
                     child: Text('Click me'),
                     onPressed: () async {
-                      await Future.delayed(const Duration(seconds: 2));
+                      await Future<void>.delayed(const Duration(seconds: 2));
                     },
                   ),
                   AsyncFilledButton.icon(
@@ -99,14 +109,14 @@ class _HomePageState extends State<HomePage> {
                     label: Text('Click me'),
                     icon: Icon(Icons.add),
                     onPressed: () async {
-                      await Future.delayed(const Duration(seconds: 2));
+                      await Future<void>.delayed(const Duration(seconds: 2));
                     },
                   ),
                   AsyncFilledButton.tonal(
                     transitionType: transitionType,
                     child: Text('Click me'),
                     onPressed: () async {
-                      await Future.delayed(const Duration(seconds: 2));
+                      await Future<void>.delayed(const Duration(seconds: 2));
                     },
                   ),
                   AsyncFilledButton.tonalIcon(
@@ -114,14 +124,14 @@ class _HomePageState extends State<HomePage> {
                     label: Text('Click me'),
                     icon: Icon(Icons.add),
                     onPressed: () async {
-                      await Future.delayed(const Duration(seconds: 2));
+                      await Future<void>.delayed(const Duration(seconds: 2));
                     },
                   ),
                 ],
               ),
               Text(
                 "AsyncTextButton",
-                style: Theme.of(context).textTheme.titleLarge,
+                style: TextTheme.of(context).titleLarge,
               ),
               Wrap(
                 spacing: 8,
@@ -132,7 +142,7 @@ class _HomePageState extends State<HomePage> {
                     transitionType: transitionType,
                     child: Text('Click me'),
                     onPressed: () async {
-                      await Future.delayed(const Duration(seconds: 2));
+                      await Future<void>.delayed(const Duration(seconds: 2));
                     },
                   ),
                   AsyncTextButton.icon(
@@ -140,14 +150,14 @@ class _HomePageState extends State<HomePage> {
                     label: Text('Click me'),
                     icon: Icon(Icons.add),
                     onPressed: () async {
-                      await Future.delayed(const Duration(seconds: 2));
+                      await Future<void>.delayed(const Duration(seconds: 2));
                     },
                   ),
                 ],
               ),
               Text(
                 "AsyncOutlinedButton",
-                style: Theme.of(context).textTheme.titleLarge,
+                style: TextTheme.of(context).titleLarge,
               ),
               Wrap(
                 spacing: 8,
@@ -158,7 +168,7 @@ class _HomePageState extends State<HomePage> {
                     transitionType: transitionType,
                     child: Text('Click me'),
                     onPressed: () async {
-                      await Future.delayed(const Duration(seconds: 2));
+                      await Future<void>.delayed(const Duration(seconds: 2));
                     },
                   ),
                   AsyncOutlinedButton.icon(
@@ -166,7 +176,46 @@ class _HomePageState extends State<HomePage> {
                     label: Text('Click me'),
                     icon: Icon(Icons.add),
                     onPressed: () async {
-                      await Future.delayed(const Duration(seconds: 2));
+                      await Future<void>.delayed(const Duration(seconds: 2));
+                    },
+                  ),
+                ],
+              ),
+              Text(
+                "AsyncIconButton",
+                style: TextTheme.of(context).titleLarge,
+              ),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                alignment: WrapAlignment.center,
+                children: [
+                  AsyncIconButton(
+                    transitionType: transitionType,
+                    icon: Icon(Icons.ads_click),
+                    onPressed: () async {
+                      await Future<void>.delayed(const Duration(seconds: 2));
+                    },
+                  ),
+                  AsyncIconButton.filled(
+                    transitionType: transitionType,
+                    icon: Icon(Icons.abc),
+                    onPressed: () async {
+                      await Future<void>.delayed(const Duration(seconds: 2));
+                    },
+                  ),
+                  AsyncIconButton.filledTonal(
+                    transitionType: transitionType,
+                    icon: Icon(Icons.abc),
+                    onPressed: () async {
+                      await Future<void>.delayed(const Duration(seconds: 2));
+                    },
+                  ),
+                  AsyncIconButton.outlined(
+                    transitionType: transitionType,
+                    icon: Icon(Icons.abc),
+                    onPressed: () async {
+                      await Future<void>.delayed(const Duration(seconds: 2));
                     },
                   ),
                 ],

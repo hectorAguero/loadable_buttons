@@ -110,3 +110,9 @@ AsyncElevatedButton(
 | `transitionType` | `TransitionAnimationType` | Type of loading animation |
 | `animationDuration` | `Duration` | Duration of the loading animation |
 | `minimumChildOpacity` | `double` | Minimum opacity of child during loading |
+
+## Compatibility Note
+
+This package is designed and tested for the latest Flutter stable version. Due to limitations in older Flutter versions regarding parameter handling, using this package with older versions might lead to unexpected behavior or limitations. Alternatively, since the package is MIT licensed, you can copy the relevant code into your project and adapt it for older versions.
+
+
