@@ -5,7 +5,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'transition_animation_type.dart';
+import 'package:loadable_buttons/src/transition_animation_type.dart';
 
 enum _IconButtonVariant { standard, filled, filledTonal, outlined }
 
@@ -53,6 +53,7 @@ class AsyncIconButton extends StatefulWidget {
         ),
         _variant = _IconButtonVariant.standard;
 
+  /// Constructor for AsyncIconButton with filled variant.
   const AsyncIconButton.filled({
     required this.icon,
     required this.onPressed,
@@ -93,6 +94,7 @@ class AsyncIconButton extends StatefulWidget {
         ),
         _variant = _IconButtonVariant.filled;
 
+  /// Constructor for AsyncIconButton with filled tonal variant.
   const AsyncIconButton.filledTonal({
     required this.icon,
     required this.onPressed,
@@ -134,6 +136,7 @@ class AsyncIconButton extends StatefulWidget {
         assert(splashRadius == null || splashRadius > 0),
         _variant = _IconButtonVariant.filledTonal;
 
+  /// Constructor for AsyncIconButton with outlined variant.
   const AsyncIconButton.outlined({
     required this.icon,
     required this.onPressed,
@@ -321,7 +324,7 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
             highlightColor: widget.highlightColor,
             splashColor: widget.splashColor,
             disabledColor: widget.disabledColor,
-            onPressed: _isLoading ? null : () => _handlePressed(),
+            onPressed: _isLoading ? null : _handlePressed,
             onHover: widget.onHover,
             onLongPress: widget.onLongPress,
             mouseCursor: widget.mouseCursor,
@@ -355,7 +358,7 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
             highlightColor: widget.highlightColor,
             splashColor: widget.splashColor,
             disabledColor: widget.disabledColor,
-            onPressed: _isLoading ? null : () => _handlePressed(),
+            onPressed: _isLoading ? null : _handlePressed,
             onHover: widget.onHover,
             onLongPress: widget.onLongPress,
             mouseCursor: widget.mouseCursor,
@@ -389,7 +392,7 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
             highlightColor: widget.highlightColor,
             splashColor: widget.splashColor,
             disabledColor: widget.disabledColor,
-            onPressed: _isLoading ? null : () => _handlePressed(),
+            onPressed: _isLoading ? null : _handlePressed,
             onHover: widget.onHover,
             onLongPress: widget.onLongPress,
             mouseCursor: widget.mouseCursor,
@@ -423,7 +426,7 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
             highlightColor: widget.highlightColor,
             splashColor: widget.splashColor,
             disabledColor: widget.disabledColor,
-            onPressed: _isLoading ? null : () => _handlePressed(),
+            onPressed: _isLoading ? null : _handlePressed,
             onHover: widget.onHover,
             onLongPress: widget.onLongPress,
             mouseCursor: widget.mouseCursor,
@@ -450,12 +453,12 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
 class _AsyncIconButtonChild extends StatelessWidget {
   const _AsyncIconButtonChild({
     required this.icon,
-    this.loadingChild,
-    this.style,
     required this.isLoading,
     required this.transitionType,
     required this.animationDuration,
     required this.minimumChildOpacity,
+    this.loadingChild,
+    this.style,
     this.customBuilder,
   });
 
@@ -476,25 +479,25 @@ class _AsyncIconButtonChild extends StatelessWidget {
           alignment: Alignment.center,
           children: [
             AnimatedOpacity(
-              child: icon,
               opacity: isLoading ? minimumChildOpacity : 1.0,
               duration: animationDuration,
+              child: icon,
             ),
             AnimatedOpacity(
-              child: Visibility(
-                child: _DefaultLoadingIndicator(style: style),
-                visible: isLoading,
-              ),
               opacity: isLoading ? 1.0 : 0.0,
               duration: animationDuration,
+              child: Visibility(
+                visible: isLoading,
+                child: _DefaultLoadingIndicator(style: style),
+              ),
             ),
           ],
         ),
       TransitionAnimationType.animatedSwitcher => AnimatedSwitcher(
+          duration: animationDuration,
           child: !isLoading
               ? IgnorePointer(ignoring: isLoading, child: icon)
               : loadingChild ?? _DefaultLoadingIndicator(style: style),
-          duration: animationDuration,
         ),
       TransitionAnimationType.customBuilder => customBuilder != null
           ? customBuilder?.call(isLoading, icon, loadingChild) ?? icon

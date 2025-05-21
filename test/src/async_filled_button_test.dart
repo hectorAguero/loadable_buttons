@@ -59,12 +59,12 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: AsyncFilledButton(
-            child: const Text('Test Button'),
             onPressed: () {
               log('Button pressed');
             },
             loadingChild: const CircularProgressIndicator(),
             transitionType: TransitionAnimationType.animatedSwitcher,
+            child: const Text('Test Button'),
           ),
         ),
       );
@@ -139,7 +139,6 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: AsyncFilledButton(
-            child: const Text('Test Button'),
             onPressed: () {
               log('Button pressed');
             },
@@ -149,6 +148,7 @@ void main() {
                   ? (loadingChild ?? const CircularProgressIndicator())
                   : child;
             },
+            child: const Text('Test Button'),
           ),
         ),
       );
@@ -162,11 +162,11 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: AsyncFilledButton(
-            child: const Text('Test Button'),
             onPressed: () {
               wasPressed = true;
             },
             loading: true,
+            child: const Text('Test Button'),
           ),
         ),
       );

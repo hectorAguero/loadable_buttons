@@ -6,7 +6,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-import 'transition_animation_type.dart';
+import 'package:loadable_buttons/src/transition_animation_type.dart';
 
 part 'async_text_button_with_icon.dart';
 
@@ -64,7 +64,6 @@ class AsyncTextButton extends StatefulWidget {
   }) {
     if (icon == null) {
       return AsyncTextButton(
-        child: label,
         onPressed: onPressed,
         loadingChild: loadingChild,
         loading: loading,
@@ -81,6 +80,7 @@ class AsyncTextButton extends StatefulWidget {
         transitionType: transitionType,
         customBuilder: customBuilder,
         key: key,
+        child: label,
       );
     }
 
@@ -161,6 +161,15 @@ class AsyncTextButton extends StatefulWidget {
 class _AsyncTextButtonState extends State<AsyncTextButton> {
   late bool _isLoading = widget.loading;
 
+  @override
+  void didUpdateWidget(covariant AsyncTextButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // If the loading state changes, update the state.
+    if (oldWidget.loading != widget.loading) {
+      _isLoading = widget.loading;
+    }
+  }
+
   Future<void> _handlePressed() async {
     // If the async callback is provided, use it.
     if (widget.onPressed != null) {
@@ -178,18 +187,9 @@ class _AsyncTextButtonState extends State<AsyncTextButton> {
   }
 
   @override
-  void didUpdateWidget(covariant AsyncTextButton oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // If the loading state changes, update the state.
-    if (oldWidget.loading != widget.loading) {
-      _isLoading = widget.loading;
-    }
-  }
-
-  @override
   Widget build(BuildContext context) => TextButton(
         key: widget.key,
-        onPressed: _isLoading ? null : () => _handlePressed(),
+        onPressed: _isLoading ? null : _handlePressed,
         onLongPress: widget.onLongPress,
         onHover: widget.onHover,
         onFocusChange: widget.onFocusChange,
@@ -203,26 +203,26 @@ class _AsyncTextButtonState extends State<AsyncTextButton> {
               alignment: Alignment.center,
               children: [
                 AnimatedOpacity(
-                  child: widget.child,
                   opacity: _isLoading ? widget.minimumChildOpacity : 1.0,
                   duration: widget.animationDuration,
+                  child: widget.child,
                 ),
                 AnimatedOpacity(
-                  child: Visibility(
-                    child: _DefaultLoadingIndicator(style: widget.style),
-                    visible: _isLoading,
-                  ),
                   opacity: _isLoading ? 1.0 : 0.0,
                   duration: widget.animationDuration,
+                  child: Visibility(
+                    visible: _isLoading,
+                    child: _DefaultLoadingIndicator(style: widget.style),
+                  ),
                 ),
               ],
             ),
           TransitionAnimationType.animatedSwitcher => AnimatedSwitcher(
+              duration: widget.animationDuration,
               child: !_isLoading
                   ? IgnorePointer(ignoring: _isLoading, child: widget.child)
                   : widget.loadingChild ??
                       _DefaultLoadingIndicator(style: widget.style),
-              duration: widget.animationDuration,
             ),
           TransitionAnimationType.customBuilder => widget.customBuilder != null
               ? widget.customBuilder?.call(

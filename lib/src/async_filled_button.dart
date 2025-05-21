@@ -5,8 +5,12 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:loadable_buttons/loadable_buttons.dart'
+    show AsyncOutlinedButton;
+import 'package:loadable_buttons/src/async_outlined_button.dart'
+    show AsyncOutlinedButton;
 
-import 'transition_animation_type.dart';
+import 'package:loadable_buttons/src/transition_animation_type.dart';
 
 part 'async_filled_button_with_icon.dart';
 
@@ -74,7 +78,7 @@ class AsyncFilledButton extends StatefulWidget {
   }) {
     if (icon == null) {
       return AsyncFilledButton(
-        child: label,
+        key: key,
         onPressed: onPressed,
         loadingChild: loadingChild,
         loading: loading,
@@ -90,7 +94,7 @@ class AsyncFilledButton extends StatefulWidget {
         minimumChildOpacity: minimumChildOpacity,
         transitionType: transitionType,
         customBuilder: customBuilder,
-        key: key,
+        child: label,
       );
     }
 
@@ -174,7 +178,6 @@ class AsyncFilledButton extends StatefulWidget {
   }) {
     if (icon == null) {
       return AsyncFilledButton.tonal(
-        child: label,
         onPressed: onPressed,
         loadingChild: loadingChild,
         loading: loading,
@@ -191,6 +194,7 @@ class AsyncFilledButton extends StatefulWidget {
         transitionType: transitionType,
         customBuilder: customBuilder,
         key: key,
+        child: label,
       );
     }
 
@@ -309,10 +313,10 @@ class _AsyncFilledButtonState extends State<AsyncFilledButton> {
       widget.child,
       widget.loadingChild,
     );
-    if (widget._variant == _AsyncFilledButtonVariant.tonal)
+    if (widget._variant == _AsyncFilledButtonVariant.tonal) {
       return FilledButton.tonal(
         key: widget.key,
-        onPressed: _isLoading ? null : () => _handlePressed(),
+        onPressed: _isLoading ? null : _handlePressed,
         onLongPress: widget.onLongPress,
         onHover: widget.onHover,
         onFocusChange: widget.onFocusChange,
@@ -326,36 +330,37 @@ class _AsyncFilledButtonState extends State<AsyncFilledButton> {
               alignment: Alignment.center,
               children: [
                 AnimatedOpacity(
-                  child: widget.child,
                   opacity: _isLoading ? widget.minimumChildOpacity : 1.0,
                   duration: widget.animationDuration,
+                  child: widget.child,
                 ),
                 AnimatedOpacity(
-                  child: Visibility(
-                    child: _DefaultLoadingIndicator(style: widget.style),
-                    visible: _isLoading,
-                  ),
                   opacity: _isLoading ? 1.0 : 0.0,
                   duration: widget.animationDuration,
+                  child: Visibility(
+                    visible: _isLoading,
+                    child: _DefaultLoadingIndicator(style: widget.style),
+                  ),
                 ),
               ],
             ),
           TransitionAnimationType.animatedSwitcher => AnimatedSwitcher(
+              duration: widget.animationDuration,
               child: !_isLoading
                   ? IgnorePointer(ignoring: _isLoading, child: widget.child)
                   : widget.loadingChild ??
                       _DefaultLoadingIndicator(style: widget.style),
-              duration: widget.animationDuration,
             ),
           TransitionAnimationType.customBuilder => widget.customBuilder != null
               ? customBuilder ?? widget.child
               : widget.child,
         },
       );
+    }
 
     return FilledButton(
       key: widget.key,
-      onPressed: _isLoading ? null : () => _handlePressed(),
+      onPressed: _isLoading ? null : _handlePressed,
       onLongPress: widget.onLongPress,
       onHover: widget.onHover,
       onFocusChange: widget.onFocusChange,
@@ -369,26 +374,26 @@ class _AsyncFilledButtonState extends State<AsyncFilledButton> {
             alignment: Alignment.center,
             children: [
               AnimatedOpacity(
-                child: widget.child,
                 opacity: _isLoading ? widget.minimumChildOpacity : 1.0,
                 duration: widget.animationDuration,
+                child: widget.child,
               ),
               AnimatedOpacity(
-                child: Visibility(
-                  child: _DefaultLoadingIndicator(style: widget.style),
-                  visible: _isLoading,
-                ),
                 opacity: _isLoading ? 1.0 : 0.0,
                 duration: widget.animationDuration,
+                child: Visibility(
+                  visible: _isLoading,
+                  child: _DefaultLoadingIndicator(style: widget.style),
+                ),
               ),
             ],
           ),
         TransitionAnimationType.animatedSwitcher => AnimatedSwitcher(
+            duration: widget.animationDuration,
             child: !_isLoading
                 ? IgnorePointer(ignoring: _isLoading, child: widget.child)
                 : widget.loadingChild ??
                     _DefaultLoadingIndicator(style: widget.style),
-            duration: widget.animationDuration,
           ),
         TransitionAnimationType.customBuilder => widget.customBuilder != null
             ? customBuilder ?? widget.child

@@ -5,12 +5,12 @@ part of 'async_filled_button.dart';
 
 class _AsyncFilledButtonWithIcon extends AsyncFilledButton {
   _AsyncFilledButtonWithIcon({
-    super.key,
     required Widget label,
     required Widget icon,
     required super.onPressed,
     required super.loading,
     required super.loadingChild,
+    super.key,
     super.style,
     IconAlignment? iconAlignment,
     bool? autofocus,
@@ -31,8 +31,10 @@ class _AsyncFilledButtonWithIcon extends AsyncFilledButton {
         );
 
   _AsyncFilledButtonWithIcon.tonal({
-    super.key,
     required super.onPressed,
+    required Widget icon,
+    required Widget label,
+    super.key,
     super.onLongPress,
     super.onHover,
     super.onFocusChange,
@@ -41,8 +43,6 @@ class _AsyncFilledButtonWithIcon extends AsyncFilledButton {
     bool? autofocus,
     super.clipBehavior,
     super.statesController,
-    required Widget icon,
-    required Widget label,
     IconAlignment? iconAlignment,
     super.loading,
     super.loadingChild,

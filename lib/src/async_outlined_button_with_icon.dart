@@ -5,12 +5,12 @@ part of 'async_outlined_button.dart';
 
 class _AsyncOutlinedButtonWithIcon extends AsyncOutlinedButton {
   _AsyncOutlinedButtonWithIcon({
-    super.key,
     required Widget label,
     required Widget icon,
     required super.onPressed,
     required super.loading,
     required super.loadingChild,
+    super.key,
     super.style,
     IconAlignment? iconAlignment,
     bool? autofocus,

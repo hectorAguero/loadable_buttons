@@ -68,7 +68,6 @@ void main() {
             loadingChild: const CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
             ),
-            transitionType: TransitionAnimationType.stack,
           ),
         ),
       );
@@ -120,8 +119,9 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsNothing);
     });
 
-    // These variants are internal and not exposed via constructors in the provided code.
-    // Need to either expose them or use a different testing strategy if they are meant to be used.
+    // These variants are internal and not exposed via constructors in the code.
+    // Need to either expose them
+    // or use a different testing strategy if they are meant to be used.
 
     testWidgets('custom builder works correctly', (tester) async {
       await tester.pumpWidget(
@@ -132,7 +132,7 @@ void main() {
               await Future<void>.delayed(const Duration(milliseconds: 100));
             },
             transitionType: TransitionAnimationType.customBuilder,
-            customBuilder: (bool loading, Widget icon, Widget? loadingChild) {
+            customBuilder: (bool loading, Widget icon, Widget? _) {
               return loading ? const Text('Loading...') : icon;
             },
           ),
@@ -221,21 +221,22 @@ void main() {
       expect(find.byTooltip('Add Item'), findsOneWidget);
     });
 
-    // Note: IconButton itself doesn't visually change with isSelected like ToggleButtons.
+    // Note: IconButton itself doesn't visually change
+    // with isSelected like ToggleButtons.
     // This test verifies the property can be passed.
     testWidgets('isSelected property is handled', (tester) async {
       bool selected = false;
-      final selectedIcon = Icon(Icons.check);
+      const selectedIcon = Icon(Icons.check);
 
       await tester.pumpWidget(
         MaterialApp(
           home: StatefulBuilder(
-            builder: (context, setState) {
+            builder: (_, setState) {
               return AsyncIconButton(
                 icon: const Icon(Icons.add),
                 onPressed: () => setState(() => selected = !selected),
                 isSelected: WidgetStateProperty.resolveWith<bool>(
-                  (states) => selected,
+                  (_) => selected,
                 ),
                 selectedIcon: selectedIcon,
               );
@@ -263,7 +264,7 @@ void main() {
 
       // This test mainly confirms the properties exist and don't crash.
       // Visual confirmation of selection state might need specific style checks
-      // or testing the variants (filled, tonal, outlined) if they behave differently.
+      // or testing variants (filled, tonal, outlined) if they behave different.
     });
   });
 }

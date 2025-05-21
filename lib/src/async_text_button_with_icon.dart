@@ -5,12 +5,12 @@ part of 'async_text_button.dart';
 
 class _AsyncTextButtonWithIcon extends AsyncTextButton {
   _AsyncTextButtonWithIcon({
-    super.key,
     required Widget label,
     required Widget icon,
     required super.onPressed,
     required super.loading,
     required super.loadingChild,
+    super.key,
     super.style,
     IconAlignment? iconAlignment,
     bool? autofocus,

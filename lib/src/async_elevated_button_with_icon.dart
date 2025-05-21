@@ -5,12 +5,12 @@ part of 'async_elevated_button.dart';
 
 class _AsyncElevatedButtonWithIcon extends AsyncElevatedButton {
   _AsyncElevatedButtonWithIcon({
-    super.key,
     required Widget label,
     required Widget icon,
     required super.onPressed,
     required super.loading,
     required super.loadingChild,
+    super.key,
     super.style,
     IconAlignment? iconAlignment,
     bool? autofocus,

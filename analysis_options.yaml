@@ -1,25 +1,27 @@
-# include: package:very_good_analysis/analysis_options.yaml
+include: package:solid_lints/analysis_options.yaml
+
 analyzer:
   language:
     strict-inference: true
     strict-raw-types: true
-  plugins:
-    - dart_code_linter
 
-dart_code_linter:
-  extends:
-    - package:dart_code_linter/presets/all.yaml
-  metrics:
-    cyclomatic-complexity: 20
-    number-of-parameters: 4
-    maximum-nesting-level: 5
+
+custom_lint:
   rules:
-    - prefer-single-widget-per-file:
-        ignore-private-widgets: true
-    - avoid-late-keyword:
-        allow-initialized: true
-    - avoid-non-null-assertion:
-        skip-checked-fields: true
-    - no-object-declaration: false
-  metrics-exclude:
-    - test/**
+    - member_ordering:
+      order:
+        - fields
+        - getters_setters
+        - constructors
+        - methods
+      widgets_order:
+        - init_state_method
+        - did_change_dependencies_method
+        - did_update_widget_method
+        - deactivate_method
+        - dispose_method
+        - build_method
+
+linter:
+  rules:
+    avoid_positional_boolean_parameters: false
