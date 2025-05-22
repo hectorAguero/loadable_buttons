@@ -5,12 +5,12 @@ part of 'async_filled_button.dart';
 
 class _AsyncFilledButtonWithIcon extends AsyncFilledButton {
   _AsyncFilledButtonWithIcon({
-    super.key,
     required Widget label,
     required Widget icon,
     required super.onPressed,
     required super.loading,
     required super.loadingChild,
+    super.key,
     super.style,
     IconAlignment? iconAlignment,
     bool? autofocus,
@@ -20,19 +20,22 @@ class _AsyncFilledButtonWithIcon extends AsyncFilledButton {
     super.minimumChildOpacity,
     super.transitionType,
     super.customBuilder,
+    super.splashFactory,
   }) : super(
-         autofocus: autofocus ?? false,
-         child: _FilledButtonWithIconChild(
-           label: label,
-           icon: icon,
-           buttonStyle: style,
-           iconAlignment: iconAlignment,
-         ),
-       );
+          autofocus: autofocus ?? false,
+          child: _FilledButtonWithIconChild(
+            label: label,
+            icon: icon,
+            buttonStyle: style,
+            iconAlignment: iconAlignment,
+          ),
+        );
 
   _AsyncFilledButtonWithIcon.tonal({
-    super.key,
     required super.onPressed,
+    required Widget icon,
+    required Widget label,
+    super.key,
     super.onLongPress,
     super.onHover,
     super.onFocusChange,
@@ -41,8 +44,6 @@ class _AsyncFilledButtonWithIcon extends AsyncFilledButton {
     bool? autofocus,
     super.clipBehavior,
     super.statesController,
-    required Widget icon,
-    required Widget label,
     IconAlignment? iconAlignment,
     super.loading,
     super.loadingChild,
@@ -50,15 +51,16 @@ class _AsyncFilledButtonWithIcon extends AsyncFilledButton {
     super.minimumChildOpacity,
     super.transitionType,
     super.customBuilder,
+    super.splashFactory,
   }) : super.tonal(
-         autofocus: autofocus ?? false,
-         child: _FilledButtonWithIconChild(
-           label: label,
-           icon: icon,
-           buttonStyle: style,
-           iconAlignment: iconAlignment,
-         ),
-       );
+          autofocus: autofocus ?? false,
+          child: _FilledButtonWithIconChild(
+            label: label,
+            icon: icon,
+            buttonStyle: style,
+            iconAlignment: iconAlignment,
+          ),
+        );
 }
 
 /// Copy of FilledButton.icon with the loading animation.
@@ -79,9 +81,8 @@ class _FilledButtonWithIconChild extends StatelessWidget {
   Widget build(BuildContext context) {
     final defaultFontSize =
         buttonStyle?.textStyle?.resolve(const <MaterialState>{})?.fontSize ??
-        14.0;
-    final scale =
-        clampDouble(
+            14.0;
+    final scale = clampDouble(
           MediaQuery.textScalerOf(context).scale(defaultFontSize) / 14.0,
           1,
           2,
@@ -89,18 +90,16 @@ class _FilledButtonWithIconChild extends StatelessWidget {
         1.0;
     final gap = lerpDouble(8, 4, scale) ?? 6;
     final elevatedButtonTheme = FilledButtonTheme.of(context);
-    final effectiveIconAlignment =
-        iconAlignment ??
+    final effectiveIconAlignment = iconAlignment ??
         elevatedButtonTheme.style?.iconAlignment ??
         buttonStyle?.iconAlignment ??
         IconAlignment.start;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
-      children:
-          effectiveIconAlignment == IconAlignment.start
-              ? <Widget>[icon, SizedBox(width: gap), Flexible(child: label)]
-              : <Widget>[Flexible(child: label), SizedBox(width: gap), icon],
+      children: effectiveIconAlignment == IconAlignment.start
+          ? <Widget>[icon, SizedBox(width: gap), Flexible(child: label)]
+          : <Widget>[Flexible(child: label), SizedBox(width: gap), icon],
     );
   }
 }

@@ -5,8 +5,12 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:loadable_buttons/loadable_buttons.dart'
+    show AsyncOutlinedButton;
+import 'package:loadable_buttons/src/async_outlined_button.dart'
+    show AsyncOutlinedButton;
 
-import 'transition_animation_type.dart';
+import 'package:loadable_buttons/src/transition_animation_type.dart';
 
 part 'async_filled_button_with_icon.dart';
 
@@ -33,13 +37,18 @@ class AsyncFilledButton extends StatefulWidget {
     this.minimumChildOpacity = 0.0,
     this.transitionType = TransitionAnimationType.stack,
     this.customBuilder,
+    this.splashFactory,
     super.key,
-  }) : _variant = _AsyncFilledButtonVariant.filled,
-       assert(
-         transitionType != TransitionAnimationType.customBuilder ||
-             customBuilder != null,
-         'customBuilder must be provided when transitionType is customBuilder',
-       );
+  })  : _variant = _AsyncFilledButtonVariant.filled,
+        assert(
+          transitionType != TransitionAnimationType.customBuilder ||
+              customBuilder != null,
+          'customBuilder must be provided when transitionType is customBuilder',
+        ),
+        assert(
+          splashFactory == null || style == null,
+          'splashFactory and style cannot be used together, use style',
+        );
 
   /// Create a filled button from [icon] and [label].
   ///
@@ -70,11 +79,12 @@ class AsyncFilledButton extends StatefulWidget {
     double minimumChildOpacity = 0.0,
     TransitionAnimationType transitionType = TransitionAnimationType.stack,
     Widget Function(bool loading, Widget child, Widget? loadingChild)?
-    customBuilder,
+        customBuilder,
+    InteractiveInkFeatureFactory? splashFactory,
   }) {
     if (icon == null) {
       return AsyncFilledButton(
-        child: label,
+        key: key,
         onPressed: onPressed,
         loadingChild: loadingChild,
         loading: loading,
@@ -90,7 +100,8 @@ class AsyncFilledButton extends StatefulWidget {
         minimumChildOpacity: minimumChildOpacity,
         transitionType: transitionType,
         customBuilder: customBuilder,
-        key: key,
+        splashFactory: splashFactory,
+        child: label,
       );
     }
 
@@ -110,6 +121,7 @@ class AsyncFilledButton extends StatefulWidget {
       minimumChildOpacity: minimumChildOpacity,
       transitionType: transitionType,
       customBuilder: customBuilder,
+      splashFactory: splashFactory,
     );
   }
 
@@ -136,13 +148,14 @@ class AsyncFilledButton extends StatefulWidget {
     this.minimumChildOpacity = 0.0,
     this.transitionType = TransitionAnimationType.stack,
     this.customBuilder,
+    this.splashFactory,
     super.key,
-  }) : _variant = _AsyncFilledButtonVariant.tonal,
-       assert(
-         transitionType != TransitionAnimationType.customBuilder ||
-             customBuilder != null,
-         'customBuilder must be provided when transitionType is customBuilder',
-       );
+  })  : _variant = _AsyncFilledButtonVariant.tonal,
+        assert(
+          transitionType != TransitionAnimationType.customBuilder ||
+              customBuilder != null,
+          'customBuilder must be provided when transitionType is customBuilder',
+        );
 
   /// Create a filled tonal button from [icon] and [label].
   ///
@@ -170,11 +183,12 @@ class AsyncFilledButton extends StatefulWidget {
     double minimumChildOpacity = 0.0,
     TransitionAnimationType transitionType = TransitionAnimationType.stack,
     Widget Function(bool loading, Widget child, Widget? loadingChild)?
-    customBuilder,
+        customBuilder,
+    InteractiveInkFeatureFactory? splashFactory,
   }) {
     if (icon == null) {
       return AsyncFilledButton.tonal(
-        child: label,
+        key: key,
         onPressed: onPressed,
         loadingChild: loadingChild,
         loading: loading,
@@ -190,7 +204,8 @@ class AsyncFilledButton extends StatefulWidget {
         minimumChildOpacity: minimumChildOpacity,
         transitionType: transitionType,
         customBuilder: customBuilder,
-        key: key,
+        splashFactory: splashFactory,
+        child: label,
       );
     }
 
@@ -214,6 +229,7 @@ class AsyncFilledButton extends StatefulWidget {
       minimumChildOpacity: minimumChildOpacity,
       transitionType: transitionType,
       customBuilder: customBuilder,
+      splashFactory: splashFactory,
     );
   }
 
@@ -266,7 +282,12 @@ class AsyncFilledButton extends StatefulWidget {
   /// The custom builder of the loading animation,
   /// when TransitionAnimationType.customBuilder is selected.
   final Widget Function(bool loading, Widget child, Widget? loadingChild)?
-  customBuilder;
+      customBuilder;
+
+  /// Optional SplashFactory to customize the splash effect.
+  /// Use NoSplash.splashFactory to disable flutter default splash effect.
+  /// It won't be used if the style property is set.
+  final InteractiveInkFeatureFactory? splashFactory;
 
   final _AsyncFilledButtonVariant _variant;
 
@@ -304,107 +325,69 @@ class _AsyncFilledButtonState extends State<AsyncFilledButton> {
 
   @override
   Widget build(BuildContext context) {
-    final customBuilder = widget.customBuilder?.call(
-      _isLoading,
-      widget.child,
-      widget.loadingChild,
-    );
-    if (widget._variant == _AsyncFilledButtonVariant.tonal)
+    if (widget._variant == _AsyncFilledButtonVariant.tonal) {
       return FilledButton.tonal(
         key: widget.key,
-        onPressed: _isLoading ? null : () => _handlePressed(),
+        onPressed: _isLoading ? null : _handlePressed,
         onLongPress: widget.onLongPress,
         onHover: widget.onHover,
         onFocusChange: widget.onFocusChange,
-        style: widget.style,
+        style: widget.style ??
+            FilledButton.styleFrom(splashFactory: widget.splashFactory),
         focusNode: widget.focusNode,
         autofocus: widget.autofocus,
         clipBehavior: widget.clipBehavior,
         statesController: widget.statesController,
-        child: switch (widget.transitionType) {
-          TransitionAnimationType.stack => Stack(
-            alignment: Alignment.center,
-            children: [
-              AnimatedOpacity(
-                child: widget.child,
-                opacity: _isLoading ? widget.minimumChildOpacity : 1.0,
-                duration: widget.animationDuration,
-              ),
-              AnimatedOpacity(
-                child: Visibility(
-                  child: _DefaultLoadingIndicator(style: widget.style),
-                  visible: _isLoading,
-                ),
-                opacity: _isLoading ? 1.0 : 0.0,
-                duration: widget.animationDuration,
-              ),
-            ],
+        child: _ChildContent(
+          customBuilder: widget.customBuilder?.call(
+            _isLoading,
+            widget.child,
+            widget.loadingChild,
           ),
-          TransitionAnimationType.animatedSwitcher => AnimatedSwitcher(
-            child:
-                !_isLoading
-                    ? IgnorePointer(ignoring: _isLoading, child: widget.child)
-                    : widget.loadingChild ??
-                        _DefaultLoadingIndicator(style: widget.style),
-            duration: widget.animationDuration,
-          ),
-          TransitionAnimationType.customBuilder =>
-            widget.customBuilder != null
-                ? customBuilder ?? widget.child
-                : widget.child,
-        },
+          loadingChild: widget.loadingChild,
+          isLoading: _isLoading,
+          transitionType: widget.transitionType,
+          animationDuration: widget.animationDuration,
+          minimumChildOpacity: widget.minimumChildOpacity,
+          style: widget.style,
+          child: widget.child,
+        ),
       );
+    }
 
     return FilledButton(
       key: widget.key,
-      onPressed: _isLoading ? null : () => _handlePressed(),
+      onPressed: _isLoading ? null : _handlePressed,
       onLongPress: widget.onLongPress,
       onHover: widget.onHover,
       onFocusChange: widget.onFocusChange,
-      style: widget.style,
+      style: widget.style ??
+          FilledButton.styleFrom(splashFactory: widget.splashFactory),
       focusNode: widget.focusNode,
       autofocus: widget.autofocus,
       clipBehavior: widget.clipBehavior,
       statesController: widget.statesController,
-      child: switch (widget.transitionType) {
-        TransitionAnimationType.stack => Stack(
-          alignment: Alignment.center,
-          children: [
-            AnimatedOpacity(
-              child: widget.child,
-              opacity: _isLoading ? widget.minimumChildOpacity : 1.0,
-              duration: widget.animationDuration,
-            ),
-            AnimatedOpacity(
-              child: Visibility(
-                child: _DefaultLoadingIndicator(style: widget.style),
-                visible: _isLoading,
-              ),
-              opacity: _isLoading ? 1.0 : 0.0,
-              duration: widget.animationDuration,
-            ),
-          ],
+      child: _ChildContent(
+        customBuilder: widget.customBuilder?.call(
+          _isLoading,
+          widget.child,
+          widget.loadingChild,
         ),
-        TransitionAnimationType.animatedSwitcher => AnimatedSwitcher(
-          child:
-              !_isLoading
-                  ? IgnorePointer(ignoring: _isLoading, child: widget.child)
-                  : widget.loadingChild ??
-                      _DefaultLoadingIndicator(style: widget.style),
-          duration: widget.animationDuration,
-        ),
-        TransitionAnimationType.customBuilder =>
-          widget.customBuilder != null
-              ? customBuilder ?? widget.child
-              : widget.child,
-      },
+        loadingChild: widget.loadingChild,
+        isLoading: _isLoading,
+        transitionType: widget.transitionType,
+        animationDuration: widget.animationDuration,
+        minimumChildOpacity: widget.minimumChildOpacity,
+        style: widget.style,
+        child: widget.child,
+      ),
     );
   }
 }
 
 class _DefaultLoadingIndicator extends StatelessWidget {
   const _DefaultLoadingIndicator({required ButtonStyle? style})
-    : _style = style;
+      : _style = style;
 
   static const double _defaultStrokeWidth = 3.0;
 
@@ -418,5 +401,67 @@ class _DefaultLoadingIndicator extends StatelessWidget {
       strokeCap: StrokeCap.round,
       constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
     );
+  }
+}
+
+class _ChildContent extends StatelessWidget {
+  final Widget? customBuilder;
+  final Widget child;
+  final Widget? loadingChild;
+  final bool isLoading;
+  final TransitionAnimationType transitionType;
+  final Duration animationDuration;
+  final double minimumChildOpacity;
+  final ButtonStyle? style;
+
+  const _ChildContent({
+    required this.customBuilder,
+    required this.child,
+    required this.loadingChild,
+    required this.isLoading,
+    required this.transitionType,
+    required this.animationDuration,
+    required this.minimumChildOpacity,
+    required this.style,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return switch (transitionType) {
+      TransitionAnimationType.stack => Stack(
+          alignment: Alignment.center,
+          children: [
+            AnimatedOpacity(
+              opacity: isLoading ? minimumChildOpacity : 1.0,
+              duration: animationDuration,
+              child: AnimatedSize(duration: animationDuration, child: child),
+            ),
+            AnimatedOpacity(
+              opacity: isLoading ? 1.0 : 0.0,
+              duration: animationDuration,
+              child: Visibility(
+                visible: isLoading,
+                child: _DefaultLoadingIndicator(style: style),
+              ),
+            ),
+          ],
+        ),
+      TransitionAnimationType.animatedSwitcher => AnimatedSwitcher(
+          duration: animationDuration,
+          transitionBuilder: (child, animation) => FadeTransition(
+            key: ValueKey<Key?>(child.key),
+            opacity: animation,
+            child: AnimatedSize(
+              duration: animationDuration,
+              child: child,
+            ),
+          ),
+          child: !isLoading
+              ? IgnorePointer(ignoring: isLoading, child: child)
+              : loadingChild ?? _DefaultLoadingIndicator(style: style),
+        ),
+      TransitionAnimationType.customBuilder =>
+        customBuilder != null ? customBuilder ?? child : child,
+    };
   }
 }

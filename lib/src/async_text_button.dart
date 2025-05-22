@@ -6,7 +6,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-import 'transition_animation_type.dart';
+import 'package:loadable_buttons/src/transition_animation_type.dart';
 
 part 'async_text_button_with_icon.dart';
 
@@ -31,12 +31,17 @@ class AsyncTextButton extends StatefulWidget {
     this.minimumChildOpacity = 0.0,
     this.transitionType = TransitionAnimationType.stack,
     this.customBuilder,
+    this.splashFactory,
     super.key,
-  }) : assert(
-         transitionType != TransitionAnimationType.customBuilder ||
-             customBuilder != null,
-         'customBuilder must be provided when transitionType is customBuilder',
-       );
+  })  : assert(
+          transitionType != TransitionAnimationType.customBuilder ||
+              customBuilder != null,
+          'customBuilder must be provided when transitionType is customBuilder',
+        ),
+        assert(
+          splashFactory == null || style == null,
+          'splashFactory and style cannot be used together, use style',
+        );
 
   /// AsyncTextButton.icon is a custom widget that allows to load a child
   /// and an icon.
@@ -60,11 +65,12 @@ class AsyncTextButton extends StatefulWidget {
     double minimumChildOpacity = 0.0,
     TransitionAnimationType transitionType = TransitionAnimationType.stack,
     Widget Function(bool loading, Widget child, Widget? loadingChild)?
-    customBuilder,
+        customBuilder,
+    InteractiveInkFeatureFactory? splashFactory,
   }) {
     if (icon == null) {
       return AsyncTextButton(
-        child: label,
+        key: key,
         onPressed: onPressed,
         loadingChild: loadingChild,
         loading: loading,
@@ -80,7 +86,8 @@ class AsyncTextButton extends StatefulWidget {
         minimumChildOpacity: minimumChildOpacity,
         transitionType: transitionType,
         customBuilder: customBuilder,
-        key: key,
+        splashFactory: splashFactory,
+        child: label,
       );
     }
 
@@ -100,6 +107,7 @@ class AsyncTextButton extends StatefulWidget {
       minimumChildOpacity: minimumChildOpacity,
       transitionType: transitionType,
       customBuilder: customBuilder,
+      splashFactory: splashFactory,
     );
   }
 
@@ -152,7 +160,12 @@ class AsyncTextButton extends StatefulWidget {
   /// The custom builder of the loading animation,
   /// when TransitionAnimationType.customBuilder is selected.
   final Widget Function(bool loading, Widget child, Widget? loadingChild)?
-  customBuilder;
+      customBuilder;
+
+  /// Optional SplashFactory to customize the splash effect.
+  /// Use NoSplash.splashFactory to disable flutter default splash effect.
+  /// It won't be used if the style property is set.
+  final InteractiveInkFeatureFactory? splashFactory;
 
   @override
   State<AsyncTextButton> createState() => _AsyncTextButtonState();
@@ -160,6 +173,15 @@ class AsyncTextButton extends StatefulWidget {
 
 class _AsyncTextButtonState extends State<AsyncTextButton> {
   late bool _isLoading = widget.loading;
+
+  @override
+  void didUpdateWidget(covariant AsyncTextButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // If the loading state changes, update the state.
+    if (oldWidget.loading != widget.loading) {
+      _isLoading = widget.loading;
+    }
+  }
 
   Future<void> _handlePressed() async {
     // If the async callback is provided, use it.
@@ -178,69 +200,70 @@ class _AsyncTextButtonState extends State<AsyncTextButton> {
   }
 
   @override
-  void didUpdateWidget(covariant AsyncTextButton oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // If the loading state changes, update the state.
-    if (oldWidget.loading != widget.loading) {
-      _isLoading = widget.loading;
-    }
-  }
-
-  @override
   Widget build(BuildContext context) => TextButton(
-    key: widget.key,
-    onPressed: _isLoading ? null : () => _handlePressed(),
-    onLongPress: widget.onLongPress,
-    onHover: widget.onHover,
-    onFocusChange: widget.onFocusChange,
-    style: widget.style,
-    focusNode: widget.focusNode,
-    autofocus: widget.autofocus,
-    clipBehavior: widget.clipBehavior,
-    statesController: widget.statesController,
-    child: switch (widget.transitionType) {
-      TransitionAnimationType.stack => Stack(
-        alignment: Alignment.center,
-        children: [
-          AnimatedOpacity(
-            child: widget.child,
-            opacity: _isLoading ? widget.minimumChildOpacity : 1.0,
-            duration: widget.animationDuration,
-          ),
-          AnimatedOpacity(
-            child: Visibility(
-              child: _DefaultLoadingIndicator(style: widget.style),
-              visible: _isLoading,
+        key: widget.key,
+        onPressed: _isLoading ? null : _handlePressed,
+        onLongPress: widget.onLongPress,
+        onHover: widget.onHover,
+        onFocusChange: widget.onFocusChange,
+        style: widget.style ??
+            TextButton.styleFrom(splashFactory: widget.splashFactory),
+        focusNode: widget.focusNode,
+        autofocus: widget.autofocus,
+        clipBehavior: widget.clipBehavior,
+        statesController: widget.statesController,
+        child: switch (widget.transitionType) {
+          TransitionAnimationType.stack => Stack(
+              alignment: Alignment.center,
+              children: [
+                AnimatedOpacity(
+                  opacity: _isLoading ? widget.minimumChildOpacity : 1.0,
+                  duration: widget.animationDuration,
+                  child: AnimatedSize(
+                    duration: widget.animationDuration,
+                    child: widget.child,
+                  ),
+                ),
+                AnimatedOpacity(
+                  opacity: _isLoading ? 1.0 : 0.0,
+                  duration: widget.animationDuration,
+                  child: Visibility(
+                    visible: _isLoading,
+                    child: _DefaultLoadingIndicator(style: widget.style),
+                  ),
+                ),
+              ],
             ),
-            opacity: _isLoading ? 1.0 : 0.0,
-            duration: widget.animationDuration,
-          ),
-        ],
-      ),
-      TransitionAnimationType.animatedSwitcher => AnimatedSwitcher(
-        child:
-            !_isLoading
-                ? IgnorePointer(ignoring: _isLoading, child: widget.child)
-                : widget.loadingChild ??
-                    _DefaultLoadingIndicator(style: widget.style),
-        duration: widget.animationDuration,
-      ),
-      TransitionAnimationType.customBuilder =>
-        widget.customBuilder != null
-            ? widget.customBuilder?.call(
-                  _isLoading,
-                  widget.child,
-                  widget.loadingChild,
-                ) ??
-                widget.child
-            : widget.child,
-    },
-  );
+          TransitionAnimationType.animatedSwitcher => AnimatedSwitcher(
+              duration: widget.animationDuration,
+              transitionBuilder: (child, animation) => FadeTransition(
+                key: ValueKey<Key?>(child.key),
+                opacity: animation,
+                child: AnimatedSize(
+                  duration: widget.animationDuration,
+                  child: child,
+                ),
+              ),
+              child: !_isLoading
+                  ? IgnorePointer(ignoring: _isLoading, child: widget.child)
+                  : widget.loadingChild ??
+                      _DefaultLoadingIndicator(style: widget.style),
+            ),
+          TransitionAnimationType.customBuilder => widget.customBuilder != null
+              ? widget.customBuilder?.call(
+                    _isLoading,
+                    widget.child,
+                    widget.loadingChild,
+                  ) ??
+                  widget.child
+              : widget.child,
+        },
+      );
 }
 
 class _DefaultLoadingIndicator extends StatelessWidget {
   const _DefaultLoadingIndicator({required ButtonStyle? style})
-    : _style = style;
+      : _style = style;
 
   static const double _defaultStrokeWidth = 3.0;
 

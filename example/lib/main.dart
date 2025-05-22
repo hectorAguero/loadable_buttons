@@ -21,30 +21,53 @@ class MyApp extends StatelessWidget {
           dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
         ),
       ),
-      home: const HomePage(),
+      home: const _HomePage(),
     );
   }
 }
 
 /// HomePage is a StatefulWidget that represents the main application page.
-class HomePage extends StatefulWidget {
+class _HomePage extends StatefulWidget {
   /// Creates a HomePage widget.
-  const HomePage({super.key});
+  const _HomePage();
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<_HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  var transitionType = TransitionAnimationType.stack;
+class _HomePageState extends State<_HomePage> {
+  TransitionAnimationType transitionType = TransitionAnimationType.stack;
+  bool _isLongText = false;
+
+  static const clickMeText = 'Click me';
+  static const longClickMeText = 'Click me again';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _switchTransitionAnimationType,
-        label: Text(transitionType.name.capitalize()),
-        icon: Icon(Icons.animation),
+      floatingActionButton: Row(
+        mainAxisSize: MainAxisSize.min,
+        spacing: 8,
+        children: [
+          AsyncFloatingActionButton.extended(
+            splashFactory: NoSplash.splashFactory,
+            transitionType: transitionType,
+            onPressed: () async {
+              await Future<void>.delayed(const Duration(seconds: 1));
+              if (mounted) setState(() => _isLongText = !_isLongText);
+            },
+            icon: const Icon(Icons.ads_click_sharp),
+            label: _isLongText
+                ? const Text(longClickMeText)
+                : const Text(clickMeText),
+          ),
+          AsyncFloatingActionButton.extended(
+            splashFactory: NoSplash.splashFactory,
+            onPressed: _switchTransitionAnimationType,
+            label: Text(transitionType.name.capitalize()),
+            icon: const Icon(Icons.animation),
+          ),
+        ],
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -54,7 +77,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               Text(
                 "AsyncElevatedButton",
-                style: Theme.of(context).textTheme.titleLarge,
+                style: TextTheme.of(context).titleLarge,
               ),
               Wrap(
                 spacing: 8,
@@ -62,25 +85,33 @@ class _HomePageState extends State<HomePage> {
                 alignment: WrapAlignment.center,
                 children: [
                   AsyncElevatedButton(
+                    splashFactory: NoSplash.splashFactory,
                     transitionType: transitionType,
-                    child: Text('Click me'),
+                    child: _isLongText
+                        ? const Text(longClickMeText)
+                        : const Text(clickMeText),
                     onPressed: () async {
-                      await Future.delayed(const Duration(seconds: 2));
+                      await Future<void>.delayed(const Duration(seconds: 1));
+                      if (mounted) setState(() => _isLongText = !_isLongText);
                     },
                   ),
                   AsyncElevatedButton.icon(
+                    splashFactory: NoSplash.splashFactory,
                     transitionType: transitionType,
-                    label: Text('Click me'),
-                    icon: Icon(Icons.add),
+                    label: _isLongText
+                        ? const Text(longClickMeText)
+                        : const Text(clickMeText),
+                    icon: const Icon(Icons.add),
                     onPressed: () async {
-                      await Future.delayed(const Duration(seconds: 2));
+                      await Future<void>.delayed(const Duration(seconds: 1));
+                      if (mounted) setState(() => _isLongText = !_isLongText);
                     },
                   ),
                 ],
               ),
               Text(
                 "AsyncFilledButton",
-                style: Theme.of(context).textTheme.titleLarge,
+                style: TextTheme.of(context).titleLarge,
               ),
               Wrap(
                 spacing: 8,
@@ -88,40 +119,56 @@ class _HomePageState extends State<HomePage> {
                 alignment: WrapAlignment.center,
                 children: [
                   AsyncFilledButton(
+                    splashFactory: NoSplash.splashFactory,
                     transitionType: transitionType,
-                    child: Text('Click me'),
+                    child: _isLongText
+                        ? const Text(longClickMeText)
+                        : const Text(clickMeText),
                     onPressed: () async {
-                      await Future.delayed(const Duration(seconds: 2));
+                      await Future<void>.delayed(const Duration(seconds: 1));
+                      if (mounted) setState(() => _isLongText = !_isLongText);
                     },
                   ),
                   AsyncFilledButton.icon(
+                    splashFactory: NoSplash.splashFactory,
                     transitionType: transitionType,
-                    label: Text('Click me'),
-                    icon: Icon(Icons.add),
+                    label: _isLongText
+                        ? const Text(longClickMeText)
+                        : const Text(clickMeText),
+                    icon: const Icon(Icons.add),
                     onPressed: () async {
-                      await Future.delayed(const Duration(seconds: 2));
+                      await Future<void>.delayed(const Duration(seconds: 1));
+                      if (mounted) setState(() => _isLongText = !_isLongText);
                     },
                   ),
                   AsyncFilledButton.tonal(
+                    splashFactory: NoSplash.splashFactory,
                     transitionType: transitionType,
-                    child: Text('Click me'),
+                    child: _isLongText
+                        ? const Text(longClickMeText)
+                        : const Text(clickMeText),
                     onPressed: () async {
-                      await Future.delayed(const Duration(seconds: 2));
+                      await Future<void>.delayed(const Duration(seconds: 1));
+                      if (mounted) setState(() => _isLongText = !_isLongText);
                     },
                   ),
                   AsyncFilledButton.tonalIcon(
+                    splashFactory: NoSplash.splashFactory,
                     transitionType: transitionType,
-                    label: Text('Click me'),
-                    icon: Icon(Icons.add),
+                    label: _isLongText
+                        ? const Text(longClickMeText)
+                        : const Text(clickMeText),
+                    icon: const Icon(Icons.add),
                     onPressed: () async {
-                      await Future.delayed(const Duration(seconds: 2));
+                      await Future<void>.delayed(const Duration(seconds: 1));
+                      if (mounted) setState(() => _isLongText = !_isLongText);
                     },
                   ),
                 ],
               ),
               Text(
                 "AsyncTextButton",
-                style: Theme.of(context).textTheme.titleLarge,
+                style: TextTheme.of(context).titleLarge,
               ),
               Wrap(
                 spacing: 8,
@@ -129,25 +176,33 @@ class _HomePageState extends State<HomePage> {
                 alignment: WrapAlignment.center,
                 children: [
                   AsyncTextButton(
+                    splashFactory: NoSplash.splashFactory,
                     transitionType: transitionType,
-                    child: Text('Click me'),
+                    child: _isLongText
+                        ? const Text(longClickMeText)
+                        : const Text(clickMeText),
                     onPressed: () async {
-                      await Future.delayed(const Duration(seconds: 2));
+                      await Future<void>.delayed(const Duration(seconds: 1));
+                      if (mounted) setState(() => _isLongText = !_isLongText);
                     },
                   ),
                   AsyncTextButton.icon(
+                    splashFactory: NoSplash.splashFactory,
                     transitionType: transitionType,
-                    label: Text('Click me'),
-                    icon: Icon(Icons.add),
+                    label: _isLongText
+                        ? const Text(longClickMeText)
+                        : const Text(clickMeText),
+                    icon: const Icon(Icons.add),
                     onPressed: () async {
-                      await Future.delayed(const Duration(seconds: 2));
+                      await Future<void>.delayed(const Duration(seconds: 1));
+                      if (mounted) setState(() => _isLongText = !_isLongText);
                     },
                   ),
                 ],
               ),
               Text(
                 "AsyncOutlinedButton",
-                style: Theme.of(context).textTheme.titleLarge,
+                style: TextTheme.of(context).titleLarge,
               ),
               Wrap(
                 spacing: 8,
@@ -155,18 +210,76 @@ class _HomePageState extends State<HomePage> {
                 alignment: WrapAlignment.center,
                 children: [
                   AsyncOutlinedButton(
+                    splashFactory: NoSplash.splashFactory,
                     transitionType: transitionType,
-                    child: Text('Click me'),
+                    child: _isLongText
+                        ? const Text(longClickMeText)
+                        : const Text(clickMeText),
                     onPressed: () async {
-                      await Future.delayed(const Duration(seconds: 2));
+                      await Future<void>.delayed(const Duration(seconds: 1));
+                      if (mounted) setState(() => _isLongText = !_isLongText);
                     },
                   ),
                   AsyncOutlinedButton.icon(
+                    splashFactory: NoSplash.splashFactory,
                     transitionType: transitionType,
-                    label: Text('Click me'),
-                    icon: Icon(Icons.add),
+                    label: _isLongText
+                        ? const Text(longClickMeText)
+                        : const Text(clickMeText),
+                    icon: const Icon(Icons.add),
                     onPressed: () async {
-                      await Future.delayed(const Duration(seconds: 2));
+                      await Future<void>.delayed(const Duration(seconds: 1));
+                      if (mounted) setState(() => _isLongText = !_isLongText);
+                    },
+                  ),
+                ],
+              ),
+              Text(
+                "AsyncIconButton",
+                style: TextTheme.of(context).titleLarge,
+              ),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                alignment: WrapAlignment.center,
+                children: [
+                  AsyncIconButton(
+                    splashFactory: NoSplash.splashFactory,
+                    transitionType: transitionType,
+                    icon: const Icon(Icons.flutter_dash),
+                    onPressed: () async {
+                      await Future<void>.delayed(const Duration(seconds: 1));
+                      if (mounted) setState(() => _isLongText = !_isLongText);
+                    },
+                  ),
+                  AsyncIconButton.filled(
+                    splashFactory: NoSplash.splashFactory,
+                    transitionType: transitionType,
+                    iconSize: 32,
+                    icon: const Icon(Icons.flutter_dash),
+                    onPressed: () async {
+                      await Future<void>.delayed(const Duration(seconds: 1));
+                      if (mounted) setState(() => _isLongText = !_isLongText);
+                    },
+                  ),
+                  AsyncIconButton.filledTonal(
+                    splashFactory: NoSplash.splashFactory,
+                    transitionType: transitionType,
+                    icon: const Icon(Icons.flutter_dash),
+                    iconSize: 48,
+                    onPressed: () async {
+                      await Future<void>.delayed(const Duration(seconds: 1));
+                      if (mounted) setState(() => _isLongText = !_isLongText);
+                    },
+                  ),
+                  AsyncIconButton.outlined(
+                    splashFactory: NoSplash.splashFactory,
+                    transitionType: transitionType,
+                    icon: const Icon(Icons.flutter_dash),
+                    iconSize: 64,
+                    onPressed: () async {
+                      await Future<void>.delayed(const Duration(seconds: 1));
+                      if (mounted) setState(() => _isLongText = !_isLongText);
                     },
                   ),
                 ],
@@ -178,7 +291,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _switchTransitionAnimationType() {
+  Future<void> _switchTransitionAnimationType() async {
     setState(() {
       transitionType = transitionType == TransitionAnimationType.stack
           ? TransitionAnimationType.animatedSwitcher
