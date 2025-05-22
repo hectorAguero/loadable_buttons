@@ -45,11 +45,16 @@ class AsyncIconButton extends StatefulWidget {
     this.constraints,
     this.isSelected,
     this.selectedIcon,
+    this.splashFactory,
     super.key,
   })  : assert(
           transitionType != TransitionAnimationType.customBuilder ||
               customBuilder != null,
           'customBuilder must be provided when transitionType is customBuilder',
+        ),
+        assert(
+          splashFactory == null || style == null,
+          'splashFactory and style cannot be used together, use style',
         ),
         _variant = _IconButtonVariant.standard;
 
@@ -86,11 +91,16 @@ class AsyncIconButton extends StatefulWidget {
     this.constraints,
     this.isSelected,
     this.selectedIcon,
+    this.splashFactory,
     super.key,
   })  : assert(
           transitionType != TransitionAnimationType.customBuilder ||
               customBuilder != null,
           'customBuilder must be provided when transitionType is customBuilder',
+        ),
+        assert(
+          splashFactory == null || style == null,
+          'splashFactory and style cannot be used together, use style',
         ),
         _variant = _IconButtonVariant.filled;
 
@@ -127,11 +137,16 @@ class AsyncIconButton extends StatefulWidget {
     this.constraints,
     this.isSelected,
     this.selectedIcon,
+    this.splashFactory,
     super.key,
   })  : assert(
           transitionType != TransitionAnimationType.customBuilder ||
               customBuilder != null,
           'customBuilder must be provided when transitionType is customBuilder',
+        ),
+        assert(
+          splashFactory == null || style == null,
+          'splashFactory and style cannot be used together, use style',
         ),
         assert(splashRadius == null || splashRadius > 0),
         _variant = _IconButtonVariant.filledTonal;
@@ -169,11 +184,16 @@ class AsyncIconButton extends StatefulWidget {
     this.constraints,
     this.isSelected,
     this.selectedIcon,
+    this.splashFactory,
     super.key,
   })  : assert(
           transitionType != TransitionAnimationType.customBuilder ||
               customBuilder != null,
           'customBuilder must be provided when transitionType is customBuilder',
+        ),
+        assert(
+          splashFactory == null || style == null,
+          'splashFactory and style cannot be used together, use style',
         ),
         assert(splashRadius == null || splashRadius > 0),
         _variant = _IconButtonVariant.outlined;
@@ -223,7 +243,7 @@ class AsyncIconButton extends StatefulWidget {
   final Widget Function(bool loading, Widget child, Widget? loadingChild)?
       customBuilder;
 
-  /// The onPressed callback of the button, but being async.
+  /// Size of the icon button.
   final double? iconSize;
 
   /// The visualDensity of the button.
@@ -273,6 +293,11 @@ class AsyncIconButton extends StatefulWidget {
 
   /// The selected icon of the button.
   final Widget? selectedIcon;
+
+  /// Optional SplashFactory to customize the splash effect.
+  /// Use NoSplash.splashFactory to disable flutter default splash effect.
+  /// It won't be used if the style property is set.
+  final InteractiveInkFeatureFactory? splashFactory;
 
   /// The visual density of the button.
   final _IconButtonVariant _variant;
@@ -333,7 +358,8 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
             tooltip: widget.tooltip,
             enableFeedback: widget.enableFeedback,
             constraints: widget.constraints,
-            style: widget.style,
+            style: widget.style ??
+                IconButton.styleFrom(splashFactory: widget.splashFactory),
             icon: _AsyncIconButtonChild(
               icon: widget.icon,
               loadingChild: widget.loadingChild,
@@ -367,7 +393,8 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
             tooltip: widget.tooltip,
             enableFeedback: widget.enableFeedback,
             constraints: widget.constraints,
-            style: widget.style,
+            style: widget.style ??
+                IconButton.styleFrom(splashFactory: widget.splashFactory),
             icon: _AsyncIconButtonChild(
               icon: widget.icon,
               loadingChild: widget.loadingChild,
@@ -401,7 +428,8 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
             tooltip: widget.tooltip,
             enableFeedback: widget.enableFeedback,
             constraints: widget.constraints,
-            style: widget.style,
+            style: widget.style ??
+                IconButton.styleFrom(splashFactory: widget.splashFactory),
             icon: _AsyncIconButtonChild(
               icon: widget.icon,
               loadingChild: widget.loadingChild,
@@ -435,7 +463,8 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
             tooltip: widget.tooltip,
             enableFeedback: widget.enableFeedback,
             constraints: widget.constraints,
-            style: widget.style,
+            style: widget.style ??
+                IconButton.styleFrom(splashFactory: widget.splashFactory),
             icon: _AsyncIconButtonChild(
               icon: widget.icon,
               loadingChild: widget.loadingChild,
@@ -481,7 +510,7 @@ class _AsyncIconButtonChild extends StatelessWidget {
             AnimatedOpacity(
               opacity: isLoading ? minimumChildOpacity : 1.0,
               duration: animationDuration,
-              child: icon,
+              child: AnimatedSize(duration: animationDuration, child: icon),
             ),
             AnimatedOpacity(
               opacity: isLoading ? 1.0 : 0.0,
@@ -494,6 +523,14 @@ class _AsyncIconButtonChild extends StatelessWidget {
           ],
         ),
       TransitionAnimationType.animatedSwitcher => AnimatedSwitcher(
+          transitionBuilder: (child, animation) => FadeTransition(
+            key: ValueKey<Key?>(child.key),
+            opacity: animation,
+            child: AnimatedSize(
+              duration: animationDuration,
+              child: child,
+            ),
+          ),
           duration: animationDuration,
           child: !isLoading
               ? IgnorePointer(ignoring: isLoading, child: icon)

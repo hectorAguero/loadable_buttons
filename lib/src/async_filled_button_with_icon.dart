@@ -20,6 +20,7 @@ class _AsyncFilledButtonWithIcon extends AsyncFilledButton {
     super.minimumChildOpacity,
     super.transitionType,
     super.customBuilder,
+    super.splashFactory,
   }) : super(
           autofocus: autofocus ?? false,
           child: _FilledButtonWithIconChild(
@@ -50,6 +51,7 @@ class _AsyncFilledButtonWithIcon extends AsyncFilledButton {
     super.minimumChildOpacity,
     super.transitionType,
     super.customBuilder,
+    super.splashFactory,
   }) : super.tonal(
           autofocus: autofocus ?? false,
           child: _FilledButtonWithIconChild(

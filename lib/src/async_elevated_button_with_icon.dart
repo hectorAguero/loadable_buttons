@@ -20,6 +20,7 @@ class _AsyncElevatedButtonWithIcon extends AsyncElevatedButton {
     super.minimumChildOpacity,
     super.transitionType,
     super.customBuilder,
+    super.splashFactory,
   }) : super(
           autofocus: autofocus ?? false,
           child: _ElevatedButtonWithIconChild(

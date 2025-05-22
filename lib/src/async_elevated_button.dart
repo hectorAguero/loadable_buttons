@@ -31,11 +31,16 @@ class AsyncElevatedButton extends StatefulWidget {
     this.minimumChildOpacity = 0.0,
     this.transitionType = TransitionAnimationType.stack,
     this.customBuilder,
+    this.splashFactory,
     super.key,
-  }) : assert(
+  })  : assert(
           transitionType != TransitionAnimationType.customBuilder ||
               customBuilder != null,
           'customBuilder must be provided when transitionType is customBuilder',
+        ),
+        assert(
+          splashFactory == null || style == null,
+          'splashFactory and style cannot be used together, use style',
         );
 
   /// AsyncElevatedButton.icon is a custom widget that allows to load a child
@@ -61,9 +66,11 @@ class AsyncElevatedButton extends StatefulWidget {
     TransitionAnimationType transitionType = TransitionAnimationType.stack,
     Widget Function(bool loading, Widget child, Widget? loadingChild)?
         customBuilder,
+    InteractiveInkFeatureFactory? splashFactory,
   }) {
     if (icon == null) {
       return AsyncElevatedButton(
+        key: key,
         onPressed: onPressed,
         loadingChild: loadingChild,
         loading: loading,
@@ -79,7 +86,7 @@ class AsyncElevatedButton extends StatefulWidget {
         minimumChildOpacity: minimumChildOpacity,
         transitionType: transitionType,
         customBuilder: customBuilder,
-        key: key,
+        splashFactory: splashFactory,
         child: label,
       );
     }
@@ -100,6 +107,7 @@ class AsyncElevatedButton extends StatefulWidget {
       minimumChildOpacity: minimumChildOpacity,
       transitionType: transitionType,
       customBuilder: customBuilder,
+      splashFactory: splashFactory,
     );
   }
 
@@ -154,6 +162,11 @@ class AsyncElevatedButton extends StatefulWidget {
   final Widget Function(bool loading, Widget child, Widget? loadingChild)?
       customBuilder;
 
+  /// Optional SplashFactory to customize the splash effect.
+  /// Use NoSplash.splashFactory to disable flutter default splash effect.
+  /// It won't be used if the style property is set.
+  final InteractiveInkFeatureFactory? splashFactory;
+
   @override
   State<AsyncElevatedButton> createState() => _AsyncElevatedButtonState();
 }
@@ -193,7 +206,8 @@ class _AsyncElevatedButtonState extends State<AsyncElevatedButton> {
         onLongPress: widget.onLongPress,
         onHover: widget.onHover,
         onFocusChange: widget.onFocusChange,
-        style: widget.style,
+        style: widget.style ??
+            ElevatedButton.styleFrom(splashFactory: widget.splashFactory),
         focusNode: widget.focusNode,
         autofocus: widget.autofocus,
         clipBehavior: widget.clipBehavior,
@@ -205,7 +219,10 @@ class _AsyncElevatedButtonState extends State<AsyncElevatedButton> {
                 AnimatedOpacity(
                   opacity: _isLoading ? widget.minimumChildOpacity : 1.0,
                   duration: widget.animationDuration,
-                  child: widget.child,
+                  child: AnimatedSize(
+                    duration: widget.animationDuration,
+                    child: widget.child,
+                  ),
                 ),
                 AnimatedOpacity(
                   opacity: _isLoading ? 1.0 : 0.0,
@@ -219,6 +236,14 @@ class _AsyncElevatedButtonState extends State<AsyncElevatedButton> {
             ),
           TransitionAnimationType.animatedSwitcher => AnimatedSwitcher(
               duration: widget.animationDuration,
+              transitionBuilder: (child, animation) => FadeTransition(
+                key: ValueKey<Key?>(child.key),
+                opacity: animation,
+                child: AnimatedSize(
+                  duration: widget.animationDuration,
+                  child: child,
+                ),
+              ),
               child: !_isLoading
                   ? IgnorePointer(ignoring: _isLoading, child: widget.child)
                   : widget.loadingChild ??

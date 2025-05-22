@@ -49,7 +49,7 @@ class AsyncFloatingActionButton extends StatefulWidget {
     this.customBuilder,
     this.loadingChild,
     this.loading = false,
-    this.style,
+    this.splashFactory,
     super.key,
   })  : assert(
           transitionType != TransitionAnimationType.customBuilder ||
@@ -93,7 +93,7 @@ class AsyncFloatingActionButton extends StatefulWidget {
     this.customBuilder,
     this.loadingChild,
     this.loading = false,
-    this.style,
+    this.splashFactory,
     super.key,
   })  : assert(
           transitionType != TransitionAnimationType.customBuilder ||
@@ -142,7 +142,7 @@ class AsyncFloatingActionButton extends StatefulWidget {
     this.customBuilder,
     this.loadingChild,
     this.loading = false,
-    this.style,
+    this.splashFactory,
     super.key,
   })  : assert(
           transitionType != TransitionAnimationType.customBuilder ||
@@ -191,11 +191,11 @@ class AsyncFloatingActionButton extends StatefulWidget {
     this.customBuilder,
     this.loadingChild,
     this.loading = false,
-    this.style,
     this.extendedIconLabelSpacing,
     this.extendedPadding,
     this.extendedTextStyle,
     this.isExtended = true,
+    this.splashFactory,
     Widget? icon,
     super.key,
   })  : assert(
@@ -307,9 +307,6 @@ class AsyncFloatingActionButton extends StatefulWidget {
   final bool isExtended;
 
   /// The padding of the button.
-  final ButtonStyle? style;
-
-  /// The padding of the button.
   final Widget? _extendedLabel;
 
   /// The padding of the button.
@@ -320,6 +317,10 @@ class AsyncFloatingActionButton extends StatefulWidget {
 
   /// The padding of the button.
   final double? extendedIconLabelSpacing;
+
+  /// Optional SplashFactory to customize the splash effect.
+  /// Use NoSplash.splashFactory to disable flutter default splash effect.
+  final InteractiveInkFeatureFactory? splashFactory;
 
   @override
   State<AsyncFloatingActionButton> createState() =>
@@ -355,149 +356,165 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton> {
   }
 
   @override
-  Widget build(BuildContext context) =>
-      switch (widget._floatingActionButtonType) {
-        _FloatingActionButtonType.regular => FloatingActionButton(
-            key: widget.key,
-            tooltip: widget.tooltip,
-            foregroundColor: widget.foregroundColor,
-            backgroundColor: widget.backgroundColor,
-            focusColor: widget.focusColor,
-            hoverColor: widget.hoverColor,
-            splashColor: widget.splashColor,
-            heroTag: widget.heroTag,
-            elevation: widget.elevation,
-            focusElevation: widget.focusElevation,
-            hoverElevation: widget.hoverElevation,
-            highlightElevation: widget.highlightElevation,
-            disabledElevation: widget.disabledElevation,
-            onPressed: _isLoading ? null : _handlePressed,
-            mouseCursor: widget.mouseCursor,
-            mini: widget.mini,
-            shape: widget.shape,
-            clipBehavior: widget.clipBehavior,
-            focusNode: widget.focusNode,
-            autofocus: widget.autofocus,
-            materialTapTargetSize: widget.materialTapTargetSize,
-            isExtended: widget.isExtended,
-            enableFeedback: widget.enableFeedback,
-            child: _AsyncFloatingActionButtonChild(
-              loadingChild: widget.loadingChild,
-              color:
-                  widget.foregroundColor ?? ColorScheme.of(context).secondary,
-              isLoading: _isLoading,
-              transitionType: widget.transitionType,
-              animationDuration: widget.animationDuration,
-              minimumChildOpacity: widget.minimumChildOpacity,
-              customBuilder: widget.customBuilder,
-              child: widget.child ?? const SizedBox.shrink(),
+  Widget build(BuildContext context) => Theme(
+        data: Theme.of(context).copyWith(splashFactory: widget.splashFactory),
+        child: switch (widget._floatingActionButtonType) {
+          _FloatingActionButtonType.regular => FloatingActionButton(
+              key: widget.key,
+              tooltip: widget.tooltip,
+              foregroundColor: widget.foregroundColor,
+              backgroundColor: widget.backgroundColor,
+              focusColor: widget.focusColor,
+              hoverColor: widget.hoverColor,
+              splashColor: widget.splashColor,
+              heroTag: widget.heroTag,
+              elevation: widget.elevation,
+              focusElevation: widget.focusElevation,
+              hoverElevation: widget.hoverElevation,
+              highlightElevation: widget.highlightElevation,
+              disabledElevation: widget.disabledElevation,
+              onPressed: _isLoading ? null : _handlePressed,
+              mouseCursor: widget.mouseCursor,
+              mini: widget.mini,
+              shape: widget.shape,
+              clipBehavior: widget.clipBehavior,
+              focusNode: widget.focusNode,
+              autofocus: widget.autofocus,
+              materialTapTargetSize: widget.materialTapTargetSize,
+              isExtended: widget.isExtended,
+              enableFeedback: widget.enableFeedback,
+              child: _AsyncFloatingActionButtonChild(
+                loadingChild: widget.loadingChild,
+                color:
+                    widget.foregroundColor ?? ColorScheme.of(context).secondary,
+                isLoading: _isLoading,
+                transitionType: widget.transitionType,
+                animationDuration: widget.animationDuration,
+                minimumChildOpacity: widget.minimumChildOpacity,
+                customBuilder: widget.customBuilder,
+                child: widget.child ?? const SizedBox.shrink(),
+              ),
             ),
-          ),
-        _FloatingActionButtonType.small => FloatingActionButton.small(
-            key: widget.key,
-            tooltip: widget.tooltip,
-            foregroundColor: widget.foregroundColor,
-            backgroundColor: widget.backgroundColor,
-            focusColor: widget.focusColor,
-            hoverColor: widget.hoverColor,
-            splashColor: widget.splashColor,
-            heroTag: widget.heroTag,
-            elevation: widget.elevation,
-            focusElevation: widget.focusElevation,
-            hoverElevation: widget.hoverElevation,
-            highlightElevation: widget.highlightElevation,
-            disabledElevation: widget.disabledElevation,
-            onPressed: _isLoading ? null : _handlePressed,
-            mouseCursor: widget.mouseCursor,
-            shape: widget.shape,
-            clipBehavior: widget.clipBehavior,
-            focusNode: widget.focusNode,
-            autofocus: widget.autofocus,
-            materialTapTargetSize: widget.materialTapTargetSize,
-            enableFeedback: widget.enableFeedback,
-            child: _AsyncFloatingActionButtonChild(
-              loadingChild: widget.loadingChild,
-              color:
-                  widget.foregroundColor ?? ColorScheme.of(context).secondary,
-              isLoading: _isLoading,
-              transitionType: widget.transitionType,
-              animationDuration: widget.animationDuration,
-              minimumChildOpacity: widget.minimumChildOpacity,
-              customBuilder: widget.customBuilder,
-              child: widget.child ?? const SizedBox.shrink(),
+          _FloatingActionButtonType.small => FloatingActionButton.small(
+              key: widget.key,
+              tooltip: widget.tooltip,
+              foregroundColor: widget.foregroundColor,
+              backgroundColor: widget.backgroundColor,
+              focusColor: widget.focusColor,
+              hoverColor: widget.hoverColor,
+              splashColor: widget.splashColor,
+              heroTag: widget.heroTag,
+              elevation: widget.elevation,
+              focusElevation: widget.focusElevation,
+              hoverElevation: widget.hoverElevation,
+              highlightElevation: widget.highlightElevation,
+              disabledElevation: widget.disabledElevation,
+              onPressed: _isLoading ? null : _handlePressed,
+              mouseCursor: widget.mouseCursor,
+              shape: widget.shape,
+              clipBehavior: widget.clipBehavior,
+              focusNode: widget.focusNode,
+              autofocus: widget.autofocus,
+              materialTapTargetSize: widget.materialTapTargetSize,
+              enableFeedback: widget.enableFeedback,
+              child: _AsyncFloatingActionButtonChild(
+                loadingChild: widget.loadingChild,
+                color:
+                    widget.foregroundColor ?? ColorScheme.of(context).secondary,
+                isLoading: _isLoading,
+                transitionType: widget.transitionType,
+                animationDuration: widget.animationDuration,
+                minimumChildOpacity: widget.minimumChildOpacity,
+                customBuilder: widget.customBuilder,
+                child: widget.child ?? const SizedBox.shrink(),
+              ),
             ),
-          ),
-        _FloatingActionButtonType.large => FloatingActionButton.large(
-            key: widget.key,
-            tooltip: widget.tooltip,
-            foregroundColor: widget.foregroundColor,
-            backgroundColor: widget.backgroundColor,
-            focusColor: widget.focusColor,
-            hoverColor: widget.hoverColor,
-            splashColor: widget.splashColor,
-            heroTag: widget.heroTag,
-            elevation: widget.elevation,
-            focusElevation: widget.focusElevation,
-            hoverElevation: widget.hoverElevation,
-            highlightElevation: widget.highlightElevation,
-            disabledElevation: widget.disabledElevation,
-            onPressed: _isLoading ? null : _handlePressed,
-            mouseCursor: widget.mouseCursor,
-            shape: widget.shape,
-            clipBehavior: widget.clipBehavior,
-            focusNode: widget.focusNode,
-            autofocus: widget.autofocus,
-            materialTapTargetSize: widget.materialTapTargetSize,
-            enableFeedback: widget.enableFeedback,
-            child: _AsyncFloatingActionButtonChild(
-              loadingChild: widget.loadingChild,
-              color:
-                  widget.foregroundColor ?? ColorScheme.of(context).secondary,
-              isLoading: _isLoading,
-              transitionType: widget.transitionType,
-              animationDuration: widget.animationDuration,
-              minimumChildOpacity: widget.minimumChildOpacity,
-              customBuilder: widget.customBuilder,
-              child: widget.child ?? const SizedBox.shrink(),
+          _FloatingActionButtonType.large => FloatingActionButton.large(
+              key: widget.key,
+              tooltip: widget.tooltip,
+              foregroundColor: widget.foregroundColor,
+              backgroundColor: widget.backgroundColor,
+              focusColor: widget.focusColor,
+              hoverColor: widget.hoverColor,
+              splashColor: widget.splashColor,
+              heroTag: widget.heroTag,
+              elevation: widget.elevation,
+              focusElevation: widget.focusElevation,
+              hoverElevation: widget.hoverElevation,
+              highlightElevation: widget.highlightElevation,
+              disabledElevation: widget.disabledElevation,
+              onPressed: _isLoading ? null : _handlePressed,
+              mouseCursor: widget.mouseCursor,
+              shape: widget.shape,
+              clipBehavior: widget.clipBehavior,
+              focusNode: widget.focusNode,
+              autofocus: widget.autofocus,
+              materialTapTargetSize: widget.materialTapTargetSize,
+              enableFeedback: widget.enableFeedback,
+              child: _AsyncFloatingActionButtonChild(
+                loadingChild: widget.loadingChild,
+                color:
+                    widget.foregroundColor ?? ColorScheme.of(context).secondary,
+                isLoading: _isLoading,
+                transitionType: widget.transitionType,
+                animationDuration: widget.animationDuration,
+                minimumChildOpacity: widget.minimumChildOpacity,
+                customBuilder: widget.customBuilder,
+                child: widget.child ?? const SizedBox.shrink(),
+              ),
             ),
-          ),
-        _FloatingActionButtonType.extended => FloatingActionButton.extended(
-            key: widget.key,
-            tooltip: widget.tooltip,
-            foregroundColor: widget.foregroundColor,
-            backgroundColor: widget.backgroundColor,
-            focusColor: widget.focusColor,
-            hoverColor: widget.hoverColor,
-            heroTag: widget.heroTag,
-            elevation: widget.elevation,
-            focusElevation: widget.focusElevation,
-            hoverElevation: widget.hoverElevation,
-            splashColor: widget.splashColor,
-            highlightElevation: widget.highlightElevation,
-            disabledElevation: widget.disabledElevation,
-            onPressed: _isLoading ? null : _handlePressed,
-            mouseCursor: widget.mouseCursor,
-            shape: widget.shape,
-            isExtended: widget.isExtended,
-            materialTapTargetSize: widget.materialTapTargetSize,
-            clipBehavior: widget.clipBehavior,
-            focusNode: widget.focusNode,
-            autofocus: widget.autofocus,
-            icon: widget.child,
-            label: _AsyncFloatingActionButtonChild(
-              loadingChild: widget.loadingChild,
-              color:
-                  widget.foregroundColor ?? ColorScheme.of(context).secondary,
-              isLoading: _isLoading,
-              transitionType: widget.transitionType,
-              animationDuration: widget.animationDuration,
-              minimumChildOpacity: widget.minimumChildOpacity,
-              customBuilder: widget.customBuilder,
-              child: widget._extendedLabel ?? const SizedBox.shrink(),
+          _FloatingActionButtonType.extended => FloatingActionButton.extended(
+              key: widget.key,
+              tooltip: widget.tooltip,
+              foregroundColor: widget.foregroundColor,
+              backgroundColor: widget.backgroundColor,
+              focusColor: widget.focusColor,
+              hoverColor: widget.hoverColor,
+              heroTag: widget.heroTag,
+              elevation: widget.elevation,
+              focusElevation: widget.focusElevation,
+              hoverElevation: widget.hoverElevation,
+              splashColor: widget.splashColor,
+              highlightElevation: widget.highlightElevation,
+              disabledElevation: widget.disabledElevation,
+              onPressed: _isLoading ? null : _handlePressed,
+              mouseCursor: widget.mouseCursor,
+              shape: widget.shape,
+              isExtended: widget.isExtended,
+              materialTapTargetSize: widget.materialTapTargetSize,
+              clipBehavior: widget.clipBehavior,
+              focusNode: widget.focusNode,
+              autofocus: widget.autofocus,
+              icon: _AsyncFloatingActionButtonChild(
+                loadingChild: const SizedBox.shrink(),
+                color:
+                    widget.foregroundColor ?? ColorScheme.of(context).secondary,
+                isLoading: _isLoading,
+                transitionType: widget.transitionType,
+                animationDuration: widget.animationDuration,
+                minimumChildOpacity: widget.minimumChildOpacity,
+                customBuilder: widget.customBuilder,
+                child: widget.child ?? const SizedBox.shrink(),
+              ),
+              label: _AsyncFloatingActionButtonChild(
+                loadingChild: widget.loadingChild,
+                color:
+                    widget.foregroundColor ?? ColorScheme.of(context).secondary,
+                isLoading: _isLoading,
+                transitionType: widget.transitionType,
+                animationDuration: widget.animationDuration,
+                minimumChildOpacity: widget.minimumChildOpacity,
+                customBuilder: widget.customBuilder,
+                invisibleChild: widget.child,
+                child: AnimatedSize(
+                  duration: widget.animationDuration,
+                  child: widget._extendedLabel ?? const SizedBox.shrink(),
+                ),
+              ),
+              enableFeedback: widget.enableFeedback,
             ),
-            enableFeedback: widget.enableFeedback,
-          ),
-      };
+        },
+      );
 }
 
 class _AsyncFloatingActionButtonChild extends StatelessWidget {
@@ -508,8 +525,9 @@ class _AsyncFloatingActionButtonChild extends StatelessWidget {
     required this.transitionType,
     required this.animationDuration,
     required this.minimumChildOpacity,
-    this.loadingChild,
-    this.customBuilder,
+    required this.loadingChild,
+    required this.customBuilder,
+    this.invisibleChild,
   });
 
   final Widget child;
@@ -521,9 +539,14 @@ class _AsyncFloatingActionButtonChild extends StatelessWidget {
   final double minimumChildOpacity;
   final Widget Function(bool loading, Widget icon, Widget? loadingChild)?
       customBuilder;
+  final Widget? invisibleChild;
+
+  static const double _maxIconSizeMaxWidth = 72;
 
   @override
   Widget build(BuildContext context) {
+    final invisibleLoadChild = invisibleChild;
+
     return switch (transitionType) {
       TransitionAnimationType.stack => Stack(
           alignment: Alignment.center,
@@ -538,13 +561,38 @@ class _AsyncFloatingActionButtonChild extends StatelessWidget {
               duration: animationDuration,
               child: Visibility(
                 visible: isLoading,
-                child: _DefaultLoadingIndicator(color: color),
+                child: invisibleChild == null
+                    ? loadingChild ?? _DefaultLoadingIndicator(color: color)
+                    : Row(
+                        children: [
+                          loadingChild ??
+                              _DefaultLoadingIndicator(color: color),
+                          if (invisibleLoadChild != null)
+                            Opacity(
+                              opacity: 0.0,
+                              child: ConstrainedBox(
+                                constraints: const BoxConstraints(
+                                  maxWidth: _maxIconSizeMaxWidth,
+                                ),
+                                child: invisibleLoadChild,
+                              ),
+                            ),
+                        ],
+                      ),
               ),
             ),
           ],
         ),
       TransitionAnimationType.animatedSwitcher => AnimatedSwitcher(
           duration: animationDuration,
+          transitionBuilder: (child, animation) => FadeTransition(
+            key: ValueKey<Key?>(child.key),
+            opacity: animation,
+            child: AnimatedSize(
+              duration: animationDuration,
+              child: child,
+            ),
+          ),
           child: !isLoading
               ? IgnorePointer(ignoring: isLoading, child: child)
               : loadingChild ?? _DefaultLoadingIndicator(color: color),

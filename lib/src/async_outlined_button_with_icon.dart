@@ -20,6 +20,7 @@ class _AsyncOutlinedButtonWithIcon extends AsyncOutlinedButton {
     super.minimumChildOpacity,
     super.transitionType,
     super.customBuilder,
+    super.splashFactory,
   }) : super(
           autofocus: autofocus ?? false,
           child: _OutlinedButtonWithIconChild(

@@ -20,6 +20,7 @@ class _AsyncTextButtonWithIcon extends AsyncTextButton {
     super.minimumChildOpacity,
     super.transitionType,
     super.customBuilder,
+    super.splashFactory,
   }) : super(
           autofocus: autofocus ?? false,
           child: _TextButtonWithIconChild(
