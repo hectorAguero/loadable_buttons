@@ -229,7 +229,8 @@ class _AsyncElevatedButtonState extends State<AsyncElevatedButton> {
                   duration: widget.animationDuration,
                   child: Visibility(
                     visible: _isLoading,
-                    child: _DefaultLoadingIndicator(style: widget.style),
+                    child: widget.loadingChild ??
+                        _DefaultLoadingIndicator(style: widget.style),
                   ),
                 ),
               ],

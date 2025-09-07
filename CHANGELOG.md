@@ -1,3 +1,7 @@
+## 0.2.1
+
+* Fixed loadingChild in AsyncElevatedButton when using TransitionAnimationType.stack
+
 ## 0.2.0
 
 * Add support for AsyncIconButton

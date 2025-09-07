@@ -1,6 +1,6 @@
 name: loadable_buttons
 description: "Provides enhanced buttons with built-in loading states, async functionality and customizable transitions."
-version: 0.2.0
+version: 0.2.1
 homepage: https://hectoraguero.dev/
 repository: https://github.com/hectorAguero/loadable_buttons
 issue_tracker: https://github.com/hectorAguero/loadable_buttons/issues
