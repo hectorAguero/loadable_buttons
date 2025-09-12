@@ -318,7 +318,6 @@ class _HomePageState extends State<_HomePage> {
                     iconSize: 64,
                     onPressed: () async {
                       await Future<void>.delayed(const Duration(seconds: 1));
-
                       if (mounted) setState(() => _isLongText = !_isLongText);
                     },
                   ),
