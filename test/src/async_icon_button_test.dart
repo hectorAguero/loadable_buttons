@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:ui' show PointerDeviceKind;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -265,6 +266,304 @@ void main() {
       // This test mainly confirms the properties exist and don't crash.
       // Visual confirmation of selection state might need specific style checks
       // or testing variants (filled, tonal, outlined) if they behave different.
+    });
+
+    testWidgets('prevents multiple taps while async is running',
+        (tester) async {
+      var count = 0;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: AsyncIconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () async {
+              count++;
+              await Future<void>.delayed(const Duration(milliseconds: 200));
+            },
+          ),
+        ),
+      );
+
+      // Two quick taps.
+      await tester.tap(find.byType(AsyncIconButton));
+      await tester.pump();
+      await tester.tap(find.byType(AsyncIconButton));
+      await tester.pump();
+
+      // Let async finish.
+      await tester.pump(const Duration(milliseconds: 250));
+      await tester.pump();
+
+      expect(count, 1);
+    });
+
+    testWidgets(
+        'default loading indicator takes color from style.foregroundColor',
+        (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: AsyncIconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () async {
+                await Future<void>.delayed(const Duration(milliseconds: 50));
+              },
+              style: IconButton.styleFrom(foregroundColor: Colors.green)),
+        ),
+      );
+
+      await tester.tap(find.byType(AsyncIconButton));
+      await tester.pump();
+
+      final cpi = tester.widget<CircularProgressIndicator>(
+        find.byType(CircularProgressIndicator),
+      );
+      expect(cpi.color, Colors.green);
+
+      await tester.pump(const Duration(milliseconds: 60));
+      await tester.pump();
+
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+    });
+
+    testWidgets('minimumChildOpacity is applied in stack transition',
+        (tester) async {
+      const minOpacity = 0.3;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: AsyncIconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () async {
+                await Future<void>.delayed(const Duration(milliseconds: 100));
+              },
+              minimumChildOpacity: minOpacity),
+        ),
+      );
+
+      await tester.tap(find.byType(AsyncIconButton));
+      await tester.pump();
+
+      // Find the AnimatedOpacity that wraps the icon (its child is AnimatedSize).
+      final animatedOpacities =
+          tester.widgetList<AnimatedOpacity>(find.byType(AnimatedOpacity));
+      final iconOpacityWidget = animatedOpacities.firstWhere(
+        (w) => w.child is AnimatedSize,
+      );
+
+      expect(iconOpacityWidget.opacity, minOpacity);
+
+      await tester.pump(const Duration(milliseconds: 120));
+      await tester.pump();
+
+      // Back to fully visible.
+      final iconOpacityAfter = tester
+          .widgetList<AnimatedOpacity>(find.byType(AnimatedOpacity))
+          .firstWhere(
+            (w) => w.child is AnimatedSize,
+          );
+      expect(iconOpacityAfter.opacity, 1.0);
+    });
+
+    testWidgets('filled variant shows loading indicator', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: AsyncIconButton.filled(
+            icon: const Icon(Icons.add),
+            onPressed: () async {
+              await Future<void>.delayed(const Duration(milliseconds: 50));
+            },
+          ),
+        ),
+      );
+
+      await tester.tap(find.byType(AsyncIconButton));
+      await tester.pump();
+
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+      await tester.pump(const Duration(milliseconds: 60));
+      await tester.pump();
+
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+    });
+
+    testWidgets('filledTonal variant shows loading indicator', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: AsyncIconButton.filledTonal(
+            icon: const Icon(Icons.add),
+            onPressed: () async {
+              await Future<void>.delayed(const Duration(milliseconds: 50));
+            },
+          ),
+        ),
+      );
+
+      await tester.tap(find.byType(AsyncIconButton));
+      await tester.pump();
+
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+      await tester.pump(const Duration(milliseconds: 60));
+      await tester.pump();
+
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+    });
+
+    testWidgets('outlined variant shows loading indicator', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: AsyncIconButton.outlined(
+            icon: const Icon(Icons.add),
+            onPressed: () async {
+              await Future<void>.delayed(const Duration(milliseconds: 50));
+            },
+          ),
+        ),
+      );
+
+      await tester.tap(find.byType(AsyncIconButton));
+      await tester.pump();
+
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+      await tester.pump(const Duration(milliseconds: 60));
+      await tester.pump();
+
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+    });
+
+    test(
+        'asserts when customBuilder is not provided with customBuilder transition',
+        () {
+      expect(
+        () => AsyncIconButton(
+          icon: const Icon(Icons.add),
+          onPressed: () {
+            print('Pressed');
+          },
+          transitionType: TransitionAnimationType.customBuilder,
+        ),
+        throwsAssertionError,
+      );
+    });
+
+    test('asserts when using splashFactory together with style', () {
+      expect(
+        () => AsyncIconButton(
+          icon: const Icon(Icons.add),
+          onPressed: () {
+            print('Pressed');
+          },
+          style: IconButton.styleFrom(),
+          splashFactory: NoSplash.splashFactory,
+        ),
+        throwsAssertionError,
+      );
+    });
+
+    test('asserts when splashRadius <= 0 on filledTonal', () {
+      expect(
+        () => AsyncIconButton.filledTonal(
+          icon: const Icon(Icons.add),
+          onPressed: () {
+            print('Pressed');
+          },
+          splashRadius: 0,
+        ),
+        throwsAssertionError,
+      );
+    });
+
+    test('asserts when splashRadius <= 0 on outlined', () {
+      expect(
+        () => AsyncIconButton.outlined(
+          icon: const Icon(Icons.add),
+          onPressed: () {
+            print('Pressed');
+          },
+          splashRadius: 0,
+        ),
+        throwsAssertionError,
+      );
+    });
+
+    testWidgets('onHover callback fires on mouse enter/exit', (tester) async {
+      bool? lastHover;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Center(
+            child: AsyncIconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () {
+                print('Pressed');
+              },
+              onHover: (v) => lastHover = v,
+            ),
+          ),
+        ),
+      );
+
+      final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+      addTearDown(gesture.removePointer);
+      await gesture.addPointer(location: const Offset(0, 0));
+      await gesture.moveTo(tester.getCenter(find.byType(AsyncIconButton)));
+      await tester.pump();
+
+      expect(lastHover, isTrue);
+
+      await gesture.moveTo(const Offset(0, 0));
+      await tester.pump();
+
+      expect(lastHover, isFalse);
+    });
+
+    testWidgets('forwards constraints and mouseCursor to IconButton',
+        (tester) async {
+      const constraints = BoxConstraints.tightFor(width: 48, height: 48);
+      final cursor = SystemMouseCursors.click;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: AsyncIconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () {
+                print('Pressed');
+              },
+              mouseCursor: cursor,
+              constraints: constraints),
+        ),
+      );
+
+      final iconButton = tester.widget<IconButton>(find.byType(IconButton));
+      expect(iconButton.constraints, constraints);
+      expect(iconButton.mouseCursor, cursor);
+    });
+
+    testWidgets('onLongPress does not fire while loading (onPressed disabled)',
+        (tester) async {
+      var longPressed = false;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: AsyncIconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () {
+                print('Pressed');
+              },
+              loading: true,
+              onLongPress: () {
+                longPressed = true;
+              }),
+        ),
+      );
+
+      await tester.longPress(find.byType(AsyncIconButton));
+      await tester.pump();
+
+      // IconButton is disabled when onPressed is null (loading), so long press won't fire.
+      expect(longPressed, isFalse);
     });
   });
 }

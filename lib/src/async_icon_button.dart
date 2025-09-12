@@ -23,7 +23,6 @@ class AsyncIconButton extends StatefulWidget {
     this.focusNode,
     this.onLongPress,
     this.onHover,
-    this.onFocusChange,
     this.animationDuration = Durations.medium1,
     this.minimumChildOpacity = 0.0,
     this.transitionType = TransitionAnimationType.stack,
@@ -69,7 +68,6 @@ class AsyncIconButton extends StatefulWidget {
     this.focusNode,
     this.onLongPress,
     this.onHover,
-    this.onFocusChange,
     this.animationDuration = Durations.medium1,
     this.minimumChildOpacity = 0.0,
     this.transitionType = TransitionAnimationType.stack,
@@ -115,7 +113,6 @@ class AsyncIconButton extends StatefulWidget {
     this.focusNode,
     this.onLongPress,
     this.onHover,
-    this.onFocusChange,
     this.animationDuration = Durations.medium1,
     this.minimumChildOpacity = 0.0,
     this.transitionType = TransitionAnimationType.stack,
@@ -162,7 +159,6 @@ class AsyncIconButton extends StatefulWidget {
     this.focusNode,
     this.onLongPress,
     this.onHover,
-    this.onFocusChange,
     this.animationDuration = Durations.medium1,
     this.minimumChildOpacity = 0.0,
     this.transitionType = TransitionAnimationType.stack,
@@ -215,9 +211,6 @@ class AsyncIconButton extends StatefulWidget {
 
   /// The onHover callback of the button.
   final ValueChanged<bool>? onHover;
-
-  /// The onFocusChange callback of the button.
-  final ValueChanged<bool>? onFocusChange;
 
   /// The style of the button.
   final ButtonStyle? style;
@@ -307,30 +300,31 @@ class AsyncIconButton extends StatefulWidget {
 }
 
 class _AsyncIconButtonState extends State<AsyncIconButton> {
-  late bool _isLoading = widget.loading;
+  bool _internalLoading = false;
+
+  bool get _isLoading => _internalLoading || widget.loading;
+
+  @override
+  void didUpdateWidget(covariant AsyncIconButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.loading != widget.loading && !widget.loading) {
+      _internalLoading = false;
+    }
+  }
 
   Future<void> _handlePressed() async {
     // If the async callback is provided, use it.
     if (widget.onPressed != null) {
       // Prevent multiple presses.
       if (_isLoading) return;
-      setState(() => _isLoading = true);
+      setState(() => _internalLoading = true);
 
       try {
         await widget.onPressed?.call();
       } finally {
         // Ensure that state is updated even if an exception occurs.
-        if (mounted) setState(() => _isLoading = false);
+        if (mounted) setState(() => _internalLoading = false);
       }
-    }
-  }
-
-  @override
-  void didUpdateWidget(covariant AsyncIconButton oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // If the loading state changes, update the state.
-    if (oldWidget.loading != widget.loading) {
-      _isLoading = widget.loading;
     }
   }
 
@@ -349,7 +343,7 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
             highlightColor: widget.highlightColor,
             splashColor: widget.splashColor,
             disabledColor: widget.disabledColor,
-            onPressed: _isLoading ? null : _handlePressed,
+            onPressed: _isLoading ? null : () => _handlePressed(),
             onHover: widget.onHover,
             onLongPress: widget.onLongPress,
             mouseCursor: widget.mouseCursor,
@@ -361,15 +355,14 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
             style: widget.style ??
                 IconButton.styleFrom(splashFactory: widget.splashFactory),
             icon: _AsyncIconButtonChild(
-              icon: widget.icon,
-              loadingChild: widget.loadingChild,
-              style: widget.style,
-              isLoading: _isLoading,
-              transitionType: widget.transitionType,
-              animationDuration: widget.animationDuration,
-              minimumChildOpacity: widget.minimumChildOpacity,
-              customBuilder: widget.customBuilder,
-            ),
+                icon: widget.icon,
+                isLoading: _isLoading,
+                transitionType: widget.transitionType,
+                animationDuration: widget.animationDuration,
+                minimumChildOpacity: widget.minimumChildOpacity,
+                loadingChild: widget.loadingChild,
+                style: widget.style,
+                customBuilder: widget.customBuilder),
           ),
         _IconButtonVariant.filled => IconButton.filled(
             key: widget.key,
@@ -384,7 +377,7 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
             highlightColor: widget.highlightColor,
             splashColor: widget.splashColor,
             disabledColor: widget.disabledColor,
-            onPressed: _isLoading ? null : _handlePressed,
+            onPressed: _isLoading ? null : () => _handlePressed(),
             onHover: widget.onHover,
             onLongPress: widget.onLongPress,
             mouseCursor: widget.mouseCursor,
@@ -396,15 +389,14 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
             style: widget.style ??
                 IconButton.styleFrom(splashFactory: widget.splashFactory),
             icon: _AsyncIconButtonChild(
-              icon: widget.icon,
-              loadingChild: widget.loadingChild,
-              style: widget.style,
-              isLoading: _isLoading,
-              transitionType: widget.transitionType,
-              animationDuration: widget.animationDuration,
-              minimumChildOpacity: widget.minimumChildOpacity,
-              customBuilder: widget.customBuilder,
-            ),
+                icon: widget.icon,
+                isLoading: _isLoading,
+                transitionType: widget.transitionType,
+                animationDuration: widget.animationDuration,
+                minimumChildOpacity: widget.minimumChildOpacity,
+                loadingChild: widget.loadingChild,
+                style: widget.style,
+                customBuilder: widget.customBuilder),
           ),
         _IconButtonVariant.filledTonal => IconButton.filledTonal(
             key: widget.key,
@@ -419,7 +411,7 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
             highlightColor: widget.highlightColor,
             splashColor: widget.splashColor,
             disabledColor: widget.disabledColor,
-            onPressed: _isLoading ? null : _handlePressed,
+            onPressed: _isLoading ? null : () => _handlePressed(),
             onHover: widget.onHover,
             onLongPress: widget.onLongPress,
             mouseCursor: widget.mouseCursor,
@@ -431,15 +423,14 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
             style: widget.style ??
                 IconButton.styleFrom(splashFactory: widget.splashFactory),
             icon: _AsyncIconButtonChild(
-              icon: widget.icon,
-              loadingChild: widget.loadingChild,
-              style: widget.style,
-              isLoading: _isLoading,
-              transitionType: widget.transitionType,
-              animationDuration: widget.animationDuration,
-              minimumChildOpacity: widget.minimumChildOpacity,
-              customBuilder: widget.customBuilder,
-            ),
+                icon: widget.icon,
+                isLoading: _isLoading,
+                transitionType: widget.transitionType,
+                animationDuration: widget.animationDuration,
+                minimumChildOpacity: widget.minimumChildOpacity,
+                loadingChild: widget.loadingChild,
+                style: widget.style,
+                customBuilder: widget.customBuilder),
           ),
         _IconButtonVariant.outlined => IconButton.outlined(
             key: widget.key,
@@ -454,7 +445,7 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
             highlightColor: widget.highlightColor,
             splashColor: widget.splashColor,
             disabledColor: widget.disabledColor,
-            onPressed: _isLoading ? null : _handlePressed,
+            onPressed: _isLoading ? null : () => _handlePressed(),
             onHover: widget.onHover,
             onLongPress: widget.onLongPress,
             mouseCursor: widget.mouseCursor,
@@ -466,15 +457,14 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
             style: widget.style ??
                 IconButton.styleFrom(splashFactory: widget.splashFactory),
             icon: _AsyncIconButtonChild(
-              icon: widget.icon,
-              loadingChild: widget.loadingChild,
-              style: widget.style,
-              isLoading: _isLoading,
-              transitionType: widget.transitionType,
-              animationDuration: widget.animationDuration,
-              minimumChildOpacity: widget.minimumChildOpacity,
-              customBuilder: widget.customBuilder,
-            ),
+                icon: widget.icon,
+                isLoading: _isLoading,
+                transitionType: widget.transitionType,
+                animationDuration: widget.animationDuration,
+                minimumChildOpacity: widget.minimumChildOpacity,
+                loadingChild: widget.loadingChild,
+                style: widget.style,
+                customBuilder: widget.customBuilder),
           ),
       };
 }
@@ -508,34 +498,27 @@ class _AsyncIconButtonChild extends StatelessWidget {
           alignment: Alignment.center,
           children: [
             AnimatedOpacity(
-              opacity: isLoading ? minimumChildOpacity : 1.0,
-              duration: animationDuration,
-              child: AnimatedSize(duration: animationDuration, child: icon),
-            ),
+                child: AnimatedSize(child: icon, duration: animationDuration),
+                opacity: isLoading ? minimumChildOpacity : 1.0,
+                duration: animationDuration),
             AnimatedOpacity(
-              opacity: isLoading ? 1.0 : 0.0,
-              duration: animationDuration,
-              child: Visibility(
-                visible: isLoading,
-                child: _DefaultLoadingIndicator(style: style),
-              ),
-            ),
+                child: Visibility(
+                    child:
+                        loadingChild ?? _DefaultLoadingIndicator(style: style),
+                    visible: isLoading),
+                opacity: isLoading ? 1.0 : 0.0,
+                duration: animationDuration),
           ],
         ),
       TransitionAnimationType.animatedSwitcher => AnimatedSwitcher(
-          transitionBuilder: (child, animation) => FadeTransition(
-            key: ValueKey<Key?>(child.key),
-            opacity: animation,
-            child: AnimatedSize(
-              duration: animationDuration,
-              child: child,
-            ),
-          ),
-          duration: animationDuration,
           child: !isLoading
               ? IgnorePointer(ignoring: isLoading, child: icon)
               : loadingChild ?? _DefaultLoadingIndicator(style: style),
-        ),
+          duration: animationDuration,
+          transitionBuilder: (child, animation) => FadeTransition(
+              key: ValueKey<Key?>(child.key),
+              opacity: animation,
+              child: AnimatedSize(child: child, duration: animationDuration))),
       TransitionAnimationType.customBuilder => customBuilder != null
           ? customBuilder?.call(isLoading, icon, loadingChild) ?? icon
           : icon

@@ -21,6 +21,7 @@ class _AsyncElevatedButtonWithIcon extends AsyncElevatedButton {
     super.transitionType,
     super.customBuilder,
     super.splashFactory,
+    super.loadingSemanticsLabel,
   }) : super(
           autofocus: autofocus ?? false,
           child: _ElevatedButtonWithIconChild(

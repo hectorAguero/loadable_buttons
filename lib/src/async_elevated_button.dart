@@ -32,6 +32,7 @@ class AsyncElevatedButton extends StatefulWidget {
     this.transitionType = TransitionAnimationType.stack,
     this.customBuilder,
     this.splashFactory,
+    this.loadingSemanticsLabel,
     super.key,
   })  : assert(
           transitionType != TransitionAnimationType.customBuilder ||
@@ -67,10 +68,11 @@ class AsyncElevatedButton extends StatefulWidget {
     Widget Function(bool loading, Widget child, Widget? loadingChild)?
         customBuilder,
     InteractiveInkFeatureFactory? splashFactory,
+    String? loadingSemanticsLabel,
   }) {
     if (icon == null) {
       return AsyncElevatedButton(
-        key: key,
+        child: label,
         onPressed: onPressed,
         loadingChild: loadingChild,
         loading: loading,
@@ -87,28 +89,29 @@ class AsyncElevatedButton extends StatefulWidget {
         transitionType: transitionType,
         customBuilder: customBuilder,
         splashFactory: splashFactory,
-        child: label,
+        loadingSemanticsLabel: loadingSemanticsLabel,
+        key: key,
       );
     }
 
     return _AsyncElevatedButtonWithIcon(
-      key: key,
-      label: label,
-      icon: icon,
-      onPressed: onPressed,
-      loading: loading,
-      loadingChild: loadingChild,
-      style: style,
-      iconAlignment: iconAlignment,
-      autofocus: autofocus,
-      clipBehavior: clipBehavior ?? Clip.none,
-      statesController: statesController,
-      animationDuration: animationDuration,
-      minimumChildOpacity: minimumChildOpacity,
-      transitionType: transitionType,
-      customBuilder: customBuilder,
-      splashFactory: splashFactory,
-    );
+        label: label,
+        icon: icon,
+        onPressed: onPressed,
+        loading: loading,
+        loadingChild: loadingChild,
+        key: key,
+        style: style,
+        iconAlignment: iconAlignment,
+        autofocus: autofocus,
+        clipBehavior: clipBehavior ?? Clip.none,
+        statesController: statesController,
+        animationDuration: animationDuration,
+        minimumChildOpacity: minimumChildOpacity,
+        transitionType: transitionType,
+        customBuilder: customBuilder,
+        splashFactory: splashFactory,
+        loadingSemanticsLabel: loadingSemanticsLabel);
   }
 
   /// The child of the button, same a the [ElevatedButton.child].
@@ -167,25 +170,33 @@ class AsyncElevatedButton extends StatefulWidget {
   /// It won't be used if the style property is set.
   final InteractiveInkFeatureFactory? splashFactory;
 
+  /// The semantics label for the loading indicator.
+  /// This is used by accessibility services to describe the loading state.
+  /// Would be ignored if [loadingChild] is provided
+  /// In that SemanticsLabel should be handled in the custom loadingChild.
+  final String? loadingSemanticsLabel;
+
   @override
   State<AsyncElevatedButton> createState() => _AsyncElevatedButtonState();
 }
 
 class _AsyncElevatedButtonState extends State<AsyncElevatedButton> {
-  late bool _isLoading = widget.loading;
+  bool _internalLoading = false;
+
+  bool get _isLoading => _internalLoading || widget.loading;
 
   Future<void> _handlePressed() async {
     // If the async callback is provided, use it.
     if (widget.onPressed != null) {
       // Prevent multiple presses.
       if (_isLoading) return;
-      setState(() => _isLoading = true);
+      setState(() => _internalLoading = true);
 
       try {
         await widget.onPressed?.call();
       } finally {
         // Ensure that state is updated even if an exception occurs.
-        if (mounted) setState(() => _isLoading = false);
+        if (mounted) setState(() => _internalLoading = false);
       }
     }
   }
@@ -193,16 +204,14 @@ class _AsyncElevatedButtonState extends State<AsyncElevatedButton> {
   @override
   void didUpdateWidget(covariant AsyncElevatedButton oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // If the loading state changes, update the state.
-    if (oldWidget.loading != widget.loading) {
-      _isLoading = widget.loading;
+    if (oldWidget.loading != widget.loading && !widget.loading) {
+      _internalLoading = false;
     }
   }
 
   @override
   Widget build(BuildContext context) => ElevatedButton(
-        key: widget.key,
-        onPressed: _isLoading ? null : _handlePressed,
+        onPressed: _isLoading ? null : () => _handlePressed(),
         onLongPress: widget.onLongPress,
         onHover: widget.onHover,
         onFocusChange: widget.onFocusChange,
@@ -217,38 +226,51 @@ class _AsyncElevatedButtonState extends State<AsyncElevatedButton> {
               alignment: Alignment.center,
               children: [
                 AnimatedOpacity(
-                  opacity: _isLoading ? widget.minimumChildOpacity : 1.0,
-                  duration: widget.animationDuration,
-                  child: AnimatedSize(
-                    duration: widget.animationDuration,
-                    child: widget.child,
-                  ),
-                ),
+                    child: AnimatedSize(
+                        // Ignore interactions on the content while loading.
+                        child: IgnorePointer(
+                          ignoring: _isLoading,
+                          child: widget.child,
+                        ),
+                        duration: widget.animationDuration),
+                    opacity: _isLoading ? widget.minimumChildOpacity : 1.0,
+                    duration: widget.animationDuration),
                 AnimatedOpacity(
-                  opacity: _isLoading ? 1.0 : 0.0,
-                  duration: widget.animationDuration,
-                  child: Visibility(
-                    visible: _isLoading,
-                    child: widget.loadingChild ??
-                        _DefaultLoadingIndicator(style: widget.style),
-                  ),
-                ),
+                    child: Visibility(
+                        child: widget.loadingChild ??
+                            _DefaultLoadingIndicator(
+                                style: widget.style,
+                                loadingSemanticsLabel:
+                                    widget.loadingSemanticsLabel),
+                        visible: _isLoading),
+                    opacity: _isLoading ? 1.0 : 0.0,
+                    duration: widget.animationDuration),
               ],
             ),
           TransitionAnimationType.animatedSwitcher => AnimatedSwitcher(
+              child: _isLoading
+                  ? KeyedSubtree(
+                      key: const ValueKey('loading'),
+                      child: widget.loadingChild ??
+                          _DefaultLoadingIndicator(
+                              style: widget.style,
+                              loadingSemanticsLabel:
+                                  widget.loadingSemanticsLabel),
+                    )
+                  : KeyedSubtree(
+                      key: const ValueKey('content'),
+                      child: IgnorePointer(
+                        ignoring: _isLoading,
+                        child: widget.child,
+                      )),
               duration: widget.animationDuration,
               transitionBuilder: (child, animation) => FadeTransition(
-                key: ValueKey<Key?>(child.key),
                 opacity: animation,
                 child: AnimatedSize(
-                  duration: widget.animationDuration,
                   child: child,
+                  duration: widget.animationDuration,
                 ),
               ),
-              child: !_isLoading
-                  ? IgnorePointer(ignoring: _isLoading, child: widget.child)
-                  : widget.loadingChild ??
-                      _DefaultLoadingIndicator(style: widget.style),
             ),
           TransitionAnimationType.customBuilder => widget.customBuilder != null
               ? widget.customBuilder?.call(
@@ -262,18 +284,28 @@ class _AsyncElevatedButtonState extends State<AsyncElevatedButton> {
 }
 
 class _DefaultLoadingIndicator extends StatelessWidget {
-  const _DefaultLoadingIndicator({required ButtonStyle? style})
+  const _DefaultLoadingIndicator(
+      {required ButtonStyle? style, required this.loadingSemanticsLabel})
       : _style = style;
 
   static const double _defaultStrokeWidth = 3.0;
 
   final ButtonStyle? _style;
+  final String? loadingSemanticsLabel;
 
   @override
   Widget build(BuildContext context) {
+    // Resolve default/normal state color, fall back to content color.
+    final Color? fallbackContentColor =
+        IconTheme.of(context).color ?? DefaultTextStyle.of(context).style.color;
+    final Color? resolvedColor =
+        _style?.foregroundColor?.resolve(<MaterialState>{}) ??
+            fallbackContentColor;
+
     return CircularProgressIndicator(
-      color: _style?.foregroundColor?.resolve({MaterialState.selected}),
+      color: resolvedColor,
       strokeWidth: _defaultStrokeWidth,
+      semanticsLabel: loadingSemanticsLabel,
       strokeCap: StrokeCap.round,
       constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
     );

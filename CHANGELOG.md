@@ -1,6 +1,13 @@
-## 0.2.1
+## 1.0.0
 
-* Fixed loadingChild in AsyncElevatedButton when using TransitionAnimationType.stack
+* Fixed `loadingChild` rendering in `AsyncElevatedButton` when using `TransitionAnimationType.stack`
+* Ensured loading indicators display correctly across all button variants
+* Prevented multiple taps while an async operation is running in `AsyncIconButton`
+* Verified and adjusted loading indicator color and opacity for `AsyncIconButton`
+* Added assertions for `customBuilder` and `splashRadius` in `AsyncIconButton`
+* Refactored `AsyncOutlinedButton` and `AsyncTextButton` tests for consistency
+* Added comprehensive tests for `AsyncFloatingActionButton` (various states and transitions)
+* Docs: Clarified `loadingChild` behavior with `TransitionAnimationType.stack` in README and added an 
 
 ## 0.2.0
 

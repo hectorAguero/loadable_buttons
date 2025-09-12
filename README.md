@@ -67,6 +67,30 @@ AsyncElevatedButton(
 );
 ```
 
+Note: When using `TransitionAnimationType.stack`, providing a `loadingChild` will show it during the loading state while preserving the button size. This is useful for keeping layout stable while showing a loader or message.
+
+Example with `loadingChild` and Stack transition:
+```dart
+AsyncElevatedButton(
+  transitionType: TransitionAnimationType.stack,
+  onPressed: () async {
+    await Future.delayed(const Duration(seconds: 2));
+  },
+  child: const Text('Submit'),
+  loadingChild: const Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      SizedBox.square(
+        dimension: 16,
+        child: CircularProgressIndicator(strokeWidth: 2),
+      ),
+      SizedBox(width: 8),
+      Text('Submitting...'),
+    ],
+  ),
+);
+```
+
 2. AnimatedSwitcher : Animates the size of the button while loading
 ```dart
 AsyncElevatedButton(
