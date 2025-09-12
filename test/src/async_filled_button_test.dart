@@ -59,13 +59,12 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: AsyncFilledButton(
-            onPressed: () {
-              log('Button pressed');
-            },
-            loadingChild: const CircularProgressIndicator(),
-            transitionType: TransitionAnimationType.animatedSwitcher,
-            child: const Text('Test Button'),
-          ),
+              child: const Text('Test Button'),
+              onPressed: () {
+                log('Button pressed');
+              },
+              loadingChild: const CircularProgressIndicator(),
+              transitionType: TransitionAnimationType.animatedSwitcher),
         ),
       );
 
@@ -139,17 +138,17 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: AsyncFilledButton(
-            onPressed: () {
-              log('Button pressed');
-            },
-            transitionType: TransitionAnimationType.customBuilder,
-            customBuilder: (bool loading, Widget child, Widget? loadingChild) {
-              return loading
-                  ? (loadingChild ?? const CircularProgressIndicator())
-                  : child;
-            },
-            child: const Text('Test Button'),
-          ),
+              child: const Text('Test Button'),
+              onPressed: () {
+                log('Button pressed');
+              },
+              transitionType: TransitionAnimationType.customBuilder,
+              customBuilder:
+                  (bool loading, Widget child, Widget? loadingChild) {
+                return loading
+                    ? (loadingChild ?? const CircularProgressIndicator())
+                    : child;
+              }),
         ),
       );
 
@@ -162,12 +161,11 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: AsyncFilledButton(
-            onPressed: () {
-              wasPressed = true;
-            },
-            loading: true,
-            child: const Text('Test Button'),
-          ),
+              child: const Text('Test Button'),
+              onPressed: () {
+                wasPressed = true;
+              },
+              loading: true),
         ),
       );
 

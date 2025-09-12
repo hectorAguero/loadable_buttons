@@ -7,9 +7,23 @@ void main() {
 }
 
 /// MyApp is a StatelessWidget. This widget is the root of your application.
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   /// Creates a MaterialApp widget.
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late var randomSeedColor = Colors.black;
+
+  void _changeSeedColor() {
+    setState(() {
+      randomSeedColor = Colors.primaries[
+          DateTime.now().millisecondsSinceEpoch % Colors.primaries.length];
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,11 +31,27 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData.from(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.black,
+          seedColor: randomSeedColor,
           dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
         ),
       ),
-      home: const _HomePage(),
+      home: Builder(builder: (context) {
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Theme.of(context).colorScheme.primaryContainer,
+                Theme.of(context).colorScheme.secondaryContainer,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          child: _HomePage(
+            onChangeSeedColor: _changeSeedColor,
+          ),
+        );
+      }),
     );
   }
 }
@@ -29,7 +59,9 @@ class MyApp extends StatelessWidget {
 /// HomePage is a StatefulWidget that represents the main application page.
 class _HomePage extends StatefulWidget {
   /// Creates a HomePage widget.
-  const _HomePage();
+  const _HomePage({this.onChangeSeedColor});
+
+  final VoidCallback? onChangeSeedColor;
 
   @override
   State<_HomePage> createState() => _HomePageState();
@@ -45,6 +77,7 @@ class _HomePageState extends State<_HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
       floatingActionButton: Row(
         mainAxisSize: MainAxisSize.min,
         spacing: 8,
@@ -66,6 +99,12 @@ class _HomePageState extends State<_HomePage> {
             onPressed: _switchTransitionAnimationType,
             label: Text(transitionType.name.capitalize()),
             icon: const Icon(Icons.animation),
+          ),
+          AsyncFloatingActionButton(
+            splashFactory: NoSplash.splashFactory,
+            transitionType: transitionType,
+            onPressed: () => widget.onChangeSeedColor?.call(),
+            child: const Icon(Icons.color_lens),
           ),
         ],
       ),
@@ -279,6 +318,7 @@ class _HomePageState extends State<_HomePage> {
                     iconSize: 64,
                     onPressed: () async {
                       await Future<void>.delayed(const Duration(seconds: 1));
+
                       if (mounted) setState(() => _isLongText = !_isLongText);
                     },
                   ),
