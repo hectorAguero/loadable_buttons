@@ -24,11 +24,12 @@ A Flutter package that provides enhanced buttons with built-in loading states an
 ### Installation
 Add the following to your `pubspec.yaml` or run:
 ```bash
-flutter pub add loadable_buttons
+flutter pub add loadable_buttons material_ui
 ```
 
 ### Importing
 ```dart
+import 'package:material_ui/material_ui.dart';
 import 'package:loadable_buttons/loadable_buttons.dart';
 ```
 
@@ -137,8 +138,25 @@ AsyncElevatedButton(
 | `animationDuration` | `Duration` | Duration of the loading animation |
 | `minimumChildOpacity` | `double` | Minimum opacity of child during loading |
 
-## Compatibility Note
+## Compatibility and migration
 
-This package is designed and tested for the latest Flutter stable version. Due to limitations in older Flutter versions regarding parameter handling, using this package with older versions might lead to unexpected behavior or limitations. Alternatively, since the package is MIT licensed, you can copy the relevant code into your project and adapt it for older versions.
+Requires Flutter **3.47.0+**, Dart **3.13.0+**, and `material_ui` **1.4.0+**
+(within the compatible 1.x range). The buttons use the standalone
+[Material UI library](https://pub.dev/packages/material_ui).
 
+When migrating from loadable_buttons 1.0.0:
 
+1. Upgrade Flutter to a supported version and add `material_ui` as a direct
+   dependency in your application.
+2. Replace `import 'package:flutter/material.dart';` with
+   `import 'package:material_ui/material_ui.dart';` in code that uses these buttons.
+3. Use `MaterialApp`, themes, `ButtonStyle`, and other Material types from
+   `material_ui` alongside loadable_buttons. The async button constructor names
+   and loading options are unchanged, but Material-specific types now come from
+   the standalone package. This is a breaking migration for consumers using the
+   legacy Flutter Material types.
+
+For applications that still contain legacy Material dependencies, follow the
+[official migration guide](https://pub.dev/packages/material_ui#migrating-existing-code-to-this-package)
+for `MaterialUiCompatibilityBridge` and localization migration. The bridge does
+not make legacy and standalone Material types interchangeable in public APIs.

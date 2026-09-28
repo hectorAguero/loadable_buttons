@@ -1,3 +1,12 @@
+## Unreleased
+
+* **Breaking:** Migrate button implementations to `package:material_ui/material_ui.dart`
+  and add `material_ui: ^1.4.0` as a runtime dependency.
+* **Breaking:** Require Flutter >=3.47.0 and Dart ^3.13.0. Consumers must use
+  Material UI imports and types for themes and button styling.
+* Migrate the example and widget tests to Material UI; preserve the existing
+  async button constructors and loading behavior.
+
 ## 1.0.0
 
 * Fixed `loadingChild` rendering in `AsyncElevatedButton` when using `TransitionAnimationType.stack`
