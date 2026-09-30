@@ -202,14 +202,6 @@ class _AsyncElevatedButtonState extends State<AsyncElevatedButton> {
   }
 
   @override
-  void didUpdateWidget(covariant AsyncElevatedButton oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.loading != widget.loading && !widget.loading) {
-      _internalLoading = false;
-    }
-  }
-
-  @override
   Widget build(BuildContext context) => ElevatedButton(
         onPressed: _isLoading ? null : () => _handlePressed(),
         onLongPress: widget.onLongPress,

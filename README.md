@@ -54,6 +54,26 @@ AsyncElevatedButton(
 );
 ```
 
+### External Loading
+
+The `loading` property controls an external loading source independently of the
+button's own async callback. The button stays in its loading state while either
+`loading` is `true` or its `onPressed` operation is pending. Setting `loading` to
+`false` does not cancel or finish that operation, and completing the operation
+does not clear external loading.
+
+```dart
+AsyncElevatedButton(
+  loading: isSaving,
+  onPressed: saveChanges,
+  child: const Text('Save'),
+);
+```
+
+This applies to all async button families and their constructor variants.
+The internal loading state is restored even when the callback throws; error
+handling remains the consumer's responsibility.
+
 ### Transition Types
 
 The package supports three types of transitions:
