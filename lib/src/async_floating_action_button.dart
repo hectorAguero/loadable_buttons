@@ -483,7 +483,9 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton> {
               // padding that Material would choose with an icon present.
               extendedPadding: widget.extendedPadding ??
                   (_useCombinedExtendedContent
-                      ? FloatingActionButtonTheme.of(context).extendedPadding ??
+                      ? Theme.of(context)
+                              .floatingActionButtonTheme
+                              .extendedPadding ??
                           _extendedPaddingWithIcon
                       : null),
               extendedTextStyle: widget.extendedTextStyle,
@@ -563,7 +565,8 @@ class _AsyncFloatingActionButtonChild extends StatelessWidget {
                 icon,
                 SizedBox(
                     width: iconLabelSpacing ??
-                        FloatingActionButtonTheme.of(context)
+                        Theme.of(context)
+                            .floatingActionButtonTheme
                             .extendedIconLabelSpacing ??
                         _defaultIconLabelSpacing),
                 child,

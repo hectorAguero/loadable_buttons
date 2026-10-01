@@ -283,7 +283,7 @@ class AsyncIconButton extends StatefulWidget {
 
   /// The selection state of the Material 3 icon button.
   ///
-  /// Resolved on each build with [MaterialState.disabled] when loading or when
+  /// Resolved on each build with [MaterialState] disabled when loading or when
   /// [onPressed] is null, and an empty state set otherwise. A null property
   /// preserves normal push-button behavior.
   final MaterialStateProperty<bool>? isSelected;
@@ -356,6 +356,15 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
             customBuilder: widget.customBuilder,
           );
 
+    // Flutter 3.29 styleFrom supplies a default cursor that would otherwise
+    // override IconButton's forwarded mouseCursor when these styles merge.
+    final style = widget.style ??
+        IconButton.styleFrom(
+          splashFactory: widget.splashFactory,
+          enabledMouseCursor: widget.mouseCursor,
+          disabledMouseCursor: widget.mouseCursor,
+        );
+
     return switch (widget._variant) {
       _IconButtonVariant.standard => IconButton(
           iconSize: widget.iconSize,
@@ -379,8 +388,7 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
           tooltip: widget.tooltip,
           enableFeedback: widget.enableFeedback,
           constraints: widget.constraints,
-          style: widget.style ??
-              IconButton.styleFrom(splashFactory: widget.splashFactory),
+          style: style,
           isSelected: isSelected,
           selectedIcon: selectedChild,
           icon: icon,
@@ -407,8 +415,7 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
           tooltip: widget.tooltip,
           enableFeedback: widget.enableFeedback,
           constraints: widget.constraints,
-          style: widget.style ??
-              IconButton.styleFrom(splashFactory: widget.splashFactory),
+          style: style,
           isSelected: isSelected,
           selectedIcon: selectedChild,
           icon: icon,
@@ -435,8 +442,7 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
           tooltip: widget.tooltip,
           enableFeedback: widget.enableFeedback,
           constraints: widget.constraints,
-          style: widget.style ??
-              IconButton.styleFrom(splashFactory: widget.splashFactory),
+          style: style,
           isSelected: isSelected,
           selectedIcon: selectedChild,
           icon: icon,
@@ -463,8 +469,7 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
           tooltip: widget.tooltip,
           enableFeedback: widget.enableFeedback,
           constraints: widget.constraints,
-          style: widget.style ??
-              IconButton.styleFrom(splashFactory: widget.splashFactory),
+          style: style,
           isSelected: isSelected,
           selectedIcon: selectedChild,
           icon: icon,

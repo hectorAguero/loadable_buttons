@@ -1,4 +1,5 @@
-include: package:very_good_analysis/analysis_options.yaml
+# Use the same Dart 3.7-compatible baseline on minimum and stable.
+include: package:very_good_analysis/analysis_options.8.0.0.yaml
 
 analyzer:
   exclude:
@@ -14,7 +15,8 @@ analyzer:
     strict-raw-types: true
 
 # Very Good Analysis owns built-in rules; these plugins add custom checks.
-# Development uses Dart >= 3.13; consumer SDK constraints stay in pubspec.yaml.
+# Modern plugins run on stable; Flutter 3.29 uses the built-in lint baseline.
+# tool/analyze.sh --minimum temporarily omits the unsupported plugin entries.
 plugins:
   solid_lints: ^1.0.0
   dart_code_linter:
@@ -91,8 +93,6 @@ solid_lints:
 
 linter:
   rules:
-    # DCL already owns async/await style and redundant async diagnostics.
-    async_return_with_no_await: false
     # Keep explicit types where they clarify fixtures and callback contracts.
     omit_local_variable_types: false
     avoid_types_on_closure_parameters: false
@@ -100,7 +100,6 @@ linter:
     cascade_invocations: false
     prefer_foreach: false
     sort_constructors_first: false
-    initialize_in_field_declaration: false
     prefer_single_quotes: false
     # Solid owns double literal formatting; keep explicit 0.0 layout values.
     prefer_int_literals: false
@@ -108,9 +107,6 @@ linter:
     prefer_asserts_with_message: false
     # Solid discourages uninitialized late fields outside test fixtures.
     use_late_for_private_fields_and_variables: false
-    # Library sources must remain compatible with the consumer Dart 3.6 floor.
-    use_declaring_parameters: false
-    use_null_aware_elements: false
     require_trailing_commas: false
     # Argument ordering is a style choice; preserve the existing widget wiring.
     sort_child_properties_last: false
