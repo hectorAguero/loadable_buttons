@@ -1,7 +1,7 @@
 # Development and linting
 
-The 1.0.x and 1.1.x compatibility lines support Flutter **3.29.0+** and Dart
-**3.6.0+**. CI tests the exact Flutter minimum declared in `pubspec.yaml` and the
+The 1.1.x compatibility line supports Flutter **3.29.0+** and Dart
+**3.7.0+**. CI tests the exact Flutter minimum declared in `pubspec.yaml` and the
 moving stable channel. See [the compatibility roadmap](docs/compatibility-roadmap.md).
 
 Use current Flutter stable with Dart **3.13 or newer** for the full plugin checks.
@@ -81,7 +81,7 @@ The package overrides policies that conflict with its API or structure:
 - Redundant `async` and preferences for uninitialized `late` fields: DCL owns
   the async check, while Solid discourages `late` outside test fixtures.
 - Newer syntax lints: the versioned baseline avoids requiring language features
-  above the package's consumer Dart 3.6 floor. Unsupported newer lint overrides
+  above the package's consumer Dart 3.7 floor. Unsupported newer lint overrides
   are omitted rather than suppressing analyzer warnings.
 
 The shared preset avoids formatter options unsupported by Dart 3.7. Both CI

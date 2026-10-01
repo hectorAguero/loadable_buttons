@@ -35,16 +35,16 @@ class AsyncFilledButton extends StatefulWidget {
     this.customBuilder,
     this.splashFactory,
     super.key,
-  })  : _variant = _AsyncFilledButtonVariant.filled,
-        assert(
-          transitionType != TransitionAnimationType.customBuilder ||
-              customBuilder != null,
-          'customBuilder must be provided when transitionType is customBuilder',
-        ),
-        assert(
-          splashFactory == null || style == null,
-          'splashFactory and style cannot be used together, use style',
-        );
+  }) : _variant = _AsyncFilledButtonVariant.filled,
+       assert(
+         transitionType != TransitionAnimationType.customBuilder ||
+             customBuilder != null,
+         'customBuilder must be provided when transitionType is customBuilder',
+       ),
+       assert(
+         splashFactory == null || style == null,
+         'splashFactory and style cannot be used together, use style',
+       );
 
   /// Create a filled button from [icon] and [label].
   ///
@@ -75,52 +75,54 @@ class AsyncFilledButton extends StatefulWidget {
     double minimumChildOpacity = 0.0,
     TransitionAnimationType transitionType = TransitionAnimationType.stack,
     Widget Function(bool loading, Widget child, Widget? loadingChild)?
-        customBuilder,
+    customBuilder,
     InteractiveInkFeatureFactory? splashFactory,
   }) {
     if (icon == null) {
       return AsyncFilledButton(
-          child: label,
-          onPressed: onPressed,
-          loadingChild: loadingChild,
-          loading: loading,
-          autofocus: autofocus,
-          clipBehavior: clipBehavior,
-          statesController: statesController,
-          style: style,
-          focusNode: focusNode,
-          onLongPress: onLongPress,
-          onHover: onHover,
-          onFocusChange: onFocusChange,
-          animationDuration: animationDuration,
-          minimumChildOpacity: minimumChildOpacity,
-          transitionType: transitionType,
-          customBuilder: customBuilder,
-          splashFactory: splashFactory,
-          key: key);
-    }
-
-    return _AsyncFilledButtonWithIcon(
-        label: label,
-        icon: icon,
+        child: label,
         onPressed: onPressed,
-        loading: loading,
         loadingChild: loadingChild,
-        key: key,
+        loading: loading,
+        autofocus: autofocus,
+        clipBehavior: clipBehavior,
+        statesController: statesController,
+        style: style,
+        focusNode: focusNode,
         onLongPress: onLongPress,
         onHover: onHover,
         onFocusChange: onFocusChange,
-        focusNode: focusNode,
-        style: style,
-        iconAlignment: iconAlignment,
-        autofocus: autofocus,
-        clipBehavior: clipBehavior ?? Clip.none,
-        statesController: statesController,
         animationDuration: animationDuration,
         minimumChildOpacity: minimumChildOpacity,
         transitionType: transitionType,
         customBuilder: customBuilder,
-        splashFactory: splashFactory);
+        splashFactory: splashFactory,
+        key: key,
+      );
+    }
+
+    return _AsyncFilledButtonWithIcon(
+      label: label,
+      icon: icon,
+      onPressed: onPressed,
+      loading: loading,
+      loadingChild: loadingChild,
+      key: key,
+      onLongPress: onLongPress,
+      onHover: onHover,
+      onFocusChange: onFocusChange,
+      focusNode: focusNode,
+      style: style,
+      iconAlignment: iconAlignment,
+      autofocus: autofocus,
+      clipBehavior: clipBehavior ?? Clip.none,
+      statesController: statesController,
+      animationDuration: animationDuration,
+      minimumChildOpacity: minimumChildOpacity,
+      transitionType: transitionType,
+      customBuilder: customBuilder,
+      splashFactory: splashFactory,
+    );
   }
 
   /// Create a tonal variant of FilledButton.
@@ -148,12 +150,12 @@ class AsyncFilledButton extends StatefulWidget {
     this.customBuilder,
     this.splashFactory,
     super.key,
-  })  : _variant = _AsyncFilledButtonVariant.tonal,
-        assert(
-          transitionType != TransitionAnimationType.customBuilder ||
-              customBuilder != null,
-          'customBuilder must be provided when transitionType is customBuilder',
-        );
+  }) : _variant = _AsyncFilledButtonVariant.tonal,
+       assert(
+         transitionType != TransitionAnimationType.customBuilder ||
+             customBuilder != null,
+         'customBuilder must be provided when transitionType is customBuilder',
+       );
 
   /// Create a filled tonal button from [icon] and [label].
   ///
@@ -181,52 +183,54 @@ class AsyncFilledButton extends StatefulWidget {
     double minimumChildOpacity = 0.0,
     TransitionAnimationType transitionType = TransitionAnimationType.stack,
     Widget Function(bool loading, Widget child, Widget? loadingChild)?
-        customBuilder,
+    customBuilder,
     InteractiveInkFeatureFactory? splashFactory,
   }) {
     if (icon == null) {
       return AsyncFilledButton.tonal(
-          child: label,
-          onPressed: onPressed,
-          loadingChild: loadingChild,
-          loading: loading,
-          autofocus: autofocus,
-          clipBehavior: clipBehavior ?? Clip.none,
-          statesController: statesController,
-          style: style,
-          focusNode: focusNode,
-          onLongPress: onLongPress,
-          onHover: onHover,
-          onFocusChange: onFocusChange,
-          animationDuration: animationDuration,
-          minimumChildOpacity: minimumChildOpacity,
-          transitionType: transitionType,
-          customBuilder: customBuilder,
-          splashFactory: splashFactory,
-          key: key);
-    }
-
-    return _AsyncFilledButtonWithIcon.tonal(
+        child: label,
         onPressed: onPressed,
-        icon: icon,
-        label: label,
-        key: key,
+        loadingChild: loadingChild,
+        loading: loading,
+        autofocus: autofocus,
+        clipBehavior: clipBehavior ?? Clip.none,
+        statesController: statesController,
+        style: style,
+        focusNode: focusNode,
         onLongPress: onLongPress,
         onHover: onHover,
         onFocusChange: onFocusChange,
-        style: style,
-        focusNode: focusNode,
-        autofocus: autofocus,
-        clipBehavior: clipBehavior,
-        statesController: statesController,
-        iconAlignment: iconAlignment,
-        loading: loading,
-        loadingChild: loadingChild,
         animationDuration: animationDuration,
         minimumChildOpacity: minimumChildOpacity,
         transitionType: transitionType,
         customBuilder: customBuilder,
-        splashFactory: splashFactory);
+        splashFactory: splashFactory,
+        key: key,
+      );
+    }
+
+    return _AsyncFilledButtonWithIcon.tonal(
+      onPressed: onPressed,
+      icon: icon,
+      label: label,
+      key: key,
+      onLongPress: onLongPress,
+      onHover: onHover,
+      onFocusChange: onFocusChange,
+      style: style,
+      focusNode: focusNode,
+      autofocus: autofocus,
+      clipBehavior: clipBehavior,
+      statesController: statesController,
+      iconAlignment: iconAlignment,
+      loading: loading,
+      loadingChild: loadingChild,
+      animationDuration: animationDuration,
+      minimumChildOpacity: minimumChildOpacity,
+      transitionType: transitionType,
+      customBuilder: customBuilder,
+      splashFactory: splashFactory,
+    );
   }
 
   /// The child of the button, same a the [FilledButton.child].
@@ -278,7 +282,7 @@ class AsyncFilledButton extends StatefulWidget {
   /// The custom builder of the loading animation,
   /// when TransitionAnimationType.customBuilder is selected.
   final Widget Function(bool loading, Widget child, Widget? loadingChild)?
-      customBuilder;
+  customBuilder;
 
   /// Optional SplashFactory to customize the splash effect.
   /// Use NoSplash.splashFactory to disable flutter default splash effect.
@@ -313,22 +317,27 @@ class _AsyncFilledButtonState extends State<AsyncFilledButton>
             isLoading || widget.onLongPress == null ? null : _handleLongPress,
         onHover: widget.onHover,
         onFocusChange: widget.onFocusChange,
-        style: widget.style ??
+        style:
+            widget.style ??
             FilledButton.styleFrom(splashFactory: widget.splashFactory),
         focusNode: widget.focusNode,
         autofocus: widget.autofocus,
         clipBehavior: widget.clipBehavior,
         statesController: widget.statesController,
         child: _ChildContent(
-            customBuilder: widget.customBuilder
-                ?.call(isLoading, widget.child, widget.loadingChild),
-            child: widget.child,
-            loadingChild: widget.loadingChild,
-            isLoading: isLoading,
-            transitionType: widget.transitionType,
-            animationDuration: widget.animationDuration,
-            minimumChildOpacity: widget.minimumChildOpacity,
-            style: widget.style),
+          customBuilder: widget.customBuilder?.call(
+            isLoading,
+            widget.child,
+            widget.loadingChild,
+          ),
+          child: widget.child,
+          loadingChild: widget.loadingChild,
+          isLoading: isLoading,
+          transitionType: widget.transitionType,
+          animationDuration: widget.animationDuration,
+          minimumChildOpacity: widget.minimumChildOpacity,
+          style: widget.style,
+        ),
       );
     }
 
@@ -338,22 +347,27 @@ class _AsyncFilledButtonState extends State<AsyncFilledButton>
           isLoading || widget.onLongPress == null ? null : _handleLongPress,
       onHover: widget.onHover,
       onFocusChange: widget.onFocusChange,
-      style: widget.style ??
+      style:
+          widget.style ??
           FilledButton.styleFrom(splashFactory: widget.splashFactory),
       focusNode: widget.focusNode,
       autofocus: widget.autofocus,
       clipBehavior: widget.clipBehavior,
       statesController: widget.statesController,
       child: _ChildContent(
-          customBuilder: widget.customBuilder
-              ?.call(isLoading, widget.child, widget.loadingChild),
-          child: widget.child,
-          loadingChild: widget.loadingChild,
-          isLoading: isLoading,
-          transitionType: widget.transitionType,
-          animationDuration: widget.animationDuration,
-          minimumChildOpacity: widget.minimumChildOpacity,
-          style: widget.style),
+        customBuilder: widget.customBuilder?.call(
+          isLoading,
+          widget.child,
+          widget.loadingChild,
+        ),
+        child: widget.child,
+        loadingChild: widget.loadingChild,
+        isLoading: isLoading,
+        transitionType: widget.transitionType,
+        animationDuration: widget.animationDuration,
+        minimumChildOpacity: widget.minimumChildOpacity,
+        style: widget.style,
+      ),
     );
   }
 }
@@ -387,7 +401,8 @@ class _ChildContent extends StatelessWidget {
 
     return LoadingTransition(
       child: child,
-      loadingChild: loadingChild ??
+      loadingChild:
+          loadingChild ??
           DefaultLoadingIndicator(
             style: style,
             themeStyleOf: (context) => FilledButtonTheme.of(context).style,

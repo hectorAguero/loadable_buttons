@@ -49,18 +49,19 @@ class AsyncFloatingActionButton extends StatefulWidget {
     this.loading = false,
     this.splashFactory,
     super.key,
-  })  : assert(
-          transitionType != TransitionAnimationType.customBuilder ||
-              customBuilder != null,
-          'customBuilder must be provided when transitionType is customBuilder',
-        ),
-        _floatingActionButtonType = mini
-            ? _FloatingActionButtonType.small
-            : _FloatingActionButtonType.regular,
-        _extendedLabel = null,
-        extendedIconLabelSpacing = null,
-        extendedPadding = null,
-        extendedTextStyle = null;
+  }) : assert(
+         transitionType != TransitionAnimationType.customBuilder ||
+             customBuilder != null,
+         'customBuilder must be provided when transitionType is customBuilder',
+       ),
+       _floatingActionButtonType =
+           mini
+               ? _FloatingActionButtonType.small
+               : _FloatingActionButtonType.regular,
+       _extendedLabel = null,
+       extendedIconLabelSpacing = null,
+       extendedPadding = null,
+       extendedTextStyle = null;
 
   /// Constructor for small FAB.
   const AsyncFloatingActionButton.small({
@@ -93,23 +94,23 @@ class AsyncFloatingActionButton extends StatefulWidget {
     this.loading = false,
     this.splashFactory,
     super.key,
-  })  : assert(
-          transitionType != TransitionAnimationType.customBuilder ||
-              customBuilder != null,
-          'customBuilder must be provided when transitionType is customBuilder',
-        ),
-        assert(elevation == null || elevation >= 0.0),
-        assert(focusElevation == null || focusElevation >= 0.0),
-        assert(hoverElevation == null || hoverElevation >= 0.0),
-        assert(highlightElevation == null || highlightElevation >= 0.0),
-        assert(disabledElevation == null || disabledElevation >= 0.0),
-        _floatingActionButtonType = _FloatingActionButtonType.small,
-        mini = true,
-        isExtended = false,
-        _extendedLabel = null,
-        extendedIconLabelSpacing = null,
-        extendedPadding = null,
-        extendedTextStyle = null;
+  }) : assert(
+         transitionType != TransitionAnimationType.customBuilder ||
+             customBuilder != null,
+         'customBuilder must be provided when transitionType is customBuilder',
+       ),
+       assert(elevation == null || elevation >= 0.0),
+       assert(focusElevation == null || focusElevation >= 0.0),
+       assert(hoverElevation == null || hoverElevation >= 0.0),
+       assert(highlightElevation == null || highlightElevation >= 0.0),
+       assert(disabledElevation == null || disabledElevation >= 0.0),
+       _floatingActionButtonType = _FloatingActionButtonType.small,
+       mini = true,
+       isExtended = false,
+       _extendedLabel = null,
+       extendedIconLabelSpacing = null,
+       extendedPadding = null,
+       extendedTextStyle = null;
 
   /// Constructor for large FAB.
   const AsyncFloatingActionButton.large({
@@ -142,23 +143,23 @@ class AsyncFloatingActionButton extends StatefulWidget {
     this.loading = false,
     this.splashFactory,
     super.key,
-  })  : assert(
-          transitionType != TransitionAnimationType.customBuilder ||
-              customBuilder != null,
-          'customBuilder must be provided when transitionType is customBuilder',
-        ),
-        assert(elevation == null || elevation >= 0.0),
-        assert(focusElevation == null || focusElevation >= 0.0),
-        assert(hoverElevation == null || hoverElevation >= 0.0),
-        assert(highlightElevation == null || highlightElevation >= 0.0),
-        assert(disabledElevation == null || disabledElevation >= 0.0),
-        _floatingActionButtonType = _FloatingActionButtonType.large,
-        mini = false,
-        isExtended = false,
-        _extendedLabel = null,
-        extendedIconLabelSpacing = null,
-        extendedPadding = null,
-        extendedTextStyle = null;
+  }) : assert(
+         transitionType != TransitionAnimationType.customBuilder ||
+             customBuilder != null,
+         'customBuilder must be provided when transitionType is customBuilder',
+       ),
+       assert(elevation == null || elevation >= 0.0),
+       assert(focusElevation == null || focusElevation >= 0.0),
+       assert(hoverElevation == null || hoverElevation >= 0.0),
+       assert(highlightElevation == null || highlightElevation >= 0.0),
+       assert(disabledElevation == null || disabledElevation >= 0.0),
+       _floatingActionButtonType = _FloatingActionButtonType.large,
+       mini = false,
+       isExtended = false,
+       _extendedLabel = null,
+       extendedIconLabelSpacing = null,
+       extendedPadding = null,
+       extendedTextStyle = null;
 
   /// Constructor for extended FAB.
   const AsyncFloatingActionButton.extended({
@@ -196,20 +197,20 @@ class AsyncFloatingActionButton extends StatefulWidget {
     this.splashFactory,
     Widget? icon,
     super.key,
-  })  : assert(
-          transitionType != TransitionAnimationType.customBuilder ||
-              customBuilder != null,
-          'customBuilder must be provided when transitionType is customBuilder',
-        ),
-        assert(elevation == null || elevation >= 0.0),
-        assert(focusElevation == null || focusElevation >= 0.0),
-        assert(hoverElevation == null || hoverElevation >= 0.0),
-        assert(highlightElevation == null || highlightElevation >= 0.0),
-        assert(disabledElevation == null || disabledElevation >= 0.0),
-        mini = false,
-        _floatingActionButtonType = _FloatingActionButtonType.extended,
-        child = icon,
-        _extendedLabel = label;
+  }) : assert(
+         transitionType != TransitionAnimationType.customBuilder ||
+             customBuilder != null,
+         'customBuilder must be provided when transitionType is customBuilder',
+       ),
+       assert(elevation == null || elevation >= 0.0),
+       assert(focusElevation == null || focusElevation >= 0.0),
+       assert(hoverElevation == null || hoverElevation >= 0.0),
+       assert(highlightElevation == null || highlightElevation >= 0.0),
+       assert(disabledElevation == null || disabledElevation >= 0.0),
+       mini = false,
+       _floatingActionButtonType = _FloatingActionButtonType.extended,
+       child = icon,
+       _extendedLabel = label;
 
   /// The child of the button, same as the [FloatingActionButton.child].
   final Widget? child;
@@ -242,7 +243,7 @@ class AsyncFloatingActionButton extends StatefulWidget {
   /// The custom builder of the loading animation,
   /// when TransitionAnimationType.customBuilder is selected.
   final Widget Function(bool loading, Widget child, Widget? loadingChild)?
-      customBuilder;
+  customBuilder;
 
   /// The focusColor of the button.
   final Color? focusColor;
@@ -327,8 +328,10 @@ class AsyncFloatingActionButton extends StatefulWidget {
 
 class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton>
     with AsyncButtonState<AsyncFloatingActionButton> {
-  static const _extendedPaddingWithIcon =
-      EdgeInsetsDirectional.only(start: 16, end: 20);
+  static const _extendedPaddingWithIcon = EdgeInsetsDirectional.only(
+    start: 16,
+    end: 20,
+  );
 
   @override
   bool get externalLoading => widget.loading;
@@ -343,165 +346,169 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton>
 
   @override
   Widget build(BuildContext context) => Theme(
-        data: Theme.of(context).copyWith(splashFactory: widget.splashFactory),
-        child: switch (widget._floatingActionButtonType) {
-          _FloatingActionButtonType.regular => FloatingActionButton(
-              child: _AsyncFloatingActionButtonChild(
+    data: Theme.of(context).copyWith(splashFactory: widget.splashFactory),
+    child: switch (widget._floatingActionButtonType) {
+      _FloatingActionButtonType.regular => FloatingActionButton(
+        child: _AsyncFloatingActionButtonChild(
+          child: widget.child ?? const SizedBox.shrink(),
+          color: widget.foregroundColor,
+          isLoading: isLoading,
+          transitionType: widget.transitionType,
+          animationDuration: widget.animationDuration,
+          minimumChildOpacity: widget.minimumChildOpacity,
+          loadingChild: widget.loadingChild,
+          customBuilder: widget.customBuilder,
+        ),
+        tooltip: widget.tooltip,
+        foregroundColor: widget.foregroundColor,
+        backgroundColor: widget.backgroundColor,
+        focusColor: widget.focusColor,
+        hoverColor: widget.hoverColor,
+        splashColor: widget.splashColor,
+        heroTag: widget.heroTag,
+        elevation: widget.elevation,
+        focusElevation: widget.focusElevation,
+        hoverElevation: widget.hoverElevation,
+        highlightElevation: widget.highlightElevation,
+        disabledElevation: widget.disabledElevation,
+        onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
+        mouseCursor: widget.mouseCursor,
+        mini: widget.mini,
+        shape: widget.shape,
+        clipBehavior: widget.clipBehavior,
+        focusNode: widget.focusNode,
+        autofocus: widget.autofocus,
+        materialTapTargetSize: widget.materialTapTargetSize,
+        isExtended: widget.isExtended,
+        enableFeedback: widget.enableFeedback,
+      ),
+      _FloatingActionButtonType.small => FloatingActionButton.small(
+        child: _AsyncFloatingActionButtonChild(
+          child: widget.child ?? const SizedBox.shrink(),
+          color: widget.foregroundColor,
+          isLoading: isLoading,
+          transitionType: widget.transitionType,
+          animationDuration: widget.animationDuration,
+          minimumChildOpacity: widget.minimumChildOpacity,
+          loadingChild: widget.loadingChild,
+          customBuilder: widget.customBuilder,
+        ),
+        tooltip: widget.tooltip,
+        foregroundColor: widget.foregroundColor,
+        backgroundColor: widget.backgroundColor,
+        focusColor: widget.focusColor,
+        hoverColor: widget.hoverColor,
+        splashColor: widget.splashColor,
+        heroTag: widget.heroTag,
+        elevation: widget.elevation,
+        focusElevation: widget.focusElevation,
+        hoverElevation: widget.hoverElevation,
+        highlightElevation: widget.highlightElevation,
+        disabledElevation: widget.disabledElevation,
+        onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
+        mouseCursor: widget.mouseCursor,
+        shape: widget.shape,
+        clipBehavior: widget.clipBehavior,
+        focusNode: widget.focusNode,
+        autofocus: widget.autofocus,
+        materialTapTargetSize: widget.materialTapTargetSize,
+        enableFeedback: widget.enableFeedback,
+      ),
+      _FloatingActionButtonType.large => FloatingActionButton.large(
+        child: _AsyncFloatingActionButtonChild(
+          child: widget.child ?? const SizedBox.shrink(),
+          color: widget.foregroundColor,
+          isLoading: isLoading,
+          transitionType: widget.transitionType,
+          animationDuration: widget.animationDuration,
+          minimumChildOpacity: widget.minimumChildOpacity,
+          loadingChild: widget.loadingChild,
+          customBuilder: widget.customBuilder,
+        ),
+        tooltip: widget.tooltip,
+        foregroundColor: widget.foregroundColor,
+        backgroundColor: widget.backgroundColor,
+        focusColor: widget.focusColor,
+        hoverColor: widget.hoverColor,
+        splashColor: widget.splashColor,
+        heroTag: widget.heroTag,
+        elevation: widget.elevation,
+        focusElevation: widget.focusElevation,
+        hoverElevation: widget.hoverElevation,
+        highlightElevation: widget.highlightElevation,
+        disabledElevation: widget.disabledElevation,
+        onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
+        mouseCursor: widget.mouseCursor,
+        shape: widget.shape,
+        clipBehavior: widget.clipBehavior,
+        focusNode: widget.focusNode,
+        autofocus: widget.autofocus,
+        materialTapTargetSize: widget.materialTapTargetSize,
+        enableFeedback: widget.enableFeedback,
+      ),
+      _FloatingActionButtonType.extended => FloatingActionButton.extended(
+        tooltip: widget.tooltip,
+        foregroundColor: widget.foregroundColor,
+        backgroundColor: widget.backgroundColor,
+        focusColor: widget.focusColor,
+        hoverColor: widget.hoverColor,
+        heroTag: widget.heroTag,
+        elevation: widget.elevation,
+        focusElevation: widget.focusElevation,
+        hoverElevation: widget.hoverElevation,
+        splashColor: widget.splashColor,
+        highlightElevation: widget.highlightElevation,
+        disabledElevation: widget.disabledElevation,
+        onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
+        mouseCursor: widget.mouseCursor,
+        shape: widget.shape,
+        isExtended: widget.isExtended,
+        materialTapTargetSize: widget.materialTapTargetSize,
+        clipBehavior: widget.clipBehavior,
+        focusNode: widget.focusNode,
+        autofocus: widget.autofocus,
+        extendedIconLabelSpacing: widget.extendedIconLabelSpacing,
+        // The combined row occupies the label slot; retain the native
+        // padding that Material would choose with an icon present.
+        extendedPadding:
+            widget.extendedPadding ??
+            (_useCombinedExtendedContent
+                ? Theme.of(context).floatingActionButtonTheme.extendedPadding ??
+                    _extendedPaddingWithIcon
+                : null),
+        extendedTextStyle: widget.extendedTextStyle,
+        icon:
+            widget.child == null || _useCombinedExtendedContent
+                ? null
+                : _AsyncFloatingActionButtonChild(
                   child: widget.child ?? const SizedBox.shrink(),
                   color: widget.foregroundColor,
                   isLoading: isLoading,
                   transitionType: widget.transitionType,
                   animationDuration: widget.animationDuration,
                   minimumChildOpacity: widget.minimumChildOpacity,
-                  loadingChild: widget.loadingChild,
-                  customBuilder: widget.customBuilder),
-              tooltip: widget.tooltip,
-              foregroundColor: widget.foregroundColor,
-              backgroundColor: widget.backgroundColor,
-              focusColor: widget.focusColor,
-              hoverColor: widget.hoverColor,
-              splashColor: widget.splashColor,
-              heroTag: widget.heroTag,
-              elevation: widget.elevation,
-              focusElevation: widget.focusElevation,
-              hoverElevation: widget.hoverElevation,
-              highlightElevation: widget.highlightElevation,
-              disabledElevation: widget.disabledElevation,
-              onPressed:
-                  isLoading || widget.onPressed == null ? null : handlePressed,
-              mouseCursor: widget.mouseCursor,
-              mini: widget.mini,
-              shape: widget.shape,
-              clipBehavior: widget.clipBehavior,
-              focusNode: widget.focusNode,
-              autofocus: widget.autofocus,
-              materialTapTargetSize: widget.materialTapTargetSize,
-              isExtended: widget.isExtended,
-              enableFeedback: widget.enableFeedback),
-          _FloatingActionButtonType.small => FloatingActionButton.small(
-              child: _AsyncFloatingActionButtonChild(
-                  child: widget.child ?? const SizedBox.shrink(),
-                  color: widget.foregroundColor,
-                  isLoading: isLoading,
-                  transitionType: widget.transitionType,
-                  animationDuration: widget.animationDuration,
-                  minimumChildOpacity: widget.minimumChildOpacity,
-                  loadingChild: widget.loadingChild,
-                  customBuilder: widget.customBuilder),
-              tooltip: widget.tooltip,
-              foregroundColor: widget.foregroundColor,
-              backgroundColor: widget.backgroundColor,
-              focusColor: widget.focusColor,
-              hoverColor: widget.hoverColor,
-              splashColor: widget.splashColor,
-              heroTag: widget.heroTag,
-              elevation: widget.elevation,
-              focusElevation: widget.focusElevation,
-              hoverElevation: widget.hoverElevation,
-              highlightElevation: widget.highlightElevation,
-              disabledElevation: widget.disabledElevation,
-              onPressed:
-                  isLoading || widget.onPressed == null ? null : handlePressed,
-              mouseCursor: widget.mouseCursor,
-              shape: widget.shape,
-              clipBehavior: widget.clipBehavior,
-              focusNode: widget.focusNode,
-              autofocus: widget.autofocus,
-              materialTapTargetSize: widget.materialTapTargetSize,
-              enableFeedback: widget.enableFeedback),
-          _FloatingActionButtonType.large => FloatingActionButton.large(
-              child: _AsyncFloatingActionButtonChild(
-                  child: widget.child ?? const SizedBox.shrink(),
-                  color: widget.foregroundColor,
-                  isLoading: isLoading,
-                  transitionType: widget.transitionType,
-                  animationDuration: widget.animationDuration,
-                  minimumChildOpacity: widget.minimumChildOpacity,
-                  loadingChild: widget.loadingChild,
-                  customBuilder: widget.customBuilder),
-              tooltip: widget.tooltip,
-              foregroundColor: widget.foregroundColor,
-              backgroundColor: widget.backgroundColor,
-              focusColor: widget.focusColor,
-              hoverColor: widget.hoverColor,
-              splashColor: widget.splashColor,
-              heroTag: widget.heroTag,
-              elevation: widget.elevation,
-              focusElevation: widget.focusElevation,
-              hoverElevation: widget.hoverElevation,
-              highlightElevation: widget.highlightElevation,
-              disabledElevation: widget.disabledElevation,
-              onPressed:
-                  isLoading || widget.onPressed == null ? null : handlePressed,
-              mouseCursor: widget.mouseCursor,
-              shape: widget.shape,
-              clipBehavior: widget.clipBehavior,
-              focusNode: widget.focusNode,
-              autofocus: widget.autofocus,
-              materialTapTargetSize: widget.materialTapTargetSize,
-              enableFeedback: widget.enableFeedback),
-          _FloatingActionButtonType.extended => FloatingActionButton.extended(
-              tooltip: widget.tooltip,
-              foregroundColor: widget.foregroundColor,
-              backgroundColor: widget.backgroundColor,
-              focusColor: widget.focusColor,
-              hoverColor: widget.hoverColor,
-              heroTag: widget.heroTag,
-              elevation: widget.elevation,
-              focusElevation: widget.focusElevation,
-              hoverElevation: widget.hoverElevation,
-              splashColor: widget.splashColor,
-              highlightElevation: widget.highlightElevation,
-              disabledElevation: widget.disabledElevation,
-              onPressed:
-                  isLoading || widget.onPressed == null ? null : handlePressed,
-              mouseCursor: widget.mouseCursor,
-              shape: widget.shape,
-              isExtended: widget.isExtended,
-              materialTapTargetSize: widget.materialTapTargetSize,
-              clipBehavior: widget.clipBehavior,
-              focusNode: widget.focusNode,
-              autofocus: widget.autofocus,
-              extendedIconLabelSpacing: widget.extendedIconLabelSpacing,
-              // The combined row occupies the label slot; retain the native
-              // padding that Material would choose with an icon present.
-              extendedPadding: widget.extendedPadding ??
-                  (_useCombinedExtendedContent
-                      ? Theme.of(context)
-                              .floatingActionButtonTheme
-                              .extendedPadding ??
-                          _extendedPaddingWithIcon
-                      : null),
-              extendedTextStyle: widget.extendedTextStyle,
-              icon: widget.child == null || _useCombinedExtendedContent
-                  ? null
-                  : _AsyncFloatingActionButtonChild(
-                      child: widget.child ?? const SizedBox.shrink(),
-                      color: widget.foregroundColor,
-                      isLoading: isLoading,
-                      transitionType: widget.transitionType,
-                      animationDuration: widget.animationDuration,
-                      minimumChildOpacity: widget.minimumChildOpacity,
-                      loadingChild: const SizedBox.shrink(),
-                      customBuilder: widget.customBuilder),
-              label: _AsyncFloatingActionButtonChild(
-                  leadingIcon:
-                      _useCombinedExtendedContent ? widget.child : null,
-                  iconLabelSpacing: widget.extendedIconLabelSpacing,
-                  child: AnimatedSize(
-                      child: widget._extendedLabel ?? const SizedBox.shrink(),
-                      duration: widget.animationDuration),
-                  color: widget.foregroundColor,
-                  isLoading: isLoading,
-                  transitionType: widget.transitionType,
-                  animationDuration: widget.animationDuration,
-                  minimumChildOpacity: widget.minimumChildOpacity,
-                  loadingChild: widget.loadingChild,
-                  customBuilder: widget.customBuilder),
-              enableFeedback: widget.enableFeedback,
-            ),
-        },
-      );
+                  loadingChild: const SizedBox.shrink(),
+                  customBuilder: widget.customBuilder,
+                ),
+        label: _AsyncFloatingActionButtonChild(
+          leadingIcon: _useCombinedExtendedContent ? widget.child : null,
+          iconLabelSpacing: widget.extendedIconLabelSpacing,
+          child: AnimatedSize(
+            child: widget._extendedLabel ?? const SizedBox.shrink(),
+            duration: widget.animationDuration,
+          ),
+          color: widget.foregroundColor,
+          isLoading: isLoading,
+          transitionType: widget.transitionType,
+          animationDuration: widget.animationDuration,
+          minimumChildOpacity: widget.minimumChildOpacity,
+          loadingChild: widget.loadingChild,
+          customBuilder: widget.customBuilder,
+        ),
+        enableFeedback: widget.enableFeedback,
+      ),
+    },
+  );
 }
 
 class _AsyncFloatingActionButtonChild extends StatelessWidget {
@@ -530,7 +537,7 @@ class _AsyncFloatingActionButtonChild extends StatelessWidget {
   final Duration animationDuration;
   final double minimumChildOpacity;
   final Widget Function(bool loading, Widget icon, Widget? loadingChild)?
-      customBuilder;
+  customBuilder;
 
   @override
   Widget build(BuildContext context) {
@@ -541,21 +548,24 @@ class _AsyncFloatingActionButtonChild extends StatelessWidget {
     final icon = leadingIcon;
 
     return LoadingTransition(
-      child: icon == null
-          ? child
-          : Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                icon,
-                SizedBox(
-                    width: iconLabelSpacing ??
-                        Theme.of(context)
-                            .floatingActionButtonTheme
-                            .extendedIconLabelSpacing ??
-                        _defaultIconLabelSpacing),
-                child,
-              ],
-            ),
+      child:
+          icon == null
+              ? child
+              : Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  icon,
+                  SizedBox(
+                    width:
+                        iconLabelSpacing ??
+                        Theme.of(
+                          context,
+                        ).floatingActionButtonTheme.extendedIconLabelSpacing ??
+                        _defaultIconLabelSpacing,
+                  ),
+                  child,
+                ],
+              ),
       loadingChild: loadingChild ?? DefaultLoadingIndicator(color: color),
       isLoading: isLoading,
       transitionType: transitionType,

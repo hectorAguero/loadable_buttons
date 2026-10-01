@@ -1,6 +1,6 @@
 name: loadable_buttons
 description: "Provides enhanced buttons with built-in loading states, async functionality and customizable transitions."
-version: 1.0.1
+version: 1.1.0
 homepage: https://hectoraguero.dev/
 repository: https://github.com/hectorAguero/loadable_buttons
 issue_tracker: https://github.com/hectorAguero/loadable_buttons/issues
@@ -13,7 +13,7 @@ topics:
   - widget
 
 environment:
-  sdk: ^3.6.0
+  sdk: ^3.7.0
   flutter: ">=3.29.0"
 
 dependencies:

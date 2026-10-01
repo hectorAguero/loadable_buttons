@@ -19,8 +19,13 @@ void main() {
           return pending.future;
         }
 
-        Widget host(bool loading) => buttonHost(entry.value(
-            child: const Text('Run'), loading: loading, onPressed: onPressed));
+        Widget host(bool loading) => buttonHost(
+          entry.value(
+            child: const Text('Run'),
+            loading: loading,
+            onPressed: onPressed,
+          ),
+        );
 
         await tester.pumpWidget(host(false));
         final position = tester.getCenter(find.text('Run'));
@@ -53,8 +58,13 @@ void main() {
           return pending.future;
         }
 
-        Widget host(bool loading) => buttonHost(entry.value(
-            child: const Text('Run'), loading: loading, onPressed: onPressed));
+        Widget host(bool loading) => buttonHost(
+          entry.value(
+            child: const Text('Run'),
+            loading: loading,
+            onPressed: onPressed,
+          ),
+        );
 
         await tester.pumpWidget(host(false));
         final position = tester.getCenter(find.text('Run'));

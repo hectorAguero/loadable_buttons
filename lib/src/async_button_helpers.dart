@@ -59,19 +59,20 @@ class DefaultLoadingIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => CircularProgressIndicator(
-        // WidgetState is available in Flutter 3.22. Resolve each foreground
-        // in the normal state before applying precedence.
-        color: color ??
-            style?.foregroundColor?.resolve(<WidgetState>{}) ??
-            themeStyleOf
-                ?.call(context)
-                ?.foregroundColor
-                ?.resolve(<WidgetState>{}) ??
-            IconTheme.of(context).color ??
-            DefaultTextStyle.of(context).style.color,
-        strokeWidth: _defaultStrokeWidth,
-        semanticsLabel: loadingSemanticsLabel,
-        strokeCap: StrokeCap.round,
-        constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
-      );
+    // WidgetState is available in Flutter 3.22. Resolve each foreground
+    // in the normal state before applying precedence.
+    color:
+        color ??
+        style?.foregroundColor?.resolve(<WidgetState>{}) ??
+        themeStyleOf
+            ?.call(context)
+            ?.foregroundColor
+            ?.resolve(<WidgetState>{}) ??
+        IconTheme.of(context).color ??
+        DefaultTextStyle.of(context).style.color,
+    strokeWidth: _defaultStrokeWidth,
+    semanticsLabel: loadingSemanticsLabel,
+    strokeCap: StrokeCap.round,
+    constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+  );
 }

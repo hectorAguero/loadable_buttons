@@ -32,15 +32,15 @@ class AsyncElevatedButton extends StatefulWidget {
     this.splashFactory,
     this.loadingSemanticsLabel,
     super.key,
-  })  : assert(
-          transitionType != TransitionAnimationType.customBuilder ||
-              customBuilder != null,
-          'customBuilder must be provided when transitionType is customBuilder',
-        ),
-        assert(
-          splashFactory == null || style == null,
-          'splashFactory and style cannot be used together, use style',
-        );
+  }) : assert(
+         transitionType != TransitionAnimationType.customBuilder ||
+             customBuilder != null,
+         'customBuilder must be provided when transitionType is customBuilder',
+       ),
+       assert(
+         splashFactory == null || style == null,
+         'splashFactory and style cannot be used together, use style',
+       );
 
   /// AsyncElevatedButton.icon is a custom widget that allows to load a child
   /// and an icon.
@@ -64,7 +64,7 @@ class AsyncElevatedButton extends StatefulWidget {
     double minimumChildOpacity = 0.0,
     TransitionAnimationType transitionType = TransitionAnimationType.stack,
     Widget Function(bool loading, Widget child, Widget? loadingChild)?
-        customBuilder,
+    customBuilder,
     InteractiveInkFeatureFactory? splashFactory,
     String? loadingSemanticsLabel,
   }) {
@@ -93,27 +93,28 @@ class AsyncElevatedButton extends StatefulWidget {
     }
 
     return _AsyncElevatedButtonWithIcon(
-        label: label,
-        icon: icon,
-        onPressed: onPressed,
-        loading: loading,
-        loadingChild: loadingChild,
-        key: key,
-        onLongPress: onLongPress,
-        onHover: onHover,
-        onFocusChange: onFocusChange,
-        focusNode: focusNode,
-        style: style,
-        iconAlignment: iconAlignment,
-        autofocus: autofocus,
-        clipBehavior: clipBehavior ?? Clip.none,
-        statesController: statesController,
-        animationDuration: animationDuration,
-        minimumChildOpacity: minimumChildOpacity,
-        transitionType: transitionType,
-        customBuilder: customBuilder,
-        splashFactory: splashFactory,
-        loadingSemanticsLabel: loadingSemanticsLabel);
+      label: label,
+      icon: icon,
+      onPressed: onPressed,
+      loading: loading,
+      loadingChild: loadingChild,
+      key: key,
+      onLongPress: onLongPress,
+      onHover: onHover,
+      onFocusChange: onFocusChange,
+      focusNode: focusNode,
+      style: style,
+      iconAlignment: iconAlignment,
+      autofocus: autofocus,
+      clipBehavior: clipBehavior ?? Clip.none,
+      statesController: statesController,
+      animationDuration: animationDuration,
+      minimumChildOpacity: minimumChildOpacity,
+      transitionType: transitionType,
+      customBuilder: customBuilder,
+      splashFactory: splashFactory,
+      loadingSemanticsLabel: loadingSemanticsLabel,
+    );
   }
 
   /// The child of the button, same a the [ElevatedButton.child].
@@ -165,7 +166,7 @@ class AsyncElevatedButton extends StatefulWidget {
   /// The custom builder of the loading animation,
   /// when TransitionAnimationType.customBuilder is selected.
   final Widget Function(bool loading, Widget child, Widget? loadingChild)?
-      customBuilder;
+  customBuilder;
 
   /// Optional SplashFactory to customize the splash effect.
   /// Use NoSplash.splashFactory to disable flutter default splash effect.
@@ -197,33 +198,40 @@ class _AsyncElevatedButtonState extends State<AsyncElevatedButton>
 
   @override
   Widget build(BuildContext context) => ElevatedButton(
-        onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
-        onLongPress:
-            isLoading || widget.onLongPress == null ? null : _handleLongPress,
-        onHover: widget.onHover,
-        onFocusChange: widget.onFocusChange,
-        style: widget.style ??
-            ElevatedButton.styleFrom(splashFactory: widget.splashFactory),
-        focusNode: widget.focusNode,
-        autofocus: widget.autofocus,
-        clipBehavior: widget.clipBehavior,
-        statesController: widget.statesController,
-        child: widget.transitionType == TransitionAnimationType.customBuilder
-            ? widget.customBuilder
-                    ?.call(isLoading, widget.child, widget.loadingChild) ??
+    onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
+    onLongPress:
+        isLoading || widget.onLongPress == null ? null : _handleLongPress,
+    onHover: widget.onHover,
+    onFocusChange: widget.onFocusChange,
+    style:
+        widget.style ??
+        ElevatedButton.styleFrom(splashFactory: widget.splashFactory),
+    focusNode: widget.focusNode,
+    autofocus: widget.autofocus,
+    clipBehavior: widget.clipBehavior,
+    statesController: widget.statesController,
+    child:
+        widget.transitionType == TransitionAnimationType.customBuilder
+            ? widget.customBuilder?.call(
+                  isLoading,
+                  widget.child,
+                  widget.loadingChild,
+                ) ??
                 widget.child
             : LoadingTransition(
-                child: widget.child,
-                loadingChild: widget.loadingChild ??
-                    DefaultLoadingIndicator(
-                        style: widget.style,
-                        themeStyleOf: (context) =>
-                            ElevatedButtonTheme.of(context).style,
-                        loadingSemanticsLabel: widget.loadingSemanticsLabel),
-                isLoading: isLoading,
-                transitionType: widget.transitionType,
-                animationDuration: widget.animationDuration,
-                minimumChildOpacity: widget.minimumChildOpacity,
-              ),
-      );
+              child: widget.child,
+              loadingChild:
+                  widget.loadingChild ??
+                  DefaultLoadingIndicator(
+                    style: widget.style,
+                    themeStyleOf:
+                        (context) => ElevatedButtonTheme.of(context).style,
+                    loadingSemanticsLabel: widget.loadingSemanticsLabel,
+                  ),
+              isLoading: isLoading,
+              transitionType: widget.transitionType,
+              animationDuration: widget.animationDuration,
+              minimumChildOpacity: widget.minimumChildOpacity,
+            ),
+  );
 }

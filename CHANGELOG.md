@@ -1,4 +1,10 @@
-## Unreleased
+## 1.1.0
+
+* Require Flutter 3.29.0 or newer and Dart >=3.7.0 <4.0.0.
+* Replace deprecated Material state typedefs with `WidgetStatesController` and
+  `WidgetStateProperty`, retaining source compatibility for existing callers.
+* Consolidate internal async loading state and default indicators across all
+  button families while preserving their behavior.
 
 * Preserve requested icon-button cursors when the fallback splash style is
   created, including on Flutter 3.29.

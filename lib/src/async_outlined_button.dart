@@ -31,15 +31,15 @@ class AsyncOutlinedButton extends StatefulWidget {
     this.customBuilder,
     this.splashFactory,
     super.key,
-  })  : assert(
-          transitionType != TransitionAnimationType.customBuilder ||
-              customBuilder != null,
-          'customBuilder must be provided when transitionType is customBuilder',
-        ),
-        assert(
-          splashFactory == null || style == null,
-          'splashFactory and style cannot be used together, use style',
-        );
+  }) : assert(
+         transitionType != TransitionAnimationType.customBuilder ||
+             customBuilder != null,
+         'customBuilder must be provided when transitionType is customBuilder',
+       ),
+       assert(
+         splashFactory == null || style == null,
+         'splashFactory and style cannot be used together, use style',
+       );
 
   /// AsyncOutlinedButton.icon is a custom widget that allows to load a child
   /// and an icon.
@@ -63,52 +63,54 @@ class AsyncOutlinedButton extends StatefulWidget {
     double minimumChildOpacity = 0.0,
     TransitionAnimationType transitionType = TransitionAnimationType.stack,
     Widget Function(bool loading, Widget child, Widget? loadingChild)?
-        customBuilder,
+    customBuilder,
     InteractiveInkFeatureFactory? splashFactory,
   }) {
     if (icon == null) {
       return AsyncOutlinedButton(
-          child: label,
-          onPressed: onPressed,
-          loadingChild: loadingChild,
-          loading: loading,
-          autofocus: autofocus,
-          clipBehavior: clipBehavior,
-          statesController: statesController,
-          style: style,
-          focusNode: focusNode,
-          onLongPress: onLongPress,
-          onHover: onHover,
-          onFocusChange: onFocusChange,
-          animationDuration: animationDuration,
-          minimumChildOpacity: minimumChildOpacity,
-          transitionType: transitionType,
-          customBuilder: customBuilder,
-          splashFactory: splashFactory,
-          key: key);
-    }
-
-    return _AsyncOutlinedButtonWithIcon(
-        label: label,
-        icon: icon,
+        child: label,
         onPressed: onPressed,
-        loading: loading,
         loadingChild: loadingChild,
-        key: key,
+        loading: loading,
+        autofocus: autofocus,
+        clipBehavior: clipBehavior,
+        statesController: statesController,
+        style: style,
+        focusNode: focusNode,
         onLongPress: onLongPress,
         onHover: onHover,
         onFocusChange: onFocusChange,
-        focusNode: focusNode,
-        style: style,
-        iconAlignment: iconAlignment,
-        autofocus: autofocus,
-        clipBehavior: clipBehavior ?? Clip.none,
-        statesController: statesController,
         animationDuration: animationDuration,
         minimumChildOpacity: minimumChildOpacity,
         transitionType: transitionType,
         customBuilder: customBuilder,
-        splashFactory: splashFactory);
+        splashFactory: splashFactory,
+        key: key,
+      );
+    }
+
+    return _AsyncOutlinedButtonWithIcon(
+      label: label,
+      icon: icon,
+      onPressed: onPressed,
+      loading: loading,
+      loadingChild: loadingChild,
+      key: key,
+      onLongPress: onLongPress,
+      onHover: onHover,
+      onFocusChange: onFocusChange,
+      focusNode: focusNode,
+      style: style,
+      iconAlignment: iconAlignment,
+      autofocus: autofocus,
+      clipBehavior: clipBehavior ?? Clip.none,
+      statesController: statesController,
+      animationDuration: animationDuration,
+      minimumChildOpacity: minimumChildOpacity,
+      transitionType: transitionType,
+      customBuilder: customBuilder,
+      splashFactory: splashFactory,
+    );
   }
 
   /// The child of the button, same a the [OutlinedButton.child].
@@ -160,7 +162,7 @@ class AsyncOutlinedButton extends StatefulWidget {
   /// The custom builder of the loading animation,
   /// when TransitionAnimationType.customBuilder is selected.
   final Widget Function(bool loading, Widget child, Widget? loadingChild)?
-      customBuilder;
+  customBuilder;
 
   /// Optional SplashFactory to customize the splash effect.
   /// Use NoSplash.splashFactory to disable flutter default splash effect.
@@ -186,33 +188,39 @@ class _AsyncOutlinedButtonState extends State<AsyncOutlinedButton>
 
   @override
   Widget build(BuildContext context) => OutlinedButton(
-        onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
-        onLongPress:
-            isLoading || widget.onLongPress == null ? null : _handleLongPress,
-        onHover: widget.onHover,
-        onFocusChange: widget.onFocusChange,
-        style: widget.style ??
-            OutlinedButton.styleFrom(splashFactory: widget.splashFactory),
-        focusNode: widget.focusNode,
-        autofocus: widget.autofocus,
-        clipBehavior: widget.clipBehavior,
-        statesController: widget.statesController,
-        child: widget.transitionType == TransitionAnimationType.customBuilder
-            ? widget.customBuilder
-                    ?.call(isLoading, widget.child, widget.loadingChild) ??
+    onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
+    onLongPress:
+        isLoading || widget.onLongPress == null ? null : _handleLongPress,
+    onHover: widget.onHover,
+    onFocusChange: widget.onFocusChange,
+    style:
+        widget.style ??
+        OutlinedButton.styleFrom(splashFactory: widget.splashFactory),
+    focusNode: widget.focusNode,
+    autofocus: widget.autofocus,
+    clipBehavior: widget.clipBehavior,
+    statesController: widget.statesController,
+    child:
+        widget.transitionType == TransitionAnimationType.customBuilder
+            ? widget.customBuilder?.call(
+                  isLoading,
+                  widget.child,
+                  widget.loadingChild,
+                ) ??
                 widget.child
             : LoadingTransition(
-                child: widget.child,
-                loadingChild: widget.loadingChild ??
-                    DefaultLoadingIndicator(
-                      style: widget.style,
-                      themeStyleOf: (context) =>
-                          OutlinedButtonTheme.of(context).style,
-                    ),
-                isLoading: isLoading,
-                transitionType: widget.transitionType,
-                animationDuration: widget.animationDuration,
-                minimumChildOpacity: widget.minimumChildOpacity,
-              ),
-      );
+              child: widget.child,
+              loadingChild:
+                  widget.loadingChild ??
+                  DefaultLoadingIndicator(
+                    style: widget.style,
+                    themeStyleOf:
+                        (context) => OutlinedButtonTheme.of(context).style,
+                  ),
+              isLoading: isLoading,
+              transitionType: widget.transitionType,
+              animationDuration: widget.animationDuration,
+              minimumChildOpacity: widget.minimumChildOpacity,
+            ),
+  );
 }

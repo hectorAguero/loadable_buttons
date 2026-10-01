@@ -8,42 +8,48 @@ import '../support/async_button_fixture.dart';
 
 void main() {
   for (final name in ['Icon', 'Floating action']) {
-    testWidgets('$name paints minimumChildOpacity and restores idle content',
-        (tester) async {
+    testWidgets('$name paints minimumChildOpacity and restores idle content', (
+      tester,
+    ) async {
       final builder = asyncButtonBuilders[name];
       if (builder == null) fail('Missing $name fixture');
       const boundaryKey = ValueKey('capture');
       const contentKey = ValueKey('painted content');
       Widget host(bool loading, double opacity) => RepaintBoundary(
-            key: boundaryKey,
-            child: buttonHost(builder(
-              child: const SizedBox(
-                key: contentKey,
-                width: 16,
-                height: 16,
-                child: ColoredBox(color: Colors.red),
-              ),
-              onPressed: () {},
-              loading: loading,
-              minimumChildOpacity: opacity,
-              loadingChild: const SizedBox.shrink(),
-            )),
-          );
+        key: boundaryKey,
+        child: buttonHost(
+          builder(
+            child: const SizedBox(
+              key: contentKey,
+              width: 16,
+              height: 16,
+              child: ColoredBox(color: Colors.red),
+            ),
+            onPressed: () {},
+            loading: loading,
+            minimumChildOpacity: opacity,
+            loadingChild: const SizedBox.shrink(),
+          ),
+        ),
+      );
       Future<int> paintedGreen() async {
-        final boundary =
-            tester.renderObject<RenderRepaintBoundary>(find.byKey(boundaryKey));
-        final position = tester.getCenter(find.byKey(contentKey)) -
+        final boundary = tester.renderObject<RenderRepaintBoundary>(
+          find.byKey(boundaryKey),
+        );
+        final position =
+            tester.getCenter(find.byKey(contentKey)) -
             tester.getTopLeft(find.byKey(boundaryKey));
         final green = await tester.runAsync(() async {
           final image = await boundary.toImage();
           try {
-            final pixels =
-                await image.toByteData(format: ui.ImageByteFormat.rawRgba);
+            final pixels = await image.toByteData(
+              format: ui.ImageByteFormat.rawRgba,
+            );
             if (pixels == null) fail('No rendered pixels');
 
             return pixels.getUint8(
-                (position.dy.floor() * image.width + position.dx.floor()) * 4 +
-                    1);
+              (position.dy.floor() * image.width + position.dx.floor()) * 4 + 1,
+            );
           } finally {
             image.dispose();
           }

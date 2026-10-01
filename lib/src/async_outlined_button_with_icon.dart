@@ -23,14 +23,14 @@ class _AsyncOutlinedButtonWithIcon extends AsyncOutlinedButton {
     super.customBuilder,
     super.splashFactory,
   }) : super(
-          autofocus: autofocus ?? false,
-          child: _OutlinedButtonWithIconChild(
-            label: label,
-            icon: icon,
-            buttonStyle: style,
-            iconAlignment: iconAlignment,
-          ),
-        );
+         autofocus: autofocus ?? false,
+         child: _OutlinedButtonWithIconChild(
+           label: label,
+           icon: icon,
+           buttonStyle: style,
+           iconAlignment: iconAlignment,
+         ),
+       );
 }
 
 /// Copy of OutlinedButton.icon with the loading animation.
@@ -57,8 +57,9 @@ class _OutlinedButtonWithIconChild extends StatelessWidget {
   Widget build(BuildContext context) {
     final defaultFontSize =
         buttonStyle?.textStyle?.resolve(const <WidgetState>{})?.fontSize ??
-            _defaultFontSize;
-    final scale = clampDouble(
+        _defaultFontSize;
+    final scale =
+        clampDouble(
           MediaQuery.textScalerOf(context).scale(defaultFontSize) /
               _defaultFontSize,
           1,
@@ -68,16 +69,18 @@ class _OutlinedButtonWithIconChild extends StatelessWidget {
     final gap =
         lerpDouble(_unscaledIconGap, _scaledIconGap, scale) ?? _fallbackIconGap;
     final elevatedButtonTheme = OutlinedButtonTheme.of(context);
-    final effectiveIconAlignment = iconAlignment ??
+    final effectiveIconAlignment =
+        iconAlignment ??
         elevatedButtonTheme.style?.iconAlignment ??
         buttonStyle?.iconAlignment ??
         IconAlignment.start;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
-      children: effectiveIconAlignment == IconAlignment.start
-          ? <Widget>[icon, SizedBox(width: gap), Flexible(child: label)]
-          : <Widget>[Flexible(child: label), SizedBox(width: gap), icon],
+      children:
+          effectiveIconAlignment == IconAlignment.start
+              ? <Widget>[icon, SizedBox(width: gap), Flexible(child: label)]
+              : <Widget>[Flexible(child: label), SizedBox(width: gap), icon],
     );
   }
 }

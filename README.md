@@ -11,7 +11,7 @@ and customizable indicators and transitions.
 flutter pub add loadable_buttons
 ```
 
-Requires Flutter **3.29.0+** and Dart **3.6.0+ (below 4.0.0)**.
+Requires Flutter **3.29.0+** and Dart **3.7.0+ (below 4.0.0)**.
 Version 1.x uses Flutter's Material library.
 
 ## Quick start
@@ -162,11 +162,12 @@ Yes! The code is [MIT licensed](LICENSE). Feel free to browse the
 copy a button into your project, and adapt it, including for commercial use.
 Keep the copyright and MIT license notice with the copied code.
 
-Include any companion `part` files and `loading_transition.dart`, which contains
-the transition enum and widgets. Update package imports to match your project.
+Include any companion `part` files, `async_button_helpers.dart` for shared loading
+state and indicators, and `loading_transition.dart` for the transition enum
+and widgets. Update package imports to match your project.
 
-For a single-file copy, move the enum into your button file and inline the
-transition bodies. This outline shows the ternary and switch structure:
+For a single-file copy, inline the shared loading helper declarations, move the
+enum into your button file, and inline the transition bodies. This outline shows the ternary and switch structure:
 
 ```dart
 child: widget.transitionType == TransitionAnimationType.customBuilder
