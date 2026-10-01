@@ -1,5 +1,10 @@
 ## Unreleased
 
+* Honor `isSelected`, `selectedIcon`, selection-dependent styling, and native
+  Material 3 selection semantics in all `AsyncIconButton` variants. Selected
+  icons use the configured loading transition and fall back to `icon` when
+  omitted.
+
 * Forward `onLongPress`, `onHover`, `onFocusChange`, and `focusNode` through the
   Elevated, Filled, Outlined, and Text `.icon` constructors when an icon is
   provided, matching the null-icon fallback and Filled `.tonalIcon` behavior.

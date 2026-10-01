@@ -1,9 +1,26 @@
+// Keep semantics assertions compatible with the package's Flutter 3.29 minimum.
+// ignore_for_file: deprecated_member_use
+
+import 'dart:async';
 import 'dart:developer';
-import 'dart:ui' show PointerDeviceKind;
+import 'dart:ui' show PointerDeviceKind, SemanticsFlag;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:loadable_buttons/loadable_buttons.dart';
+
+typedef _IconButtonBuilder = AsyncIconButton Function({
+  required Widget icon,
+  required FutureOr<void> Function()? onPressed,
+  WidgetStateProperty<bool>? isSelected,
+  Widget? selectedIcon,
+  ButtonStyle? style,
+  bool loading,
+  Widget? loadingChild,
+  TransitionAnimationType transitionType,
+  Widget Function(bool loading, Widget icon, Widget? loadingChild)?
+      customBuilder,
+});
 
 void main() {
   group('AsyncIconButton', () {
@@ -27,6 +44,8 @@ void main() {
         MaterialApp(
           home: AsyncIconButton(
             icon: const Icon(Icons.add),
+            selectedIcon: const Icon(Icons.check),
+            isSelected: const WidgetStatePropertyAll(true),
             onPressed: () async {
               await Future<void>.delayed(const Duration(seconds: 1));
             },
@@ -36,7 +55,7 @@ void main() {
 
       // Verify initial state.
       expect(find.byType(CircularProgressIndicator), findsNothing);
-      expect(find.byIcon(Icons.add), findsOneWidget);
+      expect(find.byIcon(Icons.check), findsOneWidget);
 
       // Tap the button.
       await tester.tap(find.byType(AsyncIconButton));
@@ -46,7 +65,7 @@ void main() {
       // Verify loading state.
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
       // Icon should still but potentially faded depending on transition.
-      expect(find.byIcon(Icons.add), findsOneWidget);
+      expect(find.byIcon(Icons.check), findsOneWidget);
 
       // Wait for the delay to complete.
       await tester.pump(const Duration(seconds: 1));
@@ -55,7 +74,7 @@ void main() {
 
       // Verify final state.
       expect(find.byType(CircularProgressIndicator), findsNothing);
-      expect(find.byIcon(Icons.add), findsOneWidget);
+      expect(find.byIcon(Icons.check), findsOneWidget);
     });
 
     testWidgets('handles stack transition type', (tester) async {
@@ -222,51 +241,185 @@ void main() {
       expect(find.byTooltip('Add Item'), findsOneWidget);
     });
 
-    // Note: IconButton itself doesn't visually change
-    // with isSelected like ToggleButtons.
-    // This test verifies the property can be passed.
-    testWidgets('isSelected property is handled', (tester) async {
-      bool selected = false;
-      const selectedIcon = Icon(Icons.check);
+    final variants = <String, _IconButtonBuilder>{
+      'standard': AsyncIconButton.new,
+      'filled': AsyncIconButton.filled,
+      'filledTonal': AsyncIconButton.filledTonal,
+      'outlined': AsyncIconButton.outlined,
+    };
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: StatefulBuilder(
-            builder: (_, setState) {
-              return AsyncIconButton(
+    for (final variant in variants.entries) {
+      group('${variant.key} selection', () {
+        testWidgets('toggles icons, resolved color, and selection semantics',
+            (tester) async {
+          var selected = false;
+
+          await tester.pumpWidget(
+            _host(StatefulBuilder(builder: (_, setState) {
+              return variant.value(
                 icon: const Icon(Icons.add),
+                selectedIcon: const Icon(Icons.check),
+                isSelected: WidgetStateProperty.resolveWith((_) => selected),
                 onPressed: () => setState(() => selected = !selected),
-                isSelected: WidgetStateProperty.resolveWith<bool>(
-                  (_) => selected,
+                style: ButtonStyle(
+                  foregroundColor: WidgetStateProperty.resolveWith((states) =>
+                      states.contains(WidgetState.selected)
+                          ? Colors.green
+                          : Colors.red),
                 ),
-                selectedIcon: selectedIcon,
               );
-            },
-          ),
-        ),
-      );
+            })),
+          );
 
-      // Initially not selected.
-      expect(find.byIcon(Icons.add), findsOneWidget);
-      // Selected icon not shown by default IconButton.
-      expect(
-        find.byWidget(selectedIcon),
-        findsNothing,
-      );
+          void expectSelection(bool selected) {
+            final icon = find.byIcon(selected ? Icons.check : Icons.add);
+            expect(icon, findsOneWidget);
+            expect(
+                find.byIcon(selected ? Icons.add : Icons.check), findsNothing);
+            expect(IconTheme.of(tester.element(icon)).color,
+                selected ? Colors.green : Colors.red);
+            expect(
+                tester
+                    .getSemantics(find.byType(IconButton))
+                    .getSemanticsData()
+                    .hasFlag(SemanticsFlag.isSelected),
+                selected);
+          }
 
-      // Tap to select.
-      await tester.tap(find.byType(AsyncIconButton));
-      await tester.pump();
+          expectSelection(false);
+          await tester.tap(find.byType(AsyncIconButton));
+          await tester.pumpAndSettle();
+          expectSelection(true);
+          await tester.tap(find.byType(AsyncIconButton));
+          await tester.pumpAndSettle();
+          expectSelection(false);
+        });
 
-      // Still shows the main icon,
-      //isSelected doesn't swap it automatically for standard IconButton.
-      expect(find.byIcon(Icons.add), findsOneWidget);
-      expect(find.byWidget(selectedIcon), findsNothing);
+        testWidgets('keeps the original icon without a selected icon or state',
+            (tester) async {
+          Widget host(bool? selected, {Widget? selectedIcon}) => _host(
+                variant.value(
+                  icon: const Icon(Icons.add),
+                  selectedIcon: selectedIcon,
+                  isSelected: selected == null
+                      ? null
+                      : WidgetStatePropertyAll(selected),
+                  onPressed: () {},
+                ),
+              );
 
-      // This test mainly confirms the properties exist and don't crash.
-      // Visual confirmation of selection state might need specific style checks
-      // or testing variants (filled, tonal, outlined) if they behave different.
-    });
+          await tester.pumpWidget(host(true));
+          expect(find.byIcon(Icons.add), findsOneWidget);
+          expect(
+              tester
+                  .getSemantics(find.byType(IconButton))
+                  .getSemanticsData()
+                  .hasFlag(SemanticsFlag.isSelected),
+              isTrue);
+
+          await tester.pumpWidget(host(false));
+          expect(find.byIcon(Icons.add), findsOneWidget);
+          expect(
+              tester
+                  .getSemantics(find.byType(IconButton))
+                  .getSemanticsData()
+                  .hasFlag(SemanticsFlag.isSelected),
+              isFalse);
+
+          await tester
+              .pumpWidget(host(null, selectedIcon: const Icon(Icons.check)));
+          expect(find.byIcon(Icons.add), findsOneWidget);
+          expect(find.byIcon(Icons.check), findsNothing);
+        });
+
+        testWidgets('resolves selection for disabled and loading states',
+            (tester) async {
+          Widget host({bool enabled = true, bool loading = false}) => _host(
+                variant.value(
+                  icon: const Icon(Icons.add),
+                  selectedIcon: const Icon(Icons.check),
+                  isSelected: WidgetStateProperty.resolveWith(
+                    (states) => states.contains(WidgetState.disabled),
+                  ),
+                  onPressed: enabled ? () {} : null,
+                  loading: loading,
+                  loadingChild: const Text('Loading'),
+                ),
+              );
+
+          await tester.pumpWidget(host());
+          expect(find.byIcon(Icons.add), findsOneWidget);
+          await tester.pumpWidget(host(enabled: false));
+          expect(find.byIcon(Icons.check), findsOneWidget);
+
+          await tester.pumpWidget(host(loading: true));
+          await tester.pumpAndSettle();
+          expect(find.text('Loading'), findsOneWidget);
+          expect(
+              tester
+                  .getSemantics(find.byType(IconButton))
+                  .getSemanticsData()
+                  .hasFlag(SemanticsFlag.isSelected),
+              isTrue);
+
+          await tester.pumpWidget(host());
+          await tester.pumpAndSettle();
+          expect(find.text('Loading'), findsNothing);
+          expect(find.byIcon(Icons.check), findsNothing);
+          expect(find.byIcon(Icons.add), findsOneWidget);
+        });
+
+        for (final transition in TransitionAnimationType.values) {
+          testWidgets('${transition.name} keeps loading above selected content',
+              (tester) async {
+            final pending = Completer<void>();
+            Widget host({required bool selected, bool loading = false}) =>
+                _host(
+                  variant.value(
+                    icon: const Icon(Icons.add, semanticLabel: 'Unselected'),
+                    selectedIcon:
+                        const Icon(Icons.check, semanticLabel: 'Selected'),
+                    isSelected: WidgetStatePropertyAll(selected),
+                    onPressed: () => pending.future,
+                    loading: loading,
+                    transitionType: transition,
+                    loadingChild: const Text('Loading'),
+                    customBuilder: (loading, icon, loadingChild) =>
+                        loading ? loadingChild ?? icon : icon,
+                  ),
+                );
+            void expectLoading() {
+              expect(find.text('Loading'), findsOneWidget);
+              expect(find.bySemanticsLabel('Selected'), findsNothing);
+              expect(find.bySemanticsLabel('Unselected'), findsNothing);
+            }
+
+            await tester.pumpWidget(host(selected: true));
+            expect(find.bySemanticsLabel('Selected'), findsOneWidget);
+            await tester.pumpWidget(host(selected: true, loading: true));
+            await tester.pumpAndSettle();
+            expectLoading();
+            await tester.pumpWidget(host(selected: true));
+            await tester.pumpAndSettle();
+            expect(find.text('Loading'), findsNothing);
+            expect(find.bySemanticsLabel('Selected'), findsOneWidget);
+
+            await tester.tap(find.byType(AsyncIconButton));
+            await tester.pumpAndSettle();
+            expectLoading();
+            await tester.pumpWidget(host(selected: false));
+            await tester.pumpAndSettle();
+            expectLoading();
+
+            pending.complete();
+            await tester.pumpAndSettle();
+            expect(find.text('Loading'), findsNothing);
+            expect(find.byIcon(Icons.check), findsNothing);
+            expect(find.bySemanticsLabel('Unselected'), findsOneWidget);
+          });
+        }
+      });
+    }
 
     testWidgets('prevents multiple taps while async is running',
         (tester) async {
@@ -568,3 +721,8 @@ void main() {
     });
   });
 }
+
+Widget _host(Widget button) => MaterialApp(
+      theme: ThemeData(useMaterial3: true),
+      home: Scaffold(body: Center(child: button)),
+    );

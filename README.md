@@ -92,6 +92,29 @@ The `key` passed to any async button belongs to the async wrapper. You can use a
 `GlobalKey` to access that wrapper, and rebuilding the same button variant with
 the same key preserves its state, including a pending `onPressed` operation.
 
+### Icon Button Selection
+
+All `AsyncIconButton` variants support Material 3 selection. Pass `isSelected`
+to enable selection styling and accessibility semantics, and `selectedIcon`
+to change the selected content. If `selectedIcon` is omitted, the original
+`icon` remains visible in both selection states.
+
+```dart
+AsyncIconButton.filled(
+  isSelected: WidgetStatePropertyAll(isFavorite),
+  icon: const Icon(Icons.favorite_border),
+  selectedIcon: const Icon(Icons.favorite),
+  onPressed: toggleFavorite,
+);
+```
+
+The selection property is resolved on each build with the disabled state while
+loading or when `onPressed` is null, and an empty state set otherwise. Both
+icons use the configured loading transition; when loading finishes, the button
+shows the icon for the current selection. A null `isSelected` preserves normal
+push-button behavior. Selection follows the native `IconButton` behavior and
+requires a Material 3 theme.
+
 ### Transition Types
 
 The package supports three types of transitions:
