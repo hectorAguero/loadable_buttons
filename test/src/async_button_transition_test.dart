@@ -232,6 +232,49 @@ void main() {
     }
   }
 
+  for (final entry in _builders.entries.where((entry) =>
+      entry.key == 'Filled' || entry.key == 'Extended floating action')) {
+    testWidgets('${entry.key} switcher resizes smoothly in both directions',
+        (tester) async {
+      Widget host(bool loading) => _host(entry.value(
+            child: const Text('Send the saved document'),
+            loadingChild: const SizedBox.square(
+                dimension: 24, child: ColoredBox(color: Colors.teal)),
+            loading: loading,
+            onPressed: Future<void>.value,
+            transition: TransitionAnimationType.animatedSwitcher,
+          ));
+      Future<List<double>> widthsDuringTransition(bool loading) async {
+        await tester.pumpWidget(host(loading));
+        final widths = <double>[tester.getSize(find.byKey(_buttonKey)).width];
+        const frameDuration = Duration(milliseconds: 20);
+        for (var elapsed = Duration.zero;
+            elapsed < _duration * 3;
+            elapsed += frameDuration) {
+          await tester.pump(frameDuration);
+          widths.add(tester.getSize(find.byKey(_buttonKey)).width);
+        }
+
+        return widths;
+      }
+
+      await tester.pumpWidget(host(false));
+      final idleWidth = tester.getSize(find.byKey(_buttonKey)).width;
+      final shrinkingWidths = await widthsDuringTransition(true);
+      final loadingWidth = shrinkingWidths.last;
+      expect(loadingWidth, lessThan(idleWidth));
+      expect(shrinkingWidths.first, closeTo(idleWidth, 0.01));
+      expect(shrinkingWidths,
+          contains(allOf(greaterThan(loadingWidth), lessThan(idleWidth))));
+
+      final growingWidths = await widthsDuringTransition(false);
+      expect(growingWidths.first, closeTo(loadingWidth, 0.01));
+      expect(growingWidths,
+          contains(allOf(greaterThan(loadingWidth), lessThan(idleWidth))));
+      expect(growingWidths.last, closeTo(idleWidth, 0.01));
+    });
+  }
+
   for (final transition in [
     TransitionAnimationType.stack,
     TransitionAnimationType.animatedSwitcher
