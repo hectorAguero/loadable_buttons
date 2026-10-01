@@ -1,8 +1,7 @@
 # loadable_buttons
 
-Flutter Material buttons that show a loading indicator while your `onPressed`
-callback runs. Use synchronous or asynchronous callbacks, control loading
-externally, and customize the indicator and its transition.
+Flutter Material buttons with automatic loading states, external loading control,
+and customizable indicators and transitions.
 
 ![Async Material button examples](https://raw.githubusercontent.com/hectorAguero/loadable_buttons/main/screenshots/preview.gif)
 
@@ -12,20 +11,8 @@ externally, and customize the indicator and its transition.
 flutter pub add loadable_buttons
 ```
 
-Or add the package to your `pubspec.yaml`:
-
-```yaml
-dependencies:
-  loadable_buttons: ^1.0.1
-```
-
-The declared consumer requirements are Flutter **3.29.0 or later** and Dart
-**3.6.0 or later, below 4.0.0**. The 1.x API uses Flutter's Material library:
-
-```dart
-import 'package:flutter/material.dart';
-import 'package:loadable_buttons/loadable_buttons.dart';
-```
+Requires Flutter **3.29.0+** and Dart **3.6.0+ (below 4.0.0)**.
+Version 1.x uses Flutter's Material library.
 
 ## Quick start
 
@@ -58,48 +45,41 @@ Future<void> saveChanges() async {
 }
 ```
 
-The button manages its own loading state. A pending `onPressed` operation
-prevents another activation, including another press before the next frame.
-Loading ends when the returned Future completes.
-
-The snippets below reuse `saveChanges` from this example.
+The button shows a spinner and prevents repeated activation until the returned
+Future completes. The following examples reuse `saveChanges`.
 
 ## Button families
 
-| Material button | Async wrapper | Constructors |
-| --- | --- | --- |
-| `ElevatedButton` | `AsyncElevatedButton` | Default, `.icon` |
-| `FilledButton` | `AsyncFilledButton` | Default, `.icon`, `.tonal`, `.tonalIcon` |
-| `OutlinedButton` | `AsyncOutlinedButton` | Default, `.icon` |
-| `TextButton` | `AsyncTextButton` | Default, `.icon` |
-| `IconButton` | `AsyncIconButton` | Default, `.filled`, `.filledTonal`, `.outlined` |
-| `FloatingActionButton` | `AsyncFloatingActionButton` | Default, `.small`, `.large`, `.extended` |
+| Widget | Constructors |
+| --- | --- |
+| `AsyncElevatedButton` | Default, `.icon` |
+| `AsyncFilledButton` | Default, `.icon`, `.tonal`, `.tonalIcon` |
+| `AsyncOutlinedButton` | Default, `.icon` |
+| `AsyncTextButton` | Default, `.icon` |
+| `AsyncIconButton` | Default, `.filled`, `.filledTonal`, `.outlined` |
+| `AsyncFloatingActionButton` | Default, `.small`, `.large`, `.extended` |
 
-Use Material options such as `style`, `focusNode`, and `autofocus` on the
-corresponding wrapper. Available options depend on the button family; see the
+Use the corresponding Material options, such as `style` and `focusNode`.
+For each widget's supported properties, see the
 [API reference](https://pub.dev/documentation/loadable_buttons/latest/).
 
+For a button with an icon, use `label` instead of `child`:
+
 ```dart
-AsyncFilledButton.tonalIcon(
+AsyncFilledButton.icon(
   onPressed: saveChanges,
   icon: const Icon(Icons.save_outlined),
   label: const Text('Save changes'),
-  iconAlignment: IconAlignment.start,
 );
 ```
 
-The `.icon` constructors for Elevated, Filled, Outlined, and Text buttons, and
-Filled's `.tonalIcon`, forward `onLongPress`, `onHover`, `onFocusChange`, and
-`focusNode` whether an icon is supplied or null.
-
 ## Loading behavior
 
-`onPressed` accepts a nullable `FutureOr<void> Function()`. Return the Future
-for the work the button should wait for. Starting work without returning or
-awaiting it does not keep the button loading until that work finishes.
+`onPressed` accepts synchronous or asynchronous callbacks. Return or await your
+async work so the button can track its completion.
 
-External `loading` and the button's pending callback are independent sources.
-The button is loading while **either source is active**:
+External `loading` and a pending callback are independent: the button stays
+loading while **either is active**.
 
 ```dart
 // isSaving is a bool managed by your application.
@@ -110,120 +90,49 @@ AsyncElevatedButton(
 );
 ```
 
-Setting `loading: false` does not finish or cancel a pending operation.
-Completing that operation does not clear `loading: true`.
+Setting `loading: false` does not cancel or unlock a pending callback. Likewise,
+finishing the callback does not clear external `loading: true`.
 
-The button clears its internal loading state in `finally`, even if the callback
-throws. It does not swallow exceptions or choose an error policy. Handle
-application errors in your callback, including any error message or retry UI.
-Disposing the button does not cancel the operation; callbacks that update
-application state after an `await` should check their own lifecycle.
+Internal loading clears even if the callback throws. Exceptions are not swallowed;
+handle errors in your callback. Disposing the widget does not cancel the operation.
+Check `mounted` before updating your widget's state after an `await`.
 
-### Disabled buttons and long press
+Set `onPressed: null` to disable a button. Elevated, Filled, Outlined, and Text
+buttons remain enabled if `onLongPress` is provided; loading blocks both
+callbacks. `onLongPress` is synchronous and does not start a loading state.
 
-A null `onPressed` preserves the underlying Material button's disabled
-styling, focus, and semantics. Elevated, Filled, Outlined, and Text buttons can
-remain enabled with only an `onLongPress` callback while idle. IconButton and
-floating action buttons require `onPressed` to be enabled.
+## Customization
 
-```dart
-const AsyncOutlinedButton(
-  onPressed: null,
-  child: Text('Unavailable'),
-);
-```
-
-While loading, Elevated, Filled, Outlined, and Text buttons block both tap and
-long-press callbacks, keyboard activation, and the button's semantic actions.
-An async operation is managed through `onPressed`; `onLongPress` remains a
-synchronous callback.
-
-### Keys and rebuilds
-
-The public `key` belongs to the async wrapper. A `GlobalKey` can identify that
-wrapper without being duplicated on the underlying Material widget. Rebuilding
-the same button variant with the same key preserves its state and pending work.
-
-## Custom loading content
-
-Supply `loadingChild` to replace the default circular indicator:
+Replace the spinner with `loadingChild` and choose a transition:
 
 ```dart
 AsyncElevatedButton(
   onPressed: saveChanges,
-  loadingChild: const SizedBox.square(
-    dimension: 20,
-    child: CircularProgressIndicator(
-      strokeWidth: 2,
-      semanticsLabel: 'Saving',
-    ),
-  ),
+  loadingChild: const Text('Saving...'),
+  transitionType: TransitionAnimationType.animatedSwitcher,
+  animationDuration: const Duration(milliseconds: 250),
   child: const Text('Save'),
 );
 ```
-
-`AsyncElevatedButton` also accepts `loadingSemanticsLabel` for its default
-indicator. When supplying custom loading content, provide its own appropriate
-semantics. Keep loading content presentational; nested interactive widgets
-need their own interaction, focus, and accessibility handling.
-
-## Transitions and sizing
 
 | `TransitionAnimationType` | Behavior |
 | --- | --- |
-| `stack` (default) | Retains idle content in the layout and fades the loading content over it. |
-| `animatedSwitcher` | Switches between idle and loading content with a fade and animated size. |
-| `customBuilder` | Delegates content and transition rendering to your builder. |
+| `stack` (default) | Keeps idle content in the layout and fades loading content over it. |
+| `animatedSwitcher` | Fades between content with animated sizing. |
+| `customBuilder` | Uses your required `customBuilder(loading, child, loadingChild)`. |
 
-The default stack helps keep the idle footprint, but a larger `loadingChild`
-can increase the size of the content. Button constraints and text scaling also
-affect layout. Constrain custom loading content when a stable footprint matters.
+`animationDuration` defaults to `Durations.medium1`; `minimumChildOpacity`
+defaults to `0.0` for stack transitions. Custom builders must handle a nullable
+`loadingChild` and manage outgoing content, interaction, and semantics.
 
-```dart
-AsyncElevatedButton(
-  onPressed: saveChanges,
-  transitionType: TransitionAnimationType.animatedSwitcher,
-  animationDuration: const Duration(milliseconds: 250),
-  loadingChild: const Text('Saving...'),
-  child: const Text('Save'),
-);
-```
-
-For a custom transition, `customBuilder` receives the effective loading state,
-idle content, and nullable `loadingChild`. It must be supplied when selecting
-`TransitionAnimationType.customBuilder`. Supply a fallback if you leave
-`loadingChild` null:
-
-```dart
-AsyncElevatedButton(
-  onPressed: saveChanges,
-  transitionType: TransitionAnimationType.customBuilder,
-  loadingChild: const Text('Saving...'),
-  customBuilder: (loading, child, loadingChild) {
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 250),
-      child: KeyedSubtree(
-        key: ValueKey(loading),
-        child: loading
-            ? (loadingChild ?? const CircularProgressIndicator())
-            : child,
-      ),
-    );
-  },
-  child: const Text('Save'),
-);
-```
-
-The builder owns its layout, outgoing content, semantics, and any nested
-interaction. Fading content alone does not remove its interaction or semantic
-actions. Check both directions of custom transitions with your application's
-text scale, theme, and available space.
+Constrain loading content if you need a stable button size, and give custom
+indicators appropriate semantics. `AsyncElevatedButton` supports
+`loadingSemanticsLabel` for its default spinner.
 
 ## IconButton selection
 
-All `AsyncIconButton` variants honor `isSelected` and `selectedIcon` with a
-Material 3 theme. This wrapper's `isSelected` takes a state property, so wrap a
-simple bool in `WidgetStatePropertyAll`.
+With a Material 3 theme, use `isSelected` and `selectedIcon` on any
+`AsyncIconButton` variant. Wrap a bool in `WidgetStatePropertyAll`:
 
 ```dart
 // In a State object's build method; isFavorite is a bool field.
@@ -240,49 +149,36 @@ AsyncIconButton.filled(
 );
 ```
 
-Selection uses the current value supplied by your application. If
-`selectedIcon` is omitted, `icon` is used for both states. Both icons use the
-configured loading transition, and the current selection is shown after loading
-ends. A null `isSelected` keeps normal push-button behavior.
+Your application owns the selection state. If `selectedIcon` is omitted,
+`icon` is used for both states.
 
-The selection property is resolved with the disabled state while loading or
-when `onPressed` is null, and an empty state set otherwise.
+## FAQ
 
-## Common loading options
+<details>
+<summary>Can I copy a button into my project?</summary>
 
-| Option | Default | Purpose |
-| --- | --- | --- |
-| `loading` | `false` | External loading source, combined with internal loading. |
-| `loadingChild` | Default indicator | Custom loading content. |
-| `transitionType` | `TransitionAnimationType.stack` | Content transition. |
-| `animationDuration` | `Durations.medium1` | Built-in transition duration. |
-| `minimumChildOpacity` | `0.0` | Idle content opacity during a stack transition. |
-| `customBuilder` | `null` | Required for `TransitionAnimationType.customBuilder`. |
+Yes! The code is [MIT licensed](LICENSE). Feel free to browse the
+[button implementations](https://github.com/hectorAguero/loadable_buttons/tree/main/lib/src),
+copy a button into your project, and adapt it, including for commercial use.
+Keep the copyright and MIT license notice with the copied code.
 
-## Example and development
+Include any companion `part` files and referenced types, and update package
+imports to match your project.
 
-The [example application](https://github.com/hectorAguero/loadable_buttons/tree/main/example)
-demonstrates the button families, icon variants, transitions, and themes:
+</details>
 
-```sh
-cd example
-flutter pub get
-flutter run
-```
+<details>
+<summary>Do I need a controller or state management package?</summary>
 
-For contributing, use a Flutter SDK with Dart **3.13 or later** for the current
-development lint tooling. This is separate from the consumer requirements above.
-From the repository root, run:
+No. Return your operation's Future from `onPressed` and the button manages its
+loading state. Use `loading` when your application already manages that state.
 
-```sh
-flutter pub get
-bash tool/analyze.sh
-dart run dart_code_linter:metrics analyze lib test example/lib --fatal-style --fatal-performance
-flutter test --no-pub
-dart format --output=none --set-exit-if-changed lib test example/lib
-```
+</details>
 
-Report bugs or propose improvements in the
-[issue tracker](https://github.com/hectorAguero/loadable_buttons/issues).
-See the [changelog](CHANGELOG.md) for release notes and the [MIT license](LICENSE)
-for licensing.
+## More
+
+- [Example application](https://github.com/hectorAguero/loadable_buttons/tree/main/example)
+- [Contributing and development checks](CONTRIBUTING.md)
+- [Changelog](CHANGELOG.md)
+- [Issues and feature requests](https://github.com/hectorAguero/loadable_buttons/issues)
+- [MIT license](LICENSE)
