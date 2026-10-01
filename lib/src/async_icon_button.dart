@@ -281,10 +281,17 @@ class AsyncIconButton extends StatefulWidget {
   /// The constraints of the button.
   final BoxConstraints? constraints;
 
-  /// The visual density of the button.
+  /// The selection state of the Material 3 icon button.
+  ///
+  /// Resolved on each build with [MaterialState.disabled] when loading or when
+  /// [onPressed] is null, and an empty state set otherwise. A null property
+  /// preserves normal push-button behavior.
   final MaterialStateProperty<bool>? isSelected;
 
-  /// The selected icon of the button.
+  /// The icon shown when [isSelected] resolves to true in Material 3.
+  ///
+  /// Uses the same loading transition as [icon]. If null, [icon] is used in
+  /// both selection states, matching [IconButton.selectedIcon].
   final Widget? selectedIcon;
 
   /// Optional SplashFactory to customize the splash effect.
@@ -321,144 +328,149 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
   }
 
   @override
-  Widget build(BuildContext context) => switch (widget._variant) {
-        _IconButtonVariant.standard => IconButton(
-            iconSize: widget.iconSize,
-            visualDensity: widget.visualDensity,
-            padding: widget.padding,
-            alignment: widget.alignment,
-            splashRadius: widget.splashRadius,
-            color: widget.color,
-            focusColor: widget.focusColor,
-            hoverColor: widget.hoverColor,
-            highlightColor: widget.highlightColor,
-            splashColor: widget.splashColor,
-            disabledColor: widget.disabledColor,
-            onPressed:
-                _isLoading || widget.onPressed == null ? null : _handlePressed,
-            onHover: widget.onHover,
-            onLongPress: widget.onLongPress,
-            mouseCursor: widget.mouseCursor,
-            focusNode: widget.focusNode,
-            autofocus: widget.autofocus,
-            tooltip: widget.tooltip,
-            enableFeedback: widget.enableFeedback,
-            constraints: widget.constraints,
-            style: widget.style ??
-                IconButton.styleFrom(splashFactory: widget.splashFactory),
-            icon: _AsyncIconButtonChild(
-                icon: widget.icon,
-                isLoading: _isLoading,
-                transitionType: widget.transitionType,
-                animationDuration: widget.animationDuration,
-                minimumChildOpacity: widget.minimumChildOpacity,
-                loadingChild: widget.loadingChild,
-                style: widget.style,
-                customBuilder: widget.customBuilder),
-          ),
-        _IconButtonVariant.filled => IconButton.filled(
-            iconSize: widget.iconSize,
-            visualDensity: widget.visualDensity,
-            padding: widget.padding,
-            alignment: widget.alignment,
-            splashRadius: widget.splashRadius,
-            color: widget.color,
-            focusColor: widget.focusColor,
-            hoverColor: widget.hoverColor,
-            highlightColor: widget.highlightColor,
-            splashColor: widget.splashColor,
-            disabledColor: widget.disabledColor,
-            onPressed:
-                _isLoading || widget.onPressed == null ? null : _handlePressed,
-            onHover: widget.onHover,
-            onLongPress: widget.onLongPress,
-            mouseCursor: widget.mouseCursor,
-            focusNode: widget.focusNode,
-            autofocus: widget.autofocus,
-            tooltip: widget.tooltip,
-            enableFeedback: widget.enableFeedback,
-            constraints: widget.constraints,
-            style: widget.style ??
-                IconButton.styleFrom(splashFactory: widget.splashFactory),
-            icon: _AsyncIconButtonChild(
-                icon: widget.icon,
-                isLoading: _isLoading,
-                transitionType: widget.transitionType,
-                animationDuration: widget.animationDuration,
-                minimumChildOpacity: widget.minimumChildOpacity,
-                loadingChild: widget.loadingChild,
-                style: widget.style,
-                customBuilder: widget.customBuilder),
-          ),
-        _IconButtonVariant.filledTonal => IconButton.filledTonal(
-            iconSize: widget.iconSize,
-            visualDensity: widget.visualDensity,
-            padding: widget.padding,
-            alignment: widget.alignment,
-            splashRadius: widget.splashRadius,
-            color: widget.color,
-            focusColor: widget.focusColor,
-            hoverColor: widget.hoverColor,
-            highlightColor: widget.highlightColor,
-            splashColor: widget.splashColor,
-            disabledColor: widget.disabledColor,
-            onPressed:
-                _isLoading || widget.onPressed == null ? null : _handlePressed,
-            onHover: widget.onHover,
-            onLongPress: widget.onLongPress,
-            mouseCursor: widget.mouseCursor,
-            focusNode: widget.focusNode,
-            autofocus: widget.autofocus,
-            tooltip: widget.tooltip,
-            enableFeedback: widget.enableFeedback,
-            constraints: widget.constraints,
-            style: widget.style ??
-                IconButton.styleFrom(splashFactory: widget.splashFactory),
-            icon: _AsyncIconButtonChild(
-                icon: widget.icon,
-                isLoading: _isLoading,
-                transitionType: widget.transitionType,
-                animationDuration: widget.animationDuration,
-                minimumChildOpacity: widget.minimumChildOpacity,
-                loadingChild: widget.loadingChild,
-                style: widget.style,
-                customBuilder: widget.customBuilder),
-          ),
-        _IconButtonVariant.outlined => IconButton.outlined(
-            iconSize: widget.iconSize,
-            visualDensity: widget.visualDensity,
-            padding: widget.padding,
-            alignment: widget.alignment,
-            splashRadius: widget.splashRadius,
-            color: widget.color,
-            focusColor: widget.focusColor,
-            hoverColor: widget.hoverColor,
-            highlightColor: widget.highlightColor,
-            splashColor: widget.splashColor,
-            disabledColor: widget.disabledColor,
-            onPressed:
-                _isLoading || widget.onPressed == null ? null : _handlePressed,
-            onHover: widget.onHover,
-            onLongPress: widget.onLongPress,
-            mouseCursor: widget.mouseCursor,
-            focusNode: widget.focusNode,
-            autofocus: widget.autofocus,
-            tooltip: widget.tooltip,
-            enableFeedback: widget.enableFeedback,
-            constraints: widget.constraints,
-            style: widget.style ??
-                IconButton.styleFrom(splashFactory: widget.splashFactory),
-            icon: _AsyncIconButtonChild(
-                icon: widget.icon,
-                isLoading: _isLoading,
-                transitionType: widget.transitionType,
-                animationDuration: widget.animationDuration,
-                minimumChildOpacity: widget.minimumChildOpacity,
-                loadingChild: widget.loadingChild,
-                style: widget.style,
-                customBuilder: widget.customBuilder),
-          ),
-      };
+  Widget build(BuildContext context) {
+    final isSelected = widget.isSelected?.resolve({
+      if (_isLoading || widget.onPressed == null) MaterialState.disabled,
+    });
+    final icon = _AsyncIconButtonChild(
+      icon: widget.icon,
+      isLoading: _isLoading,
+      transitionType: widget.transitionType,
+      animationDuration: widget.animationDuration,
+      minimumChildOpacity: widget.minimumChildOpacity,
+      loadingChild: widget.loadingChild,
+      style: widget.style,
+      customBuilder: widget.customBuilder,
+    );
+    final selectedIcon = widget.selectedIcon;
+    final selectedChild = selectedIcon == null
+        ? null
+        : _AsyncIconButtonChild(
+            icon: selectedIcon,
+            isLoading: _isLoading,
+            transitionType: widget.transitionType,
+            animationDuration: widget.animationDuration,
+            minimumChildOpacity: widget.minimumChildOpacity,
+            loadingChild: widget.loadingChild,
+            style: widget.style,
+            customBuilder: widget.customBuilder,
+          );
+
+    return switch (widget._variant) {
+      _IconButtonVariant.standard => IconButton(
+          iconSize: widget.iconSize,
+          visualDensity: widget.visualDensity,
+          padding: widget.padding,
+          alignment: widget.alignment,
+          splashRadius: widget.splashRadius,
+          color: widget.color,
+          focusColor: widget.focusColor,
+          hoverColor: widget.hoverColor,
+          highlightColor: widget.highlightColor,
+          splashColor: widget.splashColor,
+          disabledColor: widget.disabledColor,
+          onPressed:
+              _isLoading || widget.onPressed == null ? null : _handlePressed,
+          onHover: widget.onHover,
+          onLongPress: widget.onLongPress,
+          mouseCursor: widget.mouseCursor,
+          focusNode: widget.focusNode,
+          autofocus: widget.autofocus,
+          tooltip: widget.tooltip,
+          enableFeedback: widget.enableFeedback,
+          constraints: widget.constraints,
+          style: widget.style ??
+              IconButton.styleFrom(splashFactory: widget.splashFactory),
+          isSelected: isSelected,
+          selectedIcon: selectedChild,
+          icon: icon,
+        ),
+      _IconButtonVariant.filled => IconButton.filled(
+          iconSize: widget.iconSize,
+          visualDensity: widget.visualDensity,
+          padding: widget.padding,
+          alignment: widget.alignment,
+          splashRadius: widget.splashRadius,
+          color: widget.color,
+          focusColor: widget.focusColor,
+          hoverColor: widget.hoverColor,
+          highlightColor: widget.highlightColor,
+          splashColor: widget.splashColor,
+          disabledColor: widget.disabledColor,
+          onPressed:
+              _isLoading || widget.onPressed == null ? null : _handlePressed,
+          onHover: widget.onHover,
+          onLongPress: widget.onLongPress,
+          mouseCursor: widget.mouseCursor,
+          focusNode: widget.focusNode,
+          autofocus: widget.autofocus,
+          tooltip: widget.tooltip,
+          enableFeedback: widget.enableFeedback,
+          constraints: widget.constraints,
+          style: widget.style ??
+              IconButton.styleFrom(splashFactory: widget.splashFactory),
+          isSelected: isSelected,
+          selectedIcon: selectedChild,
+          icon: icon,
+        ),
+      _IconButtonVariant.filledTonal => IconButton.filledTonal(
+          iconSize: widget.iconSize,
+          visualDensity: widget.visualDensity,
+          padding: widget.padding,
+          alignment: widget.alignment,
+          splashRadius: widget.splashRadius,
+          color: widget.color,
+          focusColor: widget.focusColor,
+          hoverColor: widget.hoverColor,
+          highlightColor: widget.highlightColor,
+          splashColor: widget.splashColor,
+          disabledColor: widget.disabledColor,
+          onPressed:
+              _isLoading || widget.onPressed == null ? null : _handlePressed,
+          onHover: widget.onHover,
+          onLongPress: widget.onLongPress,
+          mouseCursor: widget.mouseCursor,
+          focusNode: widget.focusNode,
+          autofocus: widget.autofocus,
+          tooltip: widget.tooltip,
+          enableFeedback: widget.enableFeedback,
+          constraints: widget.constraints,
+          style: widget.style ??
+              IconButton.styleFrom(splashFactory: widget.splashFactory),
+          isSelected: isSelected,
+          selectedIcon: selectedChild,
+          icon: icon,
+        ),
+      _IconButtonVariant.outlined => IconButton.outlined(
+          iconSize: widget.iconSize,
+          visualDensity: widget.visualDensity,
+          padding: widget.padding,
+          alignment: widget.alignment,
+          splashRadius: widget.splashRadius,
+          color: widget.color,
+          focusColor: widget.focusColor,
+          hoverColor: widget.hoverColor,
+          highlightColor: widget.highlightColor,
+          splashColor: widget.splashColor,
+          disabledColor: widget.disabledColor,
+          onPressed:
+              _isLoading || widget.onPressed == null ? null : _handlePressed,
+          onHover: widget.onHover,
+          onLongPress: widget.onLongPress,
+          mouseCursor: widget.mouseCursor,
+          focusNode: widget.focusNode,
+          autofocus: widget.autofocus,
+          tooltip: widget.tooltip,
+          enableFeedback: widget.enableFeedback,
+          constraints: widget.constraints,
+          style: widget.style ??
+              IconButton.styleFrom(splashFactory: widget.splashFactory),
+          isSelected: isSelected,
+          selectedIcon: selectedChild,
+          icon: icon,
+        ),
+    };
+  }
 }
 
 class _AsyncIconButtonChild extends StatelessWidget {
