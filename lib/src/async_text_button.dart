@@ -1,11 +1,9 @@
-// To support lower versions than 3.22.0 for MaterialState.
-// ignore_for_file: deprecated_member_use
-
 import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+import 'package:loadable_buttons/src/async_button_helpers.dart';
 import 'package:loadable_buttons/src/loading_transition.dart';
 
 part 'async_text_button_with_icon.dart';
@@ -55,6 +53,8 @@ class AsyncTextButton extends StatefulWidget {
     ButtonStyle? style,
     FocusNode? focusNode,
     Clip? clipBehavior,
+    // Retain the existing public Material typedef for source compatibility.
+    // ignore: deprecated_member_use
     MaterialStatesController? statesController,
     Widget? icon,
     IconAlignment? iconAlignment,
@@ -147,6 +147,8 @@ class AsyncTextButton extends StatefulWidget {
   final Clip? clipBehavior;
 
   /// The statesController of the button, TextButton property.
+  // Retain the existing public Material typedef for source compatibility.
+  // ignore: deprecated_member_use
   final MaterialStatesController? statesController;
 
   /// The animationDuration of the transition.
@@ -173,38 +175,24 @@ class AsyncTextButton extends StatefulWidget {
   State<AsyncTextButton> createState() => _AsyncTextButtonState();
 }
 
-class _AsyncTextButtonState extends State<AsyncTextButton> {
-  bool _internalLoading = false;
+class _AsyncTextButtonState extends State<AsyncTextButton>
+    with AsyncButtonState<AsyncTextButton> {
+  @override
+  bool get externalLoading => widget.loading;
 
-  bool get _isLoading => _internalLoading || widget.loading;
-
-  Future<void> _handlePressed() async {
-    // If the async callback is provided, use it.
-    if (widget.onPressed != null) {
-      // Prevent multiple presses.
-      if (_isLoading) return;
-      setState(() => _internalLoading = true);
-
-      try {
-        await widget.onPressed?.call();
-      } finally {
-        // Ensure that state is updated even if an exception occurs.
-        if (mounted) setState(() => _internalLoading = false);
-      }
-    }
-  }
+  @override
+  FutureOr<void> Function()? get asyncOnPressed => widget.onPressed;
 
   void _handleLongPress() {
-    if (_isLoading) return;
+    if (isLoading) return;
     widget.onLongPress?.call();
   }
 
   @override
   Widget build(BuildContext context) => TextButton(
-        onPressed:
-            _isLoading || widget.onPressed == null ? null : _handlePressed,
+        onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
         onLongPress:
-            _isLoading || widget.onLongPress == null ? null : _handleLongPress,
+            isLoading || widget.onLongPress == null ? null : _handleLongPress,
         onHover: widget.onHover,
         onFocusChange: widget.onFocusChange,
         style: widget.style ??
@@ -215,41 +203,20 @@ class _AsyncTextButtonState extends State<AsyncTextButton> {
         statesController: widget.statesController,
         child: widget.transitionType == TransitionAnimationType.customBuilder
             ? widget.customBuilder
-                    ?.call(_isLoading, widget.child, widget.loadingChild) ??
+                    ?.call(isLoading, widget.child, widget.loadingChild) ??
                 widget.child
             : LoadingTransition(
                 child: widget.child,
                 loadingChild: widget.loadingChild ??
-                    _DefaultLoadingIndicator(style: widget.style),
-                isLoading: _isLoading,
+                    DefaultLoadingIndicator(
+                      style: widget.style,
+                      themeStyleOf: (context) =>
+                          TextButtonTheme.of(context).style,
+                    ),
+                isLoading: isLoading,
                 transitionType: widget.transitionType,
                 animationDuration: widget.animationDuration,
                 minimumChildOpacity: widget.minimumChildOpacity,
               ),
       );
-}
-
-class _DefaultLoadingIndicator extends StatelessWidget {
-  const _DefaultLoadingIndicator({required ButtonStyle? style})
-      : _style = style;
-
-  static const double _defaultStrokeWidth = 3.0;
-
-  final ButtonStyle? _style;
-
-  @override
-  Widget build(BuildContext context) {
-    return CircularProgressIndicator(
-      color: _style?.foregroundColor?.resolve(<MaterialState>{}) ??
-          TextButtonTheme.of(context)
-              .style
-              ?.foregroundColor
-              ?.resolve(<MaterialState>{}) ??
-          IconTheme.of(context).color ??
-          DefaultTextStyle.of(context).style.color,
-      strokeWidth: _defaultStrokeWidth,
-      strokeCap: StrokeCap.round,
-      constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
-    );
-  }
 }

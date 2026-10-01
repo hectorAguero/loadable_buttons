@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import 'package:loadable_buttons/src/async_button_helpers.dart';
 import 'package:loadable_buttons/src/loading_transition.dart';
 
 enum _FloatingActionButtonType { regular, small, large, extended }
@@ -324,34 +325,21 @@ class AsyncFloatingActionButton extends StatefulWidget {
       _AsyncFloatingActionButtonState();
 }
 
-class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton> {
+class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton>
+    with AsyncButtonState<AsyncFloatingActionButton> {
   static const _extendedPaddingWithIcon =
       EdgeInsetsDirectional.only(start: 16, end: 20);
 
-  bool _internalLoading = false;
+  @override
+  bool get externalLoading => widget.loading;
 
-  bool get _isLoading => _internalLoading || widget.loading;
+  @override
+  FutureOr<void> Function()? get asyncOnPressed => widget.onPressed;
 
   bool get _useCombinedExtendedContent =>
       widget.transitionType == TransitionAnimationType.stack &&
       widget.isExtended &&
       widget.child != null;
-
-  Future<void> _handlePressed() async {
-    // If the async callback is provided, use it.
-    if (widget.onPressed != null) {
-      // Prevent multiple presses.
-      if (_isLoading) return;
-      setState(() => _internalLoading = true);
-
-      try {
-        await widget.onPressed?.call();
-      } finally {
-        // Ensure that state is updated even if an exception occurs.
-        if (mounted) setState(() => _internalLoading = false);
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) => Theme(
@@ -361,7 +349,7 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton> {
               child: _AsyncFloatingActionButtonChild(
                   child: widget.child ?? const SizedBox.shrink(),
                   color: widget.foregroundColor,
-                  isLoading: _isLoading,
+                  isLoading: isLoading,
                   transitionType: widget.transitionType,
                   animationDuration: widget.animationDuration,
                   minimumChildOpacity: widget.minimumChildOpacity,
@@ -379,9 +367,8 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton> {
               hoverElevation: widget.hoverElevation,
               highlightElevation: widget.highlightElevation,
               disabledElevation: widget.disabledElevation,
-              onPressed: _isLoading || widget.onPressed == null
-                  ? null
-                  : _handlePressed,
+              onPressed:
+                  isLoading || widget.onPressed == null ? null : handlePressed,
               mouseCursor: widget.mouseCursor,
               mini: widget.mini,
               shape: widget.shape,
@@ -395,7 +382,7 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton> {
               child: _AsyncFloatingActionButtonChild(
                   child: widget.child ?? const SizedBox.shrink(),
                   color: widget.foregroundColor,
-                  isLoading: _isLoading,
+                  isLoading: isLoading,
                   transitionType: widget.transitionType,
                   animationDuration: widget.animationDuration,
                   minimumChildOpacity: widget.minimumChildOpacity,
@@ -413,9 +400,8 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton> {
               hoverElevation: widget.hoverElevation,
               highlightElevation: widget.highlightElevation,
               disabledElevation: widget.disabledElevation,
-              onPressed: _isLoading || widget.onPressed == null
-                  ? null
-                  : _handlePressed,
+              onPressed:
+                  isLoading || widget.onPressed == null ? null : handlePressed,
               mouseCursor: widget.mouseCursor,
               shape: widget.shape,
               clipBehavior: widget.clipBehavior,
@@ -427,7 +413,7 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton> {
               child: _AsyncFloatingActionButtonChild(
                   child: widget.child ?? const SizedBox.shrink(),
                   color: widget.foregroundColor,
-                  isLoading: _isLoading,
+                  isLoading: isLoading,
                   transitionType: widget.transitionType,
                   animationDuration: widget.animationDuration,
                   minimumChildOpacity: widget.minimumChildOpacity,
@@ -445,9 +431,8 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton> {
               hoverElevation: widget.hoverElevation,
               highlightElevation: widget.highlightElevation,
               disabledElevation: widget.disabledElevation,
-              onPressed: _isLoading || widget.onPressed == null
-                  ? null
-                  : _handlePressed,
+              onPressed:
+                  isLoading || widget.onPressed == null ? null : handlePressed,
               mouseCursor: widget.mouseCursor,
               shape: widget.shape,
               clipBehavior: widget.clipBehavior,
@@ -468,9 +453,8 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton> {
               splashColor: widget.splashColor,
               highlightElevation: widget.highlightElevation,
               disabledElevation: widget.disabledElevation,
-              onPressed: _isLoading || widget.onPressed == null
-                  ? null
-                  : _handlePressed,
+              onPressed:
+                  isLoading || widget.onPressed == null ? null : handlePressed,
               mouseCursor: widget.mouseCursor,
               shape: widget.shape,
               isExtended: widget.isExtended,
@@ -494,7 +478,7 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton> {
                   : _AsyncFloatingActionButtonChild(
                       child: widget.child ?? const SizedBox.shrink(),
                       color: widget.foregroundColor,
-                      isLoading: _isLoading,
+                      isLoading: isLoading,
                       transitionType: widget.transitionType,
                       animationDuration: widget.animationDuration,
                       minimumChildOpacity: widget.minimumChildOpacity,
@@ -508,7 +492,7 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton> {
                       child: widget._extendedLabel ?? const SizedBox.shrink(),
                       duration: widget.animationDuration),
                   color: widget.foregroundColor,
-                  isLoading: _isLoading,
+                  isLoading: isLoading,
                   transitionType: widget.transitionType,
                   animationDuration: widget.animationDuration,
                   minimumChildOpacity: widget.minimumChildOpacity,
@@ -572,32 +556,12 @@ class _AsyncFloatingActionButtonChild extends StatelessWidget {
                 child,
               ],
             ),
-      loadingChild: loadingChild ?? _DefaultLoadingIndicator(color: color),
+      loadingChild: loadingChild ?? DefaultLoadingIndicator(color: color),
       isLoading: isLoading,
       transitionType: transitionType,
       animationDuration: animationDuration,
       minimumChildOpacity: minimumChildOpacity,
       animateChildSize: false,
-    );
-  }
-}
-
-class _DefaultLoadingIndicator extends StatelessWidget {
-  const _DefaultLoadingIndicator({required Color? color}) : _color = color;
-
-  static const double _defaultStrokeWidth = 3.0;
-
-  final Color? _color;
-
-  @override
-  Widget build(BuildContext context) {
-    return CircularProgressIndicator(
-      color: _color ??
-          IconTheme.of(context).color ??
-          DefaultTextStyle.of(context).style.color,
-      strokeWidth: _defaultStrokeWidth,
-      strokeCap: StrokeCap.round,
-      constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
     );
   }
 }

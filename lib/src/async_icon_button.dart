@@ -1,10 +1,8 @@
-// To support lower versions than 3.22.0 for MaterialState.
-// ignore_for_file: deprecated_member_use
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import 'package:loadable_buttons/src/async_button_helpers.dart';
 import 'package:loadable_buttons/src/loading_transition.dart';
 
 enum _IconButtonVariant { standard, filled, filledTonal, outlined }
@@ -283,9 +281,11 @@ class AsyncIconButton extends StatefulWidget {
 
   /// The selection state of the Material 3 icon button.
   ///
-  /// Resolved on each build with [MaterialState] disabled when loading or when
+  /// Resolved on each build with [WidgetState] disabled when loading or when
   /// [onPressed] is null, and an empty state set otherwise. A null property
   /// preserves normal push-button behavior.
+  // Retain the existing public Material typedef for source compatibility.
+  // ignore: deprecated_member_use
   final MaterialStateProperty<bool>? isSelected;
 
   /// The icon shown when [isSelected] resolves to true in Material 3.
@@ -306,35 +306,22 @@ class AsyncIconButton extends StatefulWidget {
   State<AsyncIconButton> createState() => _AsyncIconButtonState();
 }
 
-class _AsyncIconButtonState extends State<AsyncIconButton> {
-  bool _internalLoading = false;
+class _AsyncIconButtonState extends State<AsyncIconButton>
+    with AsyncButtonState<AsyncIconButton> {
+  @override
+  bool get externalLoading => widget.loading;
 
-  bool get _isLoading => _internalLoading || widget.loading;
-
-  Future<void> _handlePressed() async {
-    // If the async callback is provided, use it.
-    if (widget.onPressed != null) {
-      // Prevent multiple presses.
-      if (_isLoading) return;
-      setState(() => _internalLoading = true);
-
-      try {
-        await widget.onPressed?.call();
-      } finally {
-        // Ensure that state is updated even if an exception occurs.
-        if (mounted) setState(() => _internalLoading = false);
-      }
-    }
-  }
+  @override
+  FutureOr<void> Function()? get asyncOnPressed => widget.onPressed;
 
   @override
   Widget build(BuildContext context) {
     final isSelected = widget.isSelected?.resolve({
-      if (_isLoading || widget.onPressed == null) MaterialState.disabled,
+      if (isLoading || widget.onPressed == null) WidgetState.disabled,
     });
     final icon = _AsyncIconButtonChild(
       icon: widget.icon,
-      isLoading: _isLoading,
+      isLoading: isLoading,
       transitionType: widget.transitionType,
       animationDuration: widget.animationDuration,
       minimumChildOpacity: widget.minimumChildOpacity,
@@ -347,7 +334,7 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
         ? null
         : _AsyncIconButtonChild(
             icon: selectedIcon,
-            isLoading: _isLoading,
+            isLoading: isLoading,
             transitionType: widget.transitionType,
             animationDuration: widget.animationDuration,
             minimumChildOpacity: widget.minimumChildOpacity,
@@ -379,7 +366,7 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
           splashColor: widget.splashColor,
           disabledColor: widget.disabledColor,
           onPressed:
-              _isLoading || widget.onPressed == null ? null : _handlePressed,
+              isLoading || widget.onPressed == null ? null : handlePressed,
           onHover: widget.onHover,
           onLongPress: widget.onLongPress,
           mouseCursor: widget.mouseCursor,
@@ -406,7 +393,7 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
           splashColor: widget.splashColor,
           disabledColor: widget.disabledColor,
           onPressed:
-              _isLoading || widget.onPressed == null ? null : _handlePressed,
+              isLoading || widget.onPressed == null ? null : handlePressed,
           onHover: widget.onHover,
           onLongPress: widget.onLongPress,
           mouseCursor: widget.mouseCursor,
@@ -433,7 +420,7 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
           splashColor: widget.splashColor,
           disabledColor: widget.disabledColor,
           onPressed:
-              _isLoading || widget.onPressed == null ? null : _handlePressed,
+              isLoading || widget.onPressed == null ? null : handlePressed,
           onHover: widget.onHover,
           onLongPress: widget.onLongPress,
           mouseCursor: widget.mouseCursor,
@@ -460,7 +447,7 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
           splashColor: widget.splashColor,
           disabledColor: widget.disabledColor,
           onPressed:
-              _isLoading || widget.onPressed == null ? null : _handlePressed,
+              isLoading || widget.onPressed == null ? null : handlePressed,
           onHover: widget.onHover,
           onLongPress: widget.onLongPress,
           mouseCursor: widget.mouseCursor,
@@ -508,36 +495,15 @@ class _AsyncIconButtonChild extends StatelessWidget {
 
     return LoadingTransition(
       child: icon,
-      loadingChild: loadingChild ?? _DefaultLoadingIndicator(style: style),
+      loadingChild: loadingChild ??
+          DefaultLoadingIndicator(
+            style: style,
+            themeStyleOf: (context) => IconButtonTheme.of(context).style,
+          ),
       isLoading: isLoading,
       transitionType: transitionType,
       animationDuration: animationDuration,
       minimumChildOpacity: minimumChildOpacity,
-    );
-  }
-}
-
-class _DefaultLoadingIndicator extends StatelessWidget {
-  const _DefaultLoadingIndicator({required ButtonStyle? style})
-      : _style = style;
-
-  static const double _defaultStrokeWidth = 3.0;
-
-  final ButtonStyle? _style;
-
-  @override
-  Widget build(BuildContext context) {
-    return CircularProgressIndicator(
-      color: _style?.foregroundColor?.resolve(<MaterialState>{}) ??
-          IconButtonTheme.of(context)
-              .style
-              ?.foregroundColor
-              ?.resolve(<MaterialState>{}) ??
-          IconTheme.of(context).color ??
-          DefaultTextStyle.of(context).style.color,
-      strokeWidth: _defaultStrokeWidth,
-      strokeCap: StrokeCap.round,
-      constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
     );
   }
 }

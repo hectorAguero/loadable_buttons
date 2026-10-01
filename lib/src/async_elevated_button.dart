@@ -1,11 +1,9 @@
-// To support lower versions than 3.22.0 for MaterialState.
-// ignore_for_file: deprecated_member_use
-
 import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+import 'package:loadable_buttons/src/async_button_helpers.dart';
 import 'package:loadable_buttons/src/loading_transition.dart';
 
 part 'async_elevated_button_with_icon.dart';
@@ -56,6 +54,8 @@ class AsyncElevatedButton extends StatefulWidget {
     ButtonStyle? style,
     FocusNode? focusNode,
     Clip? clipBehavior,
+    // Retain the existing public Material typedef for source compatibility.
+    // ignore: deprecated_member_use
     MaterialStatesController? statesController,
     Widget? icon,
     IconAlignment? iconAlignment,
@@ -152,6 +152,8 @@ class AsyncElevatedButton extends StatefulWidget {
   final Clip? clipBehavior;
 
   /// The statesController of the button, ElevatedButton property.
+  // Retain the existing public Material typedef for source compatibility.
+  // ignore: deprecated_member_use
   final MaterialStatesController? statesController;
 
   /// The animationDuration of the transition.
@@ -184,38 +186,24 @@ class AsyncElevatedButton extends StatefulWidget {
   State<AsyncElevatedButton> createState() => _AsyncElevatedButtonState();
 }
 
-class _AsyncElevatedButtonState extends State<AsyncElevatedButton> {
-  bool _internalLoading = false;
+class _AsyncElevatedButtonState extends State<AsyncElevatedButton>
+    with AsyncButtonState<AsyncElevatedButton> {
+  @override
+  bool get externalLoading => widget.loading;
 
-  bool get _isLoading => _internalLoading || widget.loading;
-
-  Future<void> _handlePressed() async {
-    // If the async callback is provided, use it.
-    if (widget.onPressed != null) {
-      // Prevent multiple presses.
-      if (_isLoading) return;
-      setState(() => _internalLoading = true);
-
-      try {
-        await widget.onPressed?.call();
-      } finally {
-        // Ensure that state is updated even if an exception occurs.
-        if (mounted) setState(() => _internalLoading = false);
-      }
-    }
-  }
+  @override
+  FutureOr<void> Function()? get asyncOnPressed => widget.onPressed;
 
   void _handleLongPress() {
-    if (_isLoading) return;
+    if (isLoading) return;
     widget.onLongPress?.call();
   }
 
   @override
   Widget build(BuildContext context) => ElevatedButton(
-        onPressed:
-            _isLoading || widget.onPressed == null ? null : _handlePressed,
+        onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
         onLongPress:
-            _isLoading || widget.onLongPress == null ? null : _handleLongPress,
+            isLoading || widget.onLongPress == null ? null : _handleLongPress,
         onHover: widget.onHover,
         onFocusChange: widget.onFocusChange,
         style: widget.style ??
@@ -226,51 +214,20 @@ class _AsyncElevatedButtonState extends State<AsyncElevatedButton> {
         statesController: widget.statesController,
         child: widget.transitionType == TransitionAnimationType.customBuilder
             ? widget.customBuilder
-                    ?.call(_isLoading, widget.child, widget.loadingChild) ??
+                    ?.call(isLoading, widget.child, widget.loadingChild) ??
                 widget.child
             : LoadingTransition(
                 child: widget.child,
                 loadingChild: widget.loadingChild ??
-                    _DefaultLoadingIndicator(
+                    DefaultLoadingIndicator(
                         style: widget.style,
+                        themeStyleOf: (context) =>
+                            ElevatedButtonTheme.of(context).style,
                         loadingSemanticsLabel: widget.loadingSemanticsLabel),
-                isLoading: _isLoading,
+                isLoading: isLoading,
                 transitionType: widget.transitionType,
                 animationDuration: widget.animationDuration,
                 minimumChildOpacity: widget.minimumChildOpacity,
               ),
       );
-}
-
-class _DefaultLoadingIndicator extends StatelessWidget {
-  const _DefaultLoadingIndicator(
-      {required ButtonStyle? style, required this.loadingSemanticsLabel})
-      : _style = style;
-
-  static const double _defaultStrokeWidth = 3.0;
-
-  final ButtonStyle? _style;
-  final String? loadingSemanticsLabel;
-
-  @override
-  Widget build(BuildContext context) {
-    // Resolve explicit and themed foregrounds in the normal state.
-    final Color? fallbackContentColor =
-        IconTheme.of(context).color ?? DefaultTextStyle.of(context).style.color;
-    final Color? resolvedColor =
-        _style?.foregroundColor?.resolve(<MaterialState>{}) ??
-            ElevatedButtonTheme.of(context)
-                .style
-                ?.foregroundColor
-                ?.resolve(<MaterialState>{}) ??
-            fallbackContentColor;
-
-    return CircularProgressIndicator(
-      color: resolvedColor,
-      strokeWidth: _defaultStrokeWidth,
-      semanticsLabel: loadingSemanticsLabel,
-      strokeCap: StrokeCap.round,
-      constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
-    );
-  }
 }

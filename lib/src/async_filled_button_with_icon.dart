@@ -1,6 +1,3 @@
-// To support lower versions than 3.22.0 for MaterialState.
-// ignore_for_file: deprecated_member_use
-
 part of 'async_filled_button.dart';
 
 class _AsyncFilledButtonWithIcon extends AsyncFilledButton {
@@ -90,7 +87,7 @@ class _FilledButtonWithIconChild extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final defaultFontSize =
-        buttonStyle?.textStyle?.resolve(const <MaterialState>{})?.fontSize ??
+        buttonStyle?.textStyle?.resolve(const <WidgetState>{})?.fontSize ??
             _defaultFontSize;
     final scale = clampDouble(
           MediaQuery.textScalerOf(context).scale(defaultFontSize) /
