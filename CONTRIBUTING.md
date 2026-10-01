@@ -2,7 +2,7 @@
 
 The 1.1.x compatibility line supports Flutter **3.29.0+** and Dart
 **3.7.0+**. CI tests the exact Flutter minimum declared in `pubspec.yaml` and the
-moving stable channel. See [the compatibility roadmap](docs/compatibility-roadmap.md).
+moving stable channel. See [the compatibility roadmap](doc/compatibility-roadmap.md).
 
 Use current Flutter stable with Dart **3.13 or newer** for the full plugin checks.
 Flutter 3.29 ships Dart 3.7, which can run the built-in analyzer baseline but
