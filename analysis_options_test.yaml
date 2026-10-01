@@ -16,3 +16,14 @@ linter:
     avoid_redundant_argument_values: false
     # Test diagnostics may print; production code still uses logging.
     avoid_print: false
+
+dart_code_linter:
+  rules:
+    # DCL resolves these relative to test/analysis_options.yaml.
+    # Its default test/** pattern would otherwise become test/test/**.
+    - missing-test-assertion:
+        include:
+          - '**/*.dart'
+    - prefer-correct-test-file-name:
+        include:
+          - '**/*.dart'

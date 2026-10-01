@@ -19,7 +19,9 @@ Analysis Server after changing plugin configuration.
 
 DCL's `all` preset is intentionally replaced by an explicit rule list. Solid
 owns overlapping rules; DCL adds only rules Solid does not supply. CI also runs
-the DCL CLI to check its configuration directly.
+the DCL CLI to check its configuration directly. Test-rule include patterns are
+relative to `test/analysis_options.yaml`, so the test policy uses `**/*.dart`
+instead of the default `test/**` pattern.
 
 ## Package rules
 
@@ -90,10 +92,14 @@ Run the same checks as CI:
 
 ```sh
 flutter pub get
-dart analyze --fatal-infos
+bash tool/analyze.sh
 dart run dart_code_linter:metrics analyze lib test example/lib --fatal-style --fatal-performance
 flutter test --no-pub
 ```
+
+The analysis script checks package-wide diagnostics, then explicitly targets
+every Dart source file in `lib/`, `test/`, and `example/lib/`. This also collects
+Solid plugin diagnostics that directory-wide analysis can miss on Dart 3.13.4.
 
 The package root lockfile remains ignored, as appropriate for a published
 library. The example app keeps its own lockfile.

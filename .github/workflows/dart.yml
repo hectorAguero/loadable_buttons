@@ -21,7 +21,7 @@ jobs:
         run: flutter pub get
 
       - name: Analyze Package, Tests, and Example
-        run: dart analyze --fatal-infos
+        run: bash tool/analyze.sh
 
       - name: Check Dart Code Linter Rules
         run: dart run dart_code_linter:metrics analyze lib test example/lib --fatal-style --fatal-performance
