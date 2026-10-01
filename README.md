@@ -76,6 +76,10 @@ and long presses while loading. Their disabled state also applies to keyboard
 activation and accessibility semantics. Long-press-only buttons remain usable
 when idle.
 
+The `.icon` constructors for Elevated, Filled, Outlined, and Text buttons, and
+Filled's `.tonalIcon`, forward `onLongPress`, `onHover`, `onFocusChange`, and
+`focusNode` to the Material button whether an icon is provided or null.
+
 A null `onPressed` preserves the native Material disabled styling, focus, and
 accessibility behavior. Elevated, Filled, Outlined, and Text buttons remain
 usable with only `onLongPress` while idle; IconButton and floating action buttons
