@@ -15,6 +15,9 @@ typedef _IconButtonBuilder =
       ValueChanged<bool>? onHover,
       ValueChanged<bool>? onFocusChange,
       FocusNode? focusNode,
+      ButtonStyle? style,
+      bool loading,
+      Widget? loadingChild,
     });
 
 void main() {
@@ -27,32 +30,104 @@ void main() {
   };
 
   for (final entry in builders.entries) {
-    testWidgets('${entry.key} centers its loader over the icon and label', (
+    for (final direction in TextDirection.values) {
+      for (final paddingSource in ['default', 'theme', 'widget']) {
+        for (final scale in [1.0, 2.0]) {
+          testWidgets('${entry.key} centers its loader in the full button: '
+              '$direction $paddingSource scale=$scale', (tester) async {
+            final pending = Completer<void>();
+            const loadingKey = ValueKey('loading');
+            const paddingStyle = ButtonStyle(
+              padding: WidgetStatePropertyAll(
+                EdgeInsetsDirectional.fromSTEB(10, 4, 30, 16),
+              ),
+            );
+            await tester.pumpWidget(
+              _host(
+                entry.value(
+                  onPressed: () => pending.future,
+                  icon: const Icon(Icons.add),
+                  label: const Text('Run this operation'),
+                  style: paddingSource == 'widget' ? paddingStyle : null,
+                  loadingChild:
+                      scale == 2.0
+                          ? const SizedBox(
+                            key: loadingKey,
+                            width: 24,
+                            height: 20,
+                          )
+                          : null,
+                ),
+                direction: direction,
+                scale: scale,
+                themeStyle: paddingSource == 'theme' ? paddingStyle : null,
+              ),
+            );
+            final button = find.byWidgetPredicate(
+              (widget) => widget is ButtonStyleButton,
+            );
+            final idleSize = tester.getSize(button);
+            await tester.tap(find.text('Run this operation'));
+            await tester.pump();
+            for (final elapsed in [
+              const Duration(milliseconds: 1),
+              Durations.medium1 ~/ 2,
+              Durations.medium1,
+            ]) {
+              await tester.pump(elapsed);
+              final loader =
+                  scale == 2.0
+                      ? find.byKey(loadingKey)
+                      : find.byType(CircularProgressIndicator);
+              final buttonCenter = tester.getCenter(button);
+              final loaderCenter = tester.getCenter(loader);
+              expect(loaderCenter.dx, closeTo(buttonCenter.dx, 0.01));
+              expect(loaderCenter.dy, closeTo(buttonCenter.dy, 0.01));
+              expect(tester.getSize(button), idleSize);
+            }
+            pending.complete();
+            await tester.pump();
+            await tester.pump(Durations.medium1);
+          });
+        }
+      }
+    }
+
+    testWidgets('${entry.key} keeps centered custom loading controls usable', (
       tester,
     ) async {
-      final pending = Completer<void>();
+      const loadingKey = ValueKey('loading-control');
+      var calls = 0;
       await tester.pumpWidget(
         _host(
           entry.value(
-            onPressed: () => pending.future,
+            onPressed: () {},
+            loading: true,
             icon: const Icon(Icons.add),
             label: const Text('Run'),
+            style: const ButtonStyle(
+              fixedSize: WidgetStatePropertyAll(Size(280, 96)),
+              alignment: AlignmentDirectional.bottomStart,
+              padding: WidgetStatePropertyAll(
+                EdgeInsetsDirectional.fromSTEB(60, 2, 10, 14),
+              ),
+            ),
+            loadingChild: GestureDetector(
+              onTap: () => calls++,
+              child: const SizedBox(key: loadingKey, width: 24, height: 24),
+            ),
           ),
         ),
       );
-      final contentRect = tester
-          .getRect(find.text('Run'))
-          .expandToInclude(tester.getRect(find.byIcon(Icons.add)));
-      await tester.tap(find.text('Run'));
-      await tester.pump();
-      await tester.pump(Durations.medium1);
-      expect(
-        tester.getCenter(find.byType(CircularProgressIndicator)).dx,
-        closeTo(contentRect.center.dx, 0.01),
+      final button = find.byWidgetPredicate(
+        (widget) => widget is ButtonStyleButton,
       );
-      pending.complete();
-      await tester.pump();
-      await tester.pump(Durations.medium1);
+      final buttonCenter = tester.getCenter(button);
+      final loaderCenter = tester.getCenter(find.byKey(loadingKey));
+      expect(loaderCenter.dx, closeTo(buttonCenter.dx, 0.01));
+      expect(loaderCenter.dy, closeTo(buttonCenter.dy, 0.01));
+      await tester.tap(find.byKey(loadingKey));
+      expect(calls, 1);
     });
 
     for (final hasIcon in [true, false]) {
@@ -162,5 +237,24 @@ void main() {
   }
 }
 
-Widget _host(Widget button) =>
-    MaterialApp(home: Scaffold(body: Center(child: button)));
+Widget _host(
+  Widget button, {
+  TextDirection direction = TextDirection.ltr,
+  double scale = 1.0,
+  ButtonStyle? themeStyle,
+}) => MaterialApp(
+  theme: ThemeData(
+    elevatedButtonTheme: ElevatedButtonThemeData(style: themeStyle),
+    filledButtonTheme: FilledButtonThemeData(style: themeStyle),
+    outlinedButtonTheme: OutlinedButtonThemeData(style: themeStyle),
+    textButtonTheme: TextButtonThemeData(style: themeStyle),
+  ),
+  home: Scaffold(
+    body: Center(
+      child: MediaQuery(
+        data: MediaQueryData(textScaler: TextScaler.linear(scale)),
+        child: Directionality(textDirection: direction, child: button),
+      ),
+    ),
+  ),
+);

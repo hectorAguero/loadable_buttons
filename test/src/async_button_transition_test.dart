@@ -220,7 +220,11 @@ void main() {
             expect(idleCalls, 1);
 
             await tester.pumpWidget(host(true));
-            for (final elapsed in [Duration.zero, _halfDuration, _duration]) {
+            for (final elapsed in [
+              const Duration(milliseconds: 1),
+              _halfDuration,
+              _duration,
+            ]) {
               await tester.pump(elapsed);
               idleFocus.requestFocus();
               await tester.pump();
@@ -243,7 +247,11 @@ void main() {
             expect(loadingFocus.hasFocus, isTrue);
 
             await tester.pumpWidget(host(false));
-            for (final elapsed in [Duration.zero, _halfDuration, _duration]) {
+            for (final elapsed in [
+              const Duration(milliseconds: 1),
+              _halfDuration,
+              _duration,
+            ]) {
               await tester.pump(elapsed);
               loadingFocus.requestFocus();
               await tester.pump();
@@ -412,7 +420,7 @@ void main() {
             const label = Text('Send');
             final padding =
                 paddingSource == 'widget'
-                    ? const EdgeInsetsDirectional.only(start: 12, end: 18)
+                    ? const EdgeInsetsDirectional.fromSTEB(12, 2, 18, 10)
                     : null;
             final spacing = paddingSource == 'widget' ? 12.0 : null;
             const textStyle = TextStyle(fontSize: 16);
@@ -422,9 +430,11 @@ void main() {
                     paddingSource == 'default'
                         ? const FloatingActionButtonThemeData()
                         : const FloatingActionButtonThemeData(
-                          extendedPadding: EdgeInsetsDirectional.only(
-                            start: 10,
-                            end: 26,
+                          extendedPadding: EdgeInsetsDirectional.fromSTEB(
+                            10,
+                            4,
+                            26,
+                            12,
                           ),
                           extendedIconLabelSpacing: 20,
                         ),
@@ -471,12 +481,6 @@ void main() {
             await tester.pumpWidget(host(button(false)));
             expect(tester.getSize(find.byKey(_buttonKey)), materialSize);
             final labelRect = tester.getRect(find.text('Send'));
-            final contentRect =
-                withIcon
-                    ? labelRect.expandToInclude(
-                      tester.getRect(find.byKey(iconKey)),
-                    )
-                    : labelRect;
             if (withIcon) {
               final labelX = labelRect.center.dx;
               final iconX = tester.getCenter(find.byKey(iconKey)).dx;
@@ -488,13 +492,23 @@ void main() {
               );
             }
             await tester.pumpWidget(host(button(true)));
-            await tester.pump(_duration);
-            expect(tester.takeException(), isNull);
-            expect(tester.getSize(find.byKey(_buttonKey)), materialSize);
-            expect(
-              tester.getCenter(find.byType(CircularProgressIndicator)).dx,
-              closeTo(contentRect.center.dx, 0.01),
-            );
+            for (final elapsed in [
+              const Duration(milliseconds: 1),
+              _halfDuration,
+              _duration,
+            ]) {
+              await tester.pump(elapsed);
+              expect(tester.takeException(), isNull);
+              expect(tester.getSize(find.byKey(_buttonKey)), materialSize);
+              expect(
+                tester.getCenter(find.byType(CircularProgressIndicator)).dx,
+                closeTo(tester.getCenter(find.byKey(_buttonKey)).dx, 0.01),
+              );
+              expect(
+                tester.getCenter(find.byType(CircularProgressIndicator)).dy,
+                closeTo(tester.getCenter(find.byKey(_buttonKey)).dy, 0.01),
+              );
+            }
             await tester.pumpWidget(host(button(false)));
             await tester.pump(_duration);
             expect(tester.getSize(find.byKey(_buttonKey)), materialSize);
