@@ -304,14 +304,6 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
 
   bool get _isLoading => _internalLoading || widget.loading;
 
-  @override
-  void didUpdateWidget(covariant AsyncIconButton oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.loading != widget.loading && !widget.loading) {
-      _internalLoading = false;
-    }
-  }
-
   Future<void> _handlePressed() async {
     // If the async callback is provided, use it.
     if (widget.onPressed != null) {

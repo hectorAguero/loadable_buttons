@@ -1,3 +1,9 @@
+## Unreleased
+
+* Fix external `loading` updates clearing a pending `onPressed` operation in all
+  async button families. External and internal loading remain independent,
+  preventing duplicate execution until the operation finishes.
+
 ## 1.0.0
 
 * Fixed `loadingChild` rendering in `AsyncElevatedButton` when using `TransitionAnimationType.stack`
