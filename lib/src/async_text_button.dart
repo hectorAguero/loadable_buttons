@@ -53,7 +53,7 @@ class AsyncTextButton extends StatefulWidget {
     ButtonStyle? style,
     FocusNode? focusNode,
     Clip? clipBehavior,
-    // Retain the existing public Material typedef for source compatibility.
+    // Retain the v1 public Material typedef until the v2 API migration.
     // ignore: deprecated_member_use
     MaterialStatesController? statesController,
     Widget? icon,
@@ -147,7 +147,7 @@ class AsyncTextButton extends StatefulWidget {
   final Clip? clipBehavior;
 
   /// The statesController of the button, TextButton property.
-  // Retain the existing public Material typedef for source compatibility.
+  // Retain the v1 public Material typedef until the v2 API migration.
   // ignore: deprecated_member_use
   final MaterialStatesController? statesController;
 

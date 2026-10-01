@@ -59,7 +59,8 @@ class DefaultLoadingIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => CircularProgressIndicator(
-        // Resolve each source before applying precedence, in the normal state.
+        // WidgetState is available in Flutter 3.22. Resolve each foreground
+        // in the normal state before applying precedence.
         color: color ??
             style?.foregroundColor?.resolve(<WidgetState>{}) ??
             themeStyleOf
