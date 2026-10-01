@@ -1,0 +1,30 @@
+include: analysis_options.yaml
+
+# Inherit VGA's built-in rules and the package's Solid/DCL checks.
+# Relax only test/fixture conventions.
+solid_lints:
+  diagnostics:
+    function_lines_of_code: false
+    cyclomatic_complexity: false
+    avoid_late_keyword: false
+    avoid_returning_widgets: false
+    no_empty_block: false
+    no_magic_number: false
+
+linter:
+  rules:
+    public_member_api_docs: false
+    avoid_redundant_argument_values: false
+    # Test diagnostics may print; production code still uses logging.
+    avoid_print: false
+
+dart_code_linter:
+  rules:
+    # DCL resolves these relative to test/analysis_options.yaml.
+    # Its default test/** pattern would otherwise become test/test/**.
+    - missing-test-assertion:
+        include:
+          - '**/*.dart'
+    - prefer-correct-test-file-name:
+        include:
+          - '**/*.dart'

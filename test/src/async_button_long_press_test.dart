@@ -63,6 +63,7 @@ void main() {
         loading: false,
         onPressed: () {
           presses++;
+
           return pending.future;
         },
         onLongPress: () {
@@ -75,7 +76,10 @@ void main() {
       final position = tester.getCenter(button);
       // Capture a callback already exposed to Material before the next frame.
       final idleLongPress =
-          tester.widget<ButtonStyleButton>(button).onLongPress!;
+          tester.widget<ButtonStyleButton>(button).onLongPress;
+      if (idleLongPress == null) {
+        fail('An idle button must expose its configured long-press callback.');
+      }
       await tester.tapAt(position);
       idleLongPress();
       expect(longPresses, 0);

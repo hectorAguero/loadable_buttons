@@ -16,7 +16,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  late var randomSeedColor = Colors.black;
+  Color randomSeedColor = Colors.black;
 
   void _changeSeedColor() {
     setState(() {
@@ -330,7 +330,7 @@ class _HomePageState extends State<_HomePage> {
     );
   }
 
-  Future<void> _switchTransitionAnimationType() async {
+  void _switchTransitionAnimationType() {
     setState(() {
       transitionType = transitionType == TransitionAnimationType.stack
           ? TransitionAnimationType.animatedSwitcher
@@ -344,6 +344,7 @@ extension StringCapitalization on String {
   /// Capitalizes the first letter of the string.
   String capitalize() {
     if (isEmpty) return this;
+
     return '${this[0].toUpperCase()}${substring(1)}';
   }
 }

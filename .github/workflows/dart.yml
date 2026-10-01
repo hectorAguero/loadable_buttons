@@ -17,5 +17,14 @@ jobs:
           channel: stable
           cache: true
 
+      - name: Get Dependencies
+        run: flutter pub get
+
+      - name: Analyze Package, Tests, and Example
+        run: bash tool/analyze.sh
+
+      - name: Check Dart Code Linter Rules
+        run: dart run dart_code_linter:metrics analyze lib test example/lib --fatal-style --fatal-performance
+
       - name: Run Tests
-        run: flutter test
+        run: flutter test --no-pub

@@ -1,55 +1,128 @@
+include: package:very_good_analysis/analysis_options.yaml
+
 analyzer:
+  exclude:
+    - build/**
+    - '**/*.g.dart'
+    - '**/*.gr.dart'
+    - '**/*.mocks.dart'
+    - '**/*.freezed.dart'
+    - '**/*.pb.dart'
   language:
+    strict-casts: true
     strict-inference: true
     strict-raw-types: true
-  # Dart Code Linter uses plugins api from the analyzer
-  # to provide issues highlight in the IDE. If you don't want the issues
-  # to be shown and need only the CLI, you need to remove the section below.
-  plugins:
-    - dart_code_linter
 
-dart_code_linter:
-  # Dart Code Linter supports presets. The config from a preset will be merged
-  # with the config listed in this file. The config listed here has a higher priority.
-  # Any rule can be simply disabled by setting `- rule-name: false`.
-  # Uncomment the section below to see how presets work.
-  extends:
-    - package:dart_code_linter/presets/all.yaml
+# Very Good Analysis owns built-in rules; these plugins add custom checks.
+# Development uses Dart >= 3.13; consumer SDK constraints stay in pubspec.yaml.
+plugins:
+  solid_lints: ^1.0.0
+  dart_code_linter:
+    version: ^4.4.0
+    diagnostics:
+      always-remove-listener: true
+      avoid-redundant-async: true
+      prefer-async-await: true
+      # Plugin diagnostics are enabled at the package root, including tests.
+      missing-test-assertion: true
+      prefer-correct-test-file-name: true
 
-  # To enabled anti-patterns and metrics in the analysis report, uncomment the sections below.
-  # Metric violations are not shown in the IDE.
-  anti-patterns:
-    - long-method
-    - long-parameter-list
-  metrics-exclude:
-    - test/**
-  metrics:
+solid_lints:
+  diagnostics:
+    # Preserve Solid's custom policy without including its built-in preset.
+    avoid_global_state: true
+    avoid_late_keyword:
+      allow_initialized: true
+      ignored_types:
+        - AnimationController
+    avoid_non_null_assertion: true
+    avoid_returning_widgets: true
+    avoid_unnecessary_return_variable: true
+    avoid_unnecessary_setstate: true
+    avoid_unnecessary_type_assertions: true
+    avoid_unrelated_type_assertions: true
+    avoid_unused_parameters:
+      exclude_annotation:
+        - freezed
+        - unfreezed
+    avoid_debug_print_in_release: true
+    avoid_final_with_getter: true
+    double_literal_format: true
+    newline_before_return: true
+    no_empty_block: true
+    no_equal_then_else: true
+    prefer_early_return:
+      maximum_statements: 1
+      ignore_if_case: true
+    prefer_conditional_expressions:
+      ignore_nested: true
+    prefer_first: true
+    prefer_last: true
+    proper_super_calls: true
+    named_parameters_ordering: false
+    use_nearest_context: true
+    use_descriptive_names_for_type_parameters: true
+    # Material-compatible public constructors legitimately have many options.
+    number_of_parameters: false
+    # Mirroring Flutter's button variants intentionally repeats widget wiring.
+    avoid_duplicate_code: false
+    # Keep related private State/widgets together and constructors first.
+    member_ordering: false
+    prefer_match_file_name: false
+    # Heuristics do not distinguish forwarding widgets from business logic.
+    feature_envy: false
+    avoid_similar_names: false
+    # Nullable style fallbacks and widget variants inflate build() complexity.
+    # Keep the limit of 10 for callbacks, lifecycle methods, and other logic.
+    cyclomatic_complexity:
+      max_complexity: 10
+      exclude:
+        - method_name: build
+    # Keep numeric logic strict while allowing ordinary layout parameters.
+    no_magic_number:
+      allowed: [-1, 0, 1]
+      allowed_in_widget_params: true
+    # The example deliberately renders all variants in one showcase method.
+    function_lines_of_code:
+      max_lines: 200
+      exclude:
+        - class_name: _HomePageState
+          method_name: build
 
-    cyclomatic-complexity: 20
-    maintainability-index: 50
-    maximum-nesting: 5
-    number-of-parameters: 5
-    source-lines-of-code: 50
-    technical-debt:
-      threshold: 16
-      todo-cost: 4
-      ignore-cost: 8
-      ignore-for-file-cost: 16
-      as-dynamic-cost: 16
-      deprecated-annotations-cost: 2
-      file-nullsafety-migration-cost: 2
-      unit-type: "hours"
-
-  # Dart Code Linter provides custom configurable rules.
-  # The rules have a `kebab-case` naming instead of 
-  # `snake_case` intentionally in order for you to identify,
-  # whether the rule is from Dart Code Metrics or the standard analyzer.
-  # All rules share basic configuration like `exclude` section,
-  # but some also have a rule-specific one.
-  # Not all rules are listed here, the full list can be found on our website: https://github.com/bancolombia/dart-code-linter/wiki/Rules
+linter:
   rules:
-    - prefer-single-widget-per-file:
-        ignore-private-widgets: true
-    - prefer-trailing-comma: false
-    - member-ordering: false
-    - no-object-declaration: false
+    # DCL already owns async/await style and redundant async diagnostics.
+    async_return_with_no_await: false
+    # Keep explicit types where they clarify fixtures and callback contracts.
+    omit_local_variable_types: false
+    avoid_types_on_closure_parameters: false
+    # These rewrites express style preferences rather than package guarantees.
+    cascade_invocations: false
+    prefer_foreach: false
+    sort_constructors_first: false
+    initialize_in_field_declaration: false
+    prefer_single_quotes: false
+    # Solid owns double literal formatting; keep explicit 0.0 layout values.
+    prefer_int_literals: false
+    # Flutter-style parameter assertions may omit optional error messages.
+    prefer_asserts_with_message: false
+    # Solid discourages uninitialized late fields outside test fixtures.
+    use_late_for_private_fields_and_variables: false
+    # Library sources must remain compatible with the consumer Dart 3.6 floor.
+    use_declaring_parameters: false
+    use_null_aware_elements: false
+    require_trailing_commas: false
+    # Argument ordering is a style choice; preserve the existing widget wiring.
+    sort_child_properties_last: false
+    # The existing public Widget builder callback takes a positional bool.
+    # Changing its signature would break package consumers.
+    avoid_positional_boolean_parameters: false
+
+# These complement Solid; overlapping rules stay owned by Solid.
+dart_code_linter:
+  rules:
+    - always-remove-listener
+    - avoid-redundant-async
+    - prefer-async-await
+    - missing-test-assertion
+    - prefer-correct-test-file-name

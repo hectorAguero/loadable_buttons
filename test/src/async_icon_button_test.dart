@@ -343,7 +343,7 @@ void main() {
       await tester.tap(find.byType(AsyncIconButton));
       await tester.pump();
 
-      // Find the AnimatedOpacity that wraps the icon (its child is AnimatedSize).
+      // Find the AnimatedOpacity that wraps the icon (child is AnimatedSize).
       final animatedOpacities =
           tester.widgetList<AnimatedOpacity>(find.byType(AnimatedOpacity));
       final iconOpacityWidget = animatedOpacities.firstWhere(
@@ -434,8 +434,8 @@ void main() {
     });
 
     test(
-        'asserts when customBuilder is not provided with customBuilder transition',
-        () {
+        'asserts when customBuilder is '
+        'not provided with customBuilder transition', () {
       expect(
         () => AsyncIconButton(
           icon: const Icon(Icons.add),
@@ -507,13 +507,13 @@ void main() {
 
       final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
       addTearDown(gesture.removePointer);
-      await gesture.addPointer(location: const Offset(0, 0));
+      await gesture.addPointer(location: Offset.zero);
       await gesture.moveTo(tester.getCenter(find.byType(AsyncIconButton)));
       await tester.pump();
 
       expect(lastHover, isTrue);
 
-      await gesture.moveTo(const Offset(0, 0));
+      await gesture.moveTo(Offset.zero);
       await tester.pump();
 
       expect(lastHover, isFalse);
@@ -522,7 +522,7 @@ void main() {
     testWidgets('forwards constraints and mouseCursor to IconButton',
         (tester) async {
       const constraints = BoxConstraints.tightFor(width: 48, height: 48);
-      final cursor = SystemMouseCursors.click;
+      const cursor = SystemMouseCursors.click;
 
       await tester.pumpWidget(
         MaterialApp(
@@ -562,7 +562,8 @@ void main() {
       await tester.longPress(find.byType(AsyncIconButton));
       await tester.pump();
 
-      // IconButton is disabled when onPressed is null (loading), so long press won't fire.
+      // IconButton is disabled when onPressed is null (loading),
+      // so long press won't fire.
       expect(longPressed, isFalse);
     });
   });
