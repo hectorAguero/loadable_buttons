@@ -6,7 +6,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-import 'package:loadable_buttons/src/transition_animation_type.dart';
+import 'package:loadable_buttons/src/loading_transition.dart';
 
 part 'async_elevated_button_with_icon.dart';
 
@@ -224,65 +224,21 @@ class _AsyncElevatedButtonState extends State<AsyncElevatedButton> {
         autofocus: widget.autofocus,
         clipBehavior: widget.clipBehavior,
         statesController: widget.statesController,
-        child: switch (widget.transitionType) {
-          TransitionAnimationType.stack => Stack(
-              alignment: Alignment.center,
-              children: [
-                AnimatedOpacity(
-                    child: AnimatedSize(
-                        // Ignore interactions on the content while loading.
-                        child: IgnorePointer(
-                          ignoring: _isLoading,
-                          child: widget.child,
-                        ),
-                        duration: widget.animationDuration),
-                    opacity: _isLoading ? widget.minimumChildOpacity : 1.0,
-                    duration: widget.animationDuration),
-                AnimatedOpacity(
-                    child: Visibility(
-                        child: widget.loadingChild ??
-                            _DefaultLoadingIndicator(
-                                style: widget.style,
-                                loadingSemanticsLabel:
-                                    widget.loadingSemanticsLabel),
-                        visible: _isLoading),
-                    opacity: _isLoading ? 1.0 : 0.0,
-                    duration: widget.animationDuration),
-              ],
-            ),
-          TransitionAnimationType.animatedSwitcher => AnimatedSwitcher(
-              child: _isLoading
-                  ? KeyedSubtree(
-                      key: const ValueKey('loading'),
-                      child: widget.loadingChild ??
-                          _DefaultLoadingIndicator(
-                              style: widget.style,
-                              loadingSemanticsLabel:
-                                  widget.loadingSemanticsLabel),
-                    )
-                  : KeyedSubtree(
-                      key: const ValueKey('content'),
-                      child: IgnorePointer(
-                        ignoring: _isLoading,
-                        child: widget.child,
-                      )),
-              duration: widget.animationDuration,
-              transitionBuilder: (child, animation) => FadeTransition(
-                opacity: animation,
-                child: AnimatedSize(
-                  child: child,
-                  duration: widget.animationDuration,
-                ),
+        child: widget.transitionType == TransitionAnimationType.customBuilder
+            ? widget.customBuilder
+                    ?.call(_isLoading, widget.child, widget.loadingChild) ??
+                widget.child
+            : LoadingTransition(
+                child: widget.child,
+                loadingChild: widget.loadingChild ??
+                    _DefaultLoadingIndicator(
+                        style: widget.style,
+                        loadingSemanticsLabel: widget.loadingSemanticsLabel),
+                isLoading: _isLoading,
+                transitionType: widget.transitionType,
+                animationDuration: widget.animationDuration,
+                minimumChildOpacity: widget.minimumChildOpacity,
               ),
-            ),
-          TransitionAnimationType.customBuilder => widget.customBuilder != null
-              ? widget.customBuilder?.call(
-                  _isLoading,
-                  widget.child,
-                  widget.loadingChild,
-                )
-              : widget.child,
-        },
       );
 }
 

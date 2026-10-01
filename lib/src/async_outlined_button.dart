@@ -6,7 +6,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-import 'package:loadable_buttons/src/transition_animation_type.dart';
+import 'package:loadable_buttons/src/loading_transition.dart';
 
 part 'async_outlined_button_with_icon.dart';
 
@@ -213,45 +213,19 @@ class _AsyncOutlinedButtonState extends State<AsyncOutlinedButton> {
         autofocus: widget.autofocus,
         clipBehavior: widget.clipBehavior,
         statesController: widget.statesController,
-        child: switch (widget.transitionType) {
-          TransitionAnimationType.stack => Stack(
-              alignment: Alignment.center,
-              children: [
-                AnimatedOpacity(
-                    child: AnimatedSize(
-                        child: widget.child,
-                        duration: widget.animationDuration),
-                    opacity: _isLoading ? widget.minimumChildOpacity : 1.0,
-                    duration: widget.animationDuration),
-                AnimatedOpacity(
-                    child: Visibility(
-                        child: widget.loadingChild ??
-                            _DefaultLoadingIndicator(style: widget.style),
-                        visible: _isLoading),
-                    opacity: _isLoading ? 1.0 : 0.0,
-                    duration: widget.animationDuration),
-              ],
-            ),
-          TransitionAnimationType.animatedSwitcher => AnimatedSwitcher(
-              child: !_isLoading
-                  ? IgnorePointer(ignoring: _isLoading, child: widget.child)
-                  : widget.loadingChild ??
-                      _DefaultLoadingIndicator(style: widget.style),
-              duration: widget.animationDuration,
-              transitionBuilder: (child, animation) => FadeTransition(
-                  key: ValueKey<Key?>(child.key),
-                  opacity: animation,
-                  child: AnimatedSize(
-                      child: child, duration: widget.animationDuration))),
-          TransitionAnimationType.customBuilder => widget.customBuilder != null
-              ? widget.customBuilder?.call(
-                    _isLoading,
-                    widget.child,
-                    widget.loadingChild,
-                  ) ??
-                  widget.child
-              : widget.child,
-        },
+        child: widget.transitionType == TransitionAnimationType.customBuilder
+            ? widget.customBuilder
+                    ?.call(_isLoading, widget.child, widget.loadingChild) ??
+                widget.child
+            : LoadingTransition(
+                child: widget.child,
+                loadingChild: widget.loadingChild ??
+                    _DefaultLoadingIndicator(style: widget.style),
+                isLoading: _isLoading,
+                transitionType: widget.transitionType,
+                animationDuration: widget.animationDuration,
+                minimumChildOpacity: widget.minimumChildOpacity,
+              ),
       );
 }
 
@@ -266,7 +240,9 @@ class _DefaultLoadingIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CircularProgressIndicator(
-      color: _style?.foregroundColor?.resolve({MaterialState.selected}),
+      color: _style?.foregroundColor?.resolve(<MaterialState>{}) ??
+          IconTheme.of(context).color ??
+          DefaultTextStyle.of(context).style.color,
       strokeWidth: _defaultStrokeWidth,
       strokeCap: StrokeCap.round,
       constraints: const BoxConstraints(minWidth: 16, minHeight: 16),

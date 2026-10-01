@@ -118,7 +118,7 @@ AsyncElevatedButton(
 | `TransitionAnimationType` | Behavior |
 | --- | --- |
 | `stack` (default) | Keeps idle content in the layout and fades loading content over it. |
-| `animatedSwitcher` | Fades between content with animated sizing. |
+| `animatedSwitcher` | Fades between content; outgoing content stays in the layout until its fade ends. |
 | `customBuilder` | Uses your required `customBuilder(loading, child, loadingChild)`. |
 
 `animationDuration` defaults to `Durations.medium1`; `minimumChildOpacity`
@@ -162,8 +162,31 @@ Yes! The code is [MIT licensed](LICENSE). Feel free to browse the
 copy a button into your project, and adapt it, including for commercial use.
 Keep the copyright and MIT license notice with the copied code.
 
-Include any companion `part` files and referenced types, and update package
-imports to match your project.
+Include any companion `part` files and `loading_transition.dart`, which contains
+the transition enum and widgets. Update package imports to match your project.
+
+For a single-file copy, move the enum into your button file and inline the
+transition bodies. This outline shows the ternary and switch structure:
+
+```dart
+child: widget.transitionType == TransitionAnimationType.customBuilder
+    ? widget.customBuilder
+            ?.call(_isLoading, widget.child, widget.loadingChild) ??
+        widget.child
+    : switch (widget.transitionType) {
+        TransitionAnimationType.stack => Stack(
+            // Inline the guarded stack transition here.
+          ),
+        TransitionAnimationType.animatedSwitcher => AnimatedSwitcher(
+            duration: widget.animationDuration,
+            // Inline the guarded switcher transition here.
+          ),
+        TransitionAnimationType.customBuilder => widget.child,
+      },
+```
+
+Copy the transition bodies from [loading_transition.dart](lib/src/loading_transition.dart),
+including the pointer, focus, and semantics guards for inactive and outgoing content.
 
 </details>
 
