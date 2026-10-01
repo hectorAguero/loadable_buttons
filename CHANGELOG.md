@@ -6,6 +6,12 @@
 * Improve loading transitions with smooth resizing, centered extended FAB indicators, and correct layout when no icon is supplied.
 * Prevent inactive loading-transition content from receiving pointer input, focus, or accessibility actions.
 * Resolve default loading indicator colors from the button style or theme.
+* Document loading ownership, consumer-owned errors, disabled and accessible
+  behavior, custom builder responsibilities, sizing, and text scaling in the
+  README and public API reference.
+* Add runnable example controls for independent loading sources, completion and
+  handled errors, disabled and long-press behavior, IconButton selection, and
+  custom loading content and builders.
 
 ## 1.0.1
 

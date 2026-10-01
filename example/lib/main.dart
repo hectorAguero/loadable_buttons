@@ -1,3 +1,4 @@
+import 'package:example/loading_contract_demo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:loadable_buttons/loadable_buttons.dart';
@@ -156,6 +157,10 @@ class _HomePageState extends State<_HomePage> {
                 onThemeChanged: widget.onThemeChanged,
                 onDurationChanged: _setDuration,
                 durationError: _durationError,
+              ),
+              LoadingContractDemo(
+                transitionType: transitionType,
+                onRunTimedOperation: onPressed,
               ),
               const SizedBox(height: 8),
               Text(

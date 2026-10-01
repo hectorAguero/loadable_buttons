@@ -7,7 +7,18 @@ import 'package:loadable_buttons/src/loading_transition.dart';
 
 enum _IconButtonVariant { standard, filled, filledTonal, outlined }
 
-/// AsyncIconButton is a custom widget that allows to load a child.
+/// A Material [IconButton] with external and async loading states.
+///
+/// Effective loading is [loading] or a pending [onPressed] callback. Loading
+/// disables outer button activation; built-in transitions exclude inactive
+/// content from pointer input, focus, and semantics. Internal loading clears
+/// when the callback completes or throws, but errors are not swallowed.
+/// Handle errors in the callback and return or await all work to be tracked.
+/// Disposing the widget does not cancel that work.
+///
+/// Larger [loadingChild] content can affect layout within Material and parent
+/// constraints. Custom content owns its accessible labels; [customBuilder] also
+/// owns sizing and inactive content's interaction, focus, and semantics.
 class AsyncIconButton extends StatefulWidget {
   /// General constructor that allows both sync and async callbacks.
   /// A null [onPressed] preserves the native Material disabled behavior.
@@ -195,16 +206,33 @@ class AsyncIconButton extends StatefulWidget {
   /// The icon of the button, same as the [IconButton.icon].
   final Widget icon;
 
-  /// The child that be show when the button is loading.
+  /// The content shown while either loading source is active.
+  ///
+  /// Built-in transitions use a default spinner when null. Supply appropriate
+  /// semantics for custom content; larger content can change the button's size.
+  /// A custom builder receives this value unchanged, including null.
   final Widget? loadingChild;
 
-  /// The onPressed callback of the button, but being async.
+  /// The synchronous or asynchronous activation callback.
+  ///
+  /// Return or await async work to keep the button loading until it completes.
+  /// Internal loading clears on completion or error; exceptions propagate.
+  /// Handle errors here according to the application's policy.
+  ///
+  /// Null disables the button.
   final FutureOr<void> Function()? onPressed;
 
-  /// The loading state of the button, by default is false.
+  /// Whether the application requests external loading.
+  ///
+  /// Defaults to false. Effective loading combines this flag with a pending
+  /// [onPressed] callback. Setting it to false neither cancels nor unlocks that
+  /// callback; callback completion does not clear this flag.
   final bool loading;
 
-  /// The onLongPress callback of the button.
+  /// The synchronous long-press callback forwarded to [IconButton].
+  ///
+  /// Follows native IconButton behavior and does not start internal loading.
+  /// Enabled state is determined by [onPressed] and effective loading.
   final void Function()? onLongPress;
 
   /// The onHover callback of the button.
@@ -222,15 +250,21 @@ class AsyncIconButton extends StatefulWidget {
   /// The animationDuration of the transition.
   final Duration animationDuration;
 
-  /// The minimunOpacity of the child, when the button is loading
-  /// by default is 0.0, so the child is not visible when the button is loading.
+  /// The idle content's opacity during a stack loading transition.
+  ///
+  /// Defaults to 0.0. Partially visible idle content remains excluded from
+  /// pointer input, focus, and semantics in built-in transitions.
   final double minimumChildOpacity;
 
-  /// The type of the loading animation, by default is LoadingSwitchType.stack.
+  /// The loading transition, defaulting to [TransitionAnimationType.stack].
   final TransitionAnimationType transitionType;
 
-  /// The custom builder of the loading animation,
-  /// when TransitionAnimationType.customBuilder is selected.
+  /// The presentation builder for [TransitionAnimationType.customBuilder].
+  ///
+  /// Required in custom-builder mode. Receives effective loading, idle content,
+  /// and the supplied nullable [loadingChild], without a default spinner.
+  /// Owns sizing and all content interaction, focus, and semantics, including
+  /// inactive or outgoing subtrees. The outer button still locks activation.
   final Widget Function(bool loading, Widget child, Widget? loadingChild)?
   customBuilder;
 
