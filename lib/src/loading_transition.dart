@@ -5,6 +5,9 @@ enum TransitionAnimationType {
   /// Fades loading content over idle content retained in the layout.
   ///
   /// Larger loading content can expand the button within its constraints.
+  /// Smaller loading content normally fits within the retained idle size.
+  /// Text scaling and parent constraints still affect layout; this is not a
+  /// fixed-size guarantee.
   /// Idle content is inactive while loading, even if partially visible.
   stack,
 
@@ -12,11 +15,16 @@ enum TransitionAnimationType {
   ///
   /// Outgoing content remains in the layout until its fade ends, with pointer
   /// input, focus, and semantics excluded in both directions.
+  /// The shared layout animates its resize, including the shrink after outgoing
+  /// content is removed.
   animatedSwitcher,
 
   /// Uses the supplied custom builder to present the loading state.
   ///
   /// The builder owns sizing, interaction, focus, and semantics.
+  /// It receives effective loading, idle content, and the supplied nullable
+  /// loading content without a default spinner. Retained inactive or outgoing
+  /// content must be isolated by the builder.
   customBuilder,
 }
 

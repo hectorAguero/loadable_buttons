@@ -13,6 +13,9 @@ flutter pub add loadable_buttons
 
 Requires Flutter **3.29.0+** and Dart **3.7.0+ (below 4.0.0)**.
 Version 1.x uses Flutter's Material library.
+The planned SDK and Material UI migrations are described in the
+[compatibility roadmap](docs/compatibility-roadmap.md); they are future release
+targets, not features of 1.1.
 
 ## Quick start
 
@@ -97,9 +100,38 @@ Internal loading clears even if the callback throws. Exceptions are not swallowe
 handle errors in your callback. Disposing the widget does not cancel the operation.
 Check `mounted` before updating your widget's state after an `await`.
 
+Choose the error policy in your application, for example:
+
+```dart
+AsyncElevatedButton(
+  onPressed: () async {
+    try {
+      await saveChanges();
+    } catch (error) {
+      // Replace this with your application's feedback or retry policy.
+      debugPrint('Saving failed: $error');
+    }
+  },
+  child: const Text('Save'),
+);
+```
+
+Launching work without returning or awaiting its Future ends the tracked callback
+early. The button cannot track that work or handle its later errors.
+
 Set `onPressed: null` to disable a button. Elevated, Filled, Outlined, and Text
 buttons remain enabled if `onLongPress` is provided; loading blocks both
 callbacks. `onLongPress` is synchronous and does not start a loading state.
+IconButton forwards its long-press callback to Flutter's native IconButton;
+floating action buttons have no long-press parameter. Native Material styling,
+focus, and semantics determine the disabled appearance for each family.
+
+Enabled buttons retain native keyboard activation. Loading disables the outer
+button's activation and reports it as disabled to accessibility services. For
+built-in transitions, inactive idle content and outgoing switcher content cannot
+receive pointer input, keyboard focus, or accessibility actions, even when
+`minimumChildOpacity` makes idle content partially visible. Current loading
+content may still contain an intentional action, such as Cancel.
 
 ## Customization
 
@@ -122,12 +154,75 @@ AsyncElevatedButton(
 | `customBuilder` | Uses your required `customBuilder(loading, child, loadingChild)`. |
 
 `animationDuration` defaults to `Durations.medium1`; `minimumChildOpacity`
-defaults to `0.0` for stack transitions. Custom builders must handle a nullable
-`loadingChild` and manage outgoing content, interaction, and semantics.
+defaults to `0.0` for stack transitions.
 
-Constrain loading content if you need a stable button size, and give custom
-indicators appropriate semantics. `AsyncElevatedButton` supports
-`loadingSemanticsLabel` for its default spinner.
+### Sizing and text scaling
+
+Stack retains the idle content's layout, so a smaller indicator normally fits
+within the idle size. A larger `loadingChild` can expand the button within its
+parent and Material constraints. Stack does not guarantee a fixed size.
+Animated switcher keeps both sizes in the layout while outgoing content fades;
+the shared layout animates its resize, including the shrink after that content
+is removed.
+
+Text follows the ambient text scale, which can increase button size. Icon-and-label
+buttons also scale their spacing. Extended FAB stack transitions retain the icon
+area; padding and text styling follow Material. Fixed-size FAB variants retain
+Material's constraints.
+Oversized content or narrow parents can still overflow or clip, as with native
+Material buttons. Use short labels, test large text and narrow layouts, and
+constrain both idle and loading content when a stable size is required.
+
+### Accessible loading content
+
+Supply a localized label for your operation. `AsyncElevatedButton` supports
+`loadingSemanticsLabel` on its default spinner, including `.icon`. Other families
+can use a labeled custom indicator:
+
+```dart
+AsyncFilledButton(
+  onPressed: saveChanges,
+  loadingChild: const SizedBox.square(
+    dimension: 20,
+    child: CircularProgressIndicator(semanticsLabel: 'Saving changes'),
+  ),
+  child: const Text('Save'),
+);
+```
+
+`loadingSemanticsLabel` is ignored when you supply `loadingChild` or use a custom
+builder. Consumers own custom content labels, progress values, and any live
+announcements; the package adds no default localized announcement. Built-in
+transitions exclude inactive content from semantics, so a hidden idle label is
+not a substitute for labeling the loading content.
+
+### Custom builders
+
+Select `customBuilder` and provide the builder together. It receives effective
+loading, idle content, and the supplied nullable `loadingChild`; the package does
+not substitute its default spinner in this mode. A builder that replaces content
+immediately can avoid retaining an inactive subtree:
+
+```dart
+AsyncOutlinedButton(
+  onPressed: saveChanges,
+  transitionType: TransitionAnimationType.customBuilder,
+  customBuilder: (loading, child, loadingChild) => loading
+      ? loadingChild ??
+          const SizedBox.square(
+            dimension: 20,
+            child: CircularProgressIndicator(semanticsLabel: 'Saving changes'),
+          )
+      : child,
+  child: const Text('Save'),
+);
+```
+
+If your builder retains or animates both states, it owns sizing and must isolate
+inactive and outgoing content with `IgnorePointer`, `ExcludeFocus`, and
+`ExcludeSemantics`. Opacity alone does not disable interaction. The outer button
+still manages loading and its callback lock. Extended FABs can invoke the builder
+separately for their icon and label; account for both slots.
 
 ## IconButton selection
 
