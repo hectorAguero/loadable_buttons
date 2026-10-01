@@ -118,6 +118,7 @@ void main() {
       var calls = 0;
       Future<void> onPressed() {
         calls++;
+
         return pending.future;
       }
 

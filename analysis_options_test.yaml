@@ -1,0 +1,18 @@
+include: analysis_options.yaml
+
+# Inherit package checks and relax only test/fixture conventions.
+solid_lints:
+  diagnostics:
+    function_lines_of_code: false
+    cyclomatic_complexity: false
+    avoid_late_keyword: false
+    avoid_returning_widgets: false
+    no_empty_block: false
+    no_magic_number: false
+
+linter:
+  rules:
+    public_member_api_docs: false
+    avoid_redundant_argument_values: false
+    # Test diagnostics may print; production code still uses logging.
+    avoid_print: false

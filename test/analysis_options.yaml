@@ -1,0 +1,2 @@
+# The analyzer discovers this filename automatically for the test subtree.
+include: ../analysis_options_test.yaml

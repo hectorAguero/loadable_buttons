@@ -42,6 +42,12 @@ class _ElevatedButtonWithIconChild extends StatelessWidget {
     required this.iconAlignment,
   });
 
+  static const double _defaultFontSize = 14.0;
+  static const double _maximumTextScale = 2.0;
+  static const double _unscaledIconGap = 8.0;
+  static const double _scaledIconGap = 4.0;
+  static const double _fallbackIconGap = 6.0;
+
   final Widget label;
   final Widget icon;
   final ButtonStyle? buttonStyle;
@@ -51,14 +57,16 @@ class _ElevatedButtonWithIconChild extends StatelessWidget {
   Widget build(BuildContext context) {
     final defaultFontSize =
         buttonStyle?.textStyle?.resolve(const <MaterialState>{})?.fontSize ??
-            14.0;
+            _defaultFontSize;
     final scale = clampDouble(
-          MediaQuery.textScalerOf(context).scale(defaultFontSize) / 14.0,
+          MediaQuery.textScalerOf(context).scale(defaultFontSize) /
+              _defaultFontSize,
           1,
-          2,
+          _maximumTextScale,
         ) -
         1.0;
-    final gap = lerpDouble(8, 4, scale) ?? 6;
+    final gap =
+        lerpDouble(_unscaledIconGap, _scaledIconGap, scale) ?? _fallbackIconGap;
     final elevatedButtonTheme = ElevatedButtonTheme.of(context);
     final effectiveIconAlignment = iconAlignment ??
         elevatedButtonTheme.style?.iconAlignment ??
