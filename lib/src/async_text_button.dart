@@ -192,7 +192,6 @@ class _AsyncTextButtonState extends State<AsyncTextButton> {
 
   @override
   Widget build(BuildContext context) => TextButton(
-        key: widget.key,
         onPressed: _isLoading ? null : () => _handlePressed(),
         onLongPress: widget.onLongPress,
         onHover: widget.onHover,

@@ -323,7 +323,6 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
   @override
   Widget build(BuildContext context) => switch (widget._variant) {
         _IconButtonVariant.standard => IconButton(
-            key: widget.key,
             iconSize: widget.iconSize,
             visualDensity: widget.visualDensity,
             padding: widget.padding,
@@ -357,7 +356,6 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
                 customBuilder: widget.customBuilder),
           ),
         _IconButtonVariant.filled => IconButton.filled(
-            key: widget.key,
             iconSize: widget.iconSize,
             visualDensity: widget.visualDensity,
             padding: widget.padding,
@@ -391,7 +389,6 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
                 customBuilder: widget.customBuilder),
           ),
         _IconButtonVariant.filledTonal => IconButton.filledTonal(
-            key: widget.key,
             iconSize: widget.iconSize,
             visualDensity: widget.visualDensity,
             padding: widget.padding,
@@ -425,7 +422,6 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
                 customBuilder: widget.customBuilder),
           ),
         _IconButtonVariant.outlined => IconButton.outlined(
-            key: widget.key,
             iconSize: widget.iconSize,
             visualDensity: widget.visualDensity,
             padding: widget.padding,

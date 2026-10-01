@@ -316,7 +316,6 @@ class _AsyncFilledButtonState extends State<AsyncFilledButton> {
   Widget build(BuildContext context) {
     if (widget._variant == _AsyncFilledButtonVariant.tonal) {
       return FilledButton.tonal(
-        key: widget.key,
         onPressed: _isLoading ? null : () => _handlePressed(),
         onLongPress: widget.onLongPress,
         onHover: widget.onHover,
@@ -341,7 +340,6 @@ class _AsyncFilledButtonState extends State<AsyncFilledButton> {
     }
 
     return FilledButton(
-      key: widget.key,
       onPressed: _isLoading ? null : () => _handlePressed(),
       onLongPress: widget.onLongPress,
       onHover: widget.onHover,

@@ -74,6 +74,10 @@ This applies to all async button families and their constructor variants.
 The internal loading state is restored even when the callback throws; error
 handling remains the consumer's responsibility.
 
+The `key` passed to any async button belongs to the async wrapper. You can use a
+`GlobalKey` to access that wrapper, and rebuilding the same button variant with
+the same key preserves its state, including a pending `onPressed` operation.
+
 ### Transition Types
 
 The package supports three types of transitions:
