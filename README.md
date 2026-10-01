@@ -14,7 +14,7 @@ flutter pub add loadable_buttons
 Requires Flutter **3.29.0+** and Dart **3.7.0+ (below 4.0.0)**.
 Version 1.x uses Flutter's Material library.
 The planned SDK and Material UI migrations are described in the
-[compatibility roadmap](docs/compatibility-roadmap.md); they are future release
+[compatibility roadmap](doc/compatibility-roadmap.md); they are future release
 targets, not features of 1.1.
 
 ## Quick start
