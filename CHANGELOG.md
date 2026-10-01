@@ -1,5 +1,9 @@
 ## Unreleased
 
+* Forward `onLongPress`, `onHover`, `onFocusChange`, and `focusNode` through the
+  Elevated, Filled, Outlined, and Text `.icon` constructors when an icon is
+  provided, matching the null-icon fallback and Filled `.tonalIcon` behavior.
+
 * Preserve native Material disabled behavior when `onPressed` is null in all
   IconButton and floating action button variants.
 
