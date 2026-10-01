@@ -1,5 +1,10 @@
 ## Unreleased
 
+* Block long presses while Elevated, Filled (including tonal), Outlined, and
+  Text buttons are loading, including callbacks captured before a rebuild.
+  Loading now exposes disabled semantics and blocks keyboard activation; idle
+  long-press-only buttons retain Material behavior.
+
 * Fix duplicate `GlobalKey` errors in Filled, Outlined, Text, Icon, and floating
   action buttons by keeping the public key on the async wrapper. Rebuilds with
   the same key preserve the wrapper's state and pending operation.

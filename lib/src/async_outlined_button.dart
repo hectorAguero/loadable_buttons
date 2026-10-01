@@ -190,10 +190,17 @@ class _AsyncOutlinedButtonState extends State<AsyncOutlinedButton> {
     }
   }
 
+  void _handleLongPress() {
+    if (_isLoading) return;
+    widget.onLongPress?.call();
+  }
+
   @override
   Widget build(BuildContext context) => OutlinedButton(
-        onPressed: _isLoading ? null : () => _handlePressed(),
-        onLongPress: widget.onLongPress,
+        onPressed:
+            _isLoading || widget.onPressed == null ? null : _handlePressed,
+        onLongPress:
+            _isLoading || widget.onLongPress == null ? null : _handleLongPress,
         onHover: widget.onHover,
         onFocusChange: widget.onFocusChange,
         style: widget.style ??

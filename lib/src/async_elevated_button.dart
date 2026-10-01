@@ -201,10 +201,17 @@ class _AsyncElevatedButtonState extends State<AsyncElevatedButton> {
     }
   }
 
+  void _handleLongPress() {
+    if (_isLoading) return;
+    widget.onLongPress?.call();
+  }
+
   @override
   Widget build(BuildContext context) => ElevatedButton(
-        onPressed: _isLoading ? null : () => _handlePressed(),
-        onLongPress: widget.onLongPress,
+        onPressed:
+            _isLoading || widget.onPressed == null ? null : _handlePressed,
+        onLongPress:
+            _isLoading || widget.onLongPress == null ? null : _handleLongPress,
         onHover: widget.onHover,
         onFocusChange: widget.onFocusChange,
         style: widget.style ??
