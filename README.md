@@ -125,34 +125,9 @@ AsyncElevatedButton(
 defaults to `0.0` for stack transitions. Custom builders must handle a nullable
 `loadingChild` and manage outgoing content, interaction, and semantics.
 
-Built-in transitions immediately block pointer input, keyboard focus, and
-semantics on inactive content, including outgoing switcher content. A nonzero
-`minimumChildOpacity` only changes appearance; idle content remains inactive
-while loading. Current custom loading content may still provide actions such as
-canceling an operation.
-
-A stack keeps idle content in the layout. Loading content that is larger can
-expand the button within its Material and parent constraints. Constrain both
-states if you need a stable size. Extended FABs keep their icon area with stack
-transitions and honor `extendedPadding`, `extendedIconLabelSpacing`, and
-`extendedTextStyle`. The default spinner uses an explicit foreground color when
-provided, then the foreground inherited from the Material button theme.
-
-Loading labels remain opt-in: the default is `null`, with no built-in localized
-announcement. `AsyncElevatedButton` supports `loadingSemanticsLabel` for its
-default spinner. Every family accepts a `loadingChild` with its own semantics:
-
-```dart
-loadingChild: const SizedBox.square(
-  dimension: 16,
-  child: CircularProgressIndicator(semanticsLabel: 'Saving'),
-),
-```
-
-Supply localized labels appropriate to your operation. When using `loadingChild`
-or `customBuilder`, your application owns the indicator's semantics and any
-announcements. See the [loading transition audit](docs/loading-transition-audit.md)
-for the confirmed failures and layout findings.
+Constrain loading content if you need a stable button size, and give custom
+indicators appropriate semantics. `AsyncElevatedButton` supports
+`loadingSemanticsLabel` for its default spinner.
 
 ## IconButton selection
 
@@ -190,9 +165,28 @@ Keep the copyright and MIT license notice with the copied code.
 Include any companion `part` files and `loading_transition.dart`, which contains
 the transition enum and widgets. Update package imports to match your project.
 
-For a self-contained button, you can inline the transition with a ternary and
-switch expression, as in the earlier implementations. Keep the pointer, focus,
-and semantics guards for inactive and outgoing content.
+For a single-file copy, move the enum into your button file and inline the
+transition bodies. This outline shows the ternary and switch structure:
+
+```dart
+child: widget.transitionType == TransitionAnimationType.customBuilder
+    ? widget.customBuilder
+            ?.call(_isLoading, widget.child, widget.loadingChild) ??
+        widget.child
+    : switch (widget.transitionType) {
+        TransitionAnimationType.stack => Stack(
+            // Inline the guarded stack transition here.
+          ),
+        TransitionAnimationType.animatedSwitcher => AnimatedSwitcher(
+            duration: widget.animationDuration,
+            // Inline the guarded switcher transition here.
+          ),
+        TransitionAnimationType.customBuilder => widget.child,
+      },
+```
+
+Copy the transition bodies from [loading_transition.dart](lib/src/loading_transition.dart),
+including the pointer, focus, and semantics guards for inactive and outgoing content.
 
 </details>
 
