@@ -71,6 +71,11 @@ AsyncElevatedButton(
 ```
 
 This applies to all async button families and their constructor variants.
+Elevated, Filled (including tonal), Outlined, and Text buttons disable both taps
+and long presses while loading. Their disabled state also applies to keyboard
+activation and accessibility semantics. Long-press-only buttons remain usable
+when idle.
+
 The internal loading state is restored even when the callback throws; error
 handling remains the consumer's responsibility.
 

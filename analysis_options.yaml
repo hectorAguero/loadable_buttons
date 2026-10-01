@@ -1,12 +1,11 @@
+include: package:lints/recommended.yaml
+
 analyzer:
+  exclude:
+    - build/**
   language:
     strict-inference: true
     strict-raw-types: true
-  # Dart Code Linter uses plugins api from the analyzer
-  # to provide issues highlight in the IDE. If you don't want the issues
-  # to be shown and need only the CLI, you need to remove the section below.
-  plugins:
-    - dart_code_linter
 
 dart_code_linter:
   # Dart Code Linter supports presets. The config from a preset will be merged

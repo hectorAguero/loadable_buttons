@@ -312,12 +312,19 @@ class _AsyncFilledButtonState extends State<AsyncFilledButton> {
     }
   }
 
+  void _handleLongPress() {
+    if (_isLoading) return;
+    widget.onLongPress?.call();
+  }
+
   @override
   Widget build(BuildContext context) {
     if (widget._variant == _AsyncFilledButtonVariant.tonal) {
       return FilledButton.tonal(
-        onPressed: _isLoading ? null : () => _handlePressed(),
-        onLongPress: widget.onLongPress,
+        onPressed:
+            _isLoading || widget.onPressed == null ? null : _handlePressed,
+        onLongPress:
+            _isLoading || widget.onLongPress == null ? null : _handleLongPress,
         onHover: widget.onHover,
         onFocusChange: widget.onFocusChange,
         style: widget.style ??
@@ -340,8 +347,9 @@ class _AsyncFilledButtonState extends State<AsyncFilledButton> {
     }
 
     return FilledButton(
-      onPressed: _isLoading ? null : () => _handlePressed(),
-      onLongPress: widget.onLongPress,
+      onPressed: _isLoading || widget.onPressed == null ? null : _handlePressed,
+      onLongPress:
+          _isLoading || widget.onLongPress == null ? null : _handleLongPress,
       onHover: widget.onHover,
       onFocusChange: widget.onFocusChange,
       style: widget.style ??
