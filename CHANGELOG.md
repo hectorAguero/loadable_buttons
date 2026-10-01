@@ -1,3 +1,10 @@
+## 1.1.1
+
+* Match native Material padding in Elevated, Filled (including tonal), Outlined,
+  and Text icon-and-label buttons, including text scaling and RTL layouts.
+* Preserve explicit and inherited theme padding, including state-dependent
+  fallbacks, while keeping loading content centered over the icon and label.
+
 ## 1.1.0
 
 * Clarify the Dart requirement as >=3.7.0 <4.0.0, matching the existing Flutter 3.29.0 minimum.

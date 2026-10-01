@@ -345,8 +345,16 @@ class _AsyncFilledButtonState extends State<AsyncFilledButton>
 
   @override
   Widget build(BuildContext context) {
+    final buttonBuilder =
+        widget is _AsyncFilledButtonWithIcon
+            ? _FilledButtonWithIconPadding.new
+            : FilledButton.new;
+    final tonalButtonBuilder =
+        widget is _AsyncFilledButtonWithIcon
+            ? _FilledButtonWithIconPadding.tonal
+            : FilledButton.tonal;
     if (widget._variant == _AsyncFilledButtonVariant.tonal) {
-      return FilledButton.tonal(
+      return tonalButtonBuilder(
         onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
         onLongPress:
             isLoading || widget.onLongPress == null ? null : _handleLongPress,
@@ -376,7 +384,7 @@ class _AsyncFilledButtonState extends State<AsyncFilledButton>
       );
     }
 
-    return FilledButton(
+    return buttonBuilder(
       onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
       onLongPress:
           isLoading || widget.onLongPress == null ? null : _handleLongPress,

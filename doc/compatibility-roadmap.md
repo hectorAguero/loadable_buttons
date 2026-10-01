@@ -20,6 +20,13 @@ Keep each migration separate and validate the exact minimum and stable SDKs for
 that release line before claiming compatibility. Future constraints in this table
 are planned targets, not validation results for the current package.
 
+The v2 migration must preserve native icon-and-label button padding for Elevated,
+Filled (including tonal), Outlined, and Text buttons. Keep widget padding ahead
+of inherited family theme padding, then native defaults, resolving fallbacks per
+widget state. Retain native-reference regression coverage for text scaling,
+LTR/RTL, and null icons, and keep loading content centered over the full idle
+content.
+
 ## Flutter 3.22 compatibility check
 
 Checked PR #30 (`5cb6c44`) on October 1, 2026 with the exact Flutter **3.22.0**

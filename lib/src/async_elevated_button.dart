@@ -233,41 +233,48 @@ class _AsyncElevatedButtonState extends State<AsyncElevatedButton>
   }
 
   @override
-  Widget build(BuildContext context) => ElevatedButton(
-    onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
-    onLongPress:
-        isLoading || widget.onLongPress == null ? null : _handleLongPress,
-    onHover: widget.onHover,
-    onFocusChange: widget.onFocusChange,
-    style:
-        widget.style ??
-        ElevatedButton.styleFrom(splashFactory: widget.splashFactory),
-    focusNode: widget.focusNode,
-    autofocus: widget.autofocus,
-    clipBehavior: widget.clipBehavior,
-    statesController: widget.statesController,
-    child:
-        widget.transitionType == TransitionAnimationType.customBuilder
-            ? widget.customBuilder?.call(
-                  isLoading,
-                  widget.child,
-                  widget.loadingChild,
-                ) ??
-                widget.child
-            : LoadingTransition(
-              child: widget.child,
-              loadingChild:
-                  widget.loadingChild ??
-                  DefaultLoadingIndicator(
-                    style: widget.style,
-                    themeStyleOf:
-                        (context) => ElevatedButtonTheme.of(context).style,
-                    loadingSemanticsLabel: widget.loadingSemanticsLabel,
-                  ),
-              isLoading: isLoading,
-              transitionType: widget.transitionType,
-              animationDuration: widget.animationDuration,
-              minimumChildOpacity: widget.minimumChildOpacity,
-            ),
-  );
+  Widget build(BuildContext context) {
+    final buttonBuilder =
+        widget is _AsyncElevatedButtonWithIcon
+            ? _ElevatedButtonWithIconPadding.new
+            : ElevatedButton.new;
+
+    return buttonBuilder(
+      onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
+      onLongPress:
+          isLoading || widget.onLongPress == null ? null : _handleLongPress,
+      onHover: widget.onHover,
+      onFocusChange: widget.onFocusChange,
+      style:
+          widget.style ??
+          ElevatedButton.styleFrom(splashFactory: widget.splashFactory),
+      focusNode: widget.focusNode,
+      autofocus: widget.autofocus,
+      clipBehavior: widget.clipBehavior,
+      statesController: widget.statesController,
+      child:
+          widget.transitionType == TransitionAnimationType.customBuilder
+              ? widget.customBuilder?.call(
+                    isLoading,
+                    widget.child,
+                    widget.loadingChild,
+                  ) ??
+                  widget.child
+              : LoadingTransition(
+                child: widget.child,
+                loadingChild:
+                    widget.loadingChild ??
+                    DefaultLoadingIndicator(
+                      style: widget.style,
+                      themeStyleOf:
+                          (context) => ElevatedButtonTheme.of(context).style,
+                      loadingSemanticsLabel: widget.loadingSemanticsLabel,
+                    ),
+                isLoading: isLoading,
+                transitionType: widget.transitionType,
+                animationDuration: widget.animationDuration,
+                minimumChildOpacity: widget.minimumChildOpacity,
+              ),
+    );
+  }
 }
