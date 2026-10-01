@@ -232,6 +232,49 @@ void main() {
     }
   }
 
+  for (final entry in _builders.entries.where((entry) =>
+      entry.key == 'Filled' || entry.key == 'Extended floating action')) {
+    testWidgets('${entry.key} switcher resizes smoothly in both directions',
+        (tester) async {
+      Widget host(bool loading) => _host(entry.value(
+            child: const Text('Send the saved document'),
+            loadingChild: const SizedBox.square(
+                dimension: 24, child: ColoredBox(color: Colors.teal)),
+            loading: loading,
+            onPressed: Future<void>.value,
+            transition: TransitionAnimationType.animatedSwitcher,
+          ));
+      Future<List<double>> widthsDuringTransition(bool loading) async {
+        await tester.pumpWidget(host(loading));
+        final widths = <double>[tester.getSize(find.byKey(_buttonKey)).width];
+        const frameDuration = Duration(milliseconds: 20);
+        for (var elapsed = Duration.zero;
+            elapsed < _duration * 3;
+            elapsed += frameDuration) {
+          await tester.pump(frameDuration);
+          widths.add(tester.getSize(find.byKey(_buttonKey)).width);
+        }
+
+        return widths;
+      }
+
+      await tester.pumpWidget(host(false));
+      final idleWidth = tester.getSize(find.byKey(_buttonKey)).width;
+      final shrinkingWidths = await widthsDuringTransition(true);
+      final loadingWidth = shrinkingWidths.last;
+      expect(loadingWidth, lessThan(idleWidth));
+      expect(shrinkingWidths.first, closeTo(idleWidth, 0.01));
+      expect(shrinkingWidths,
+          contains(allOf(greaterThan(loadingWidth), lessThan(idleWidth))));
+
+      final growingWidths = await widthsDuringTransition(false);
+      expect(growingWidths.first, closeTo(loadingWidth, 0.01));
+      expect(growingWidths,
+          contains(allOf(greaterThan(loadingWidth), lessThan(idleWidth))));
+      expect(growingWidths.last, closeTo(idleWidth, 0.01));
+    });
+  }
+
   for (final transition in [
     TransitionAnimationType.stack,
     TransitionAnimationType.animatedSwitcher
@@ -304,61 +347,84 @@ void main() {
 
   for (final withIcon in [false, true]) {
     for (final direction in TextDirection.values) {
-      testWidgets(
-          'extended FAB preserves Material layout: $withIcon $direction',
-          (tester) async {
-        final iconKey = GlobalKey();
-        final icon = withIcon ? Icon(Icons.send, key: iconKey) : null;
-        const label = Text('Send');
-        const padding = EdgeInsetsDirectional.only(start: 12, end: 18);
-        const textStyle = TextStyle(fontSize: 16);
-        Widget host(Widget button) => MaterialApp(
-                home: Scaffold(
-                    body: Center(
-              child: MediaQuery(
-                  data: const MediaQueryData(textScaler: TextScaler.linear(2)),
-                  child: Directionality(
-                      textDirection: direction,
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 180),
-                        child: KeyedSubtree(key: _buttonKey, child: button),
-                      ))),
-            )));
-        await tester.pumpWidget(host(FloatingActionButton.extended(
-          onPressed: () {},
-          label: label,
-          icon: icon,
-          extendedPadding: padding,
-          extendedIconLabelSpacing: 12,
-          extendedTextStyle: textStyle,
-        )));
-        final materialSize = tester.getSize(find.byKey(_buttonKey));
-        Widget button(bool loading) => AsyncFloatingActionButton.extended(
-              onPressed: () {},
-              label: label,
-              icon: icon,
-              loading: loading,
-              extendedPadding: padding,
-              extendedIconLabelSpacing: 12,
-              extendedTextStyle: textStyle,
-            );
-        await tester.pumpWidget(host(button(false)));
-        expect(tester.getSize(find.byKey(_buttonKey)), materialSize);
-        if (withIcon) {
-          final labelX = tester.getCenter(find.text('Send')).dx;
-          final iconX = tester.getCenter(find.byKey(iconKey)).dx;
-          expect(
-              direction == TextDirection.ltr ? iconX < labelX : iconX > labelX,
-              isTrue);
-        }
-        await tester.pumpWidget(host(button(true)));
-        await tester.pump(_duration);
-        expect(tester.takeException(), isNull);
-        expect(tester.getSize(find.byKey(_buttonKey)), materialSize);
-        await tester.pumpWidget(host(button(false)));
-        await tester.pump(_duration);
-        expect(tester.getSize(find.byKey(_buttonKey)), materialSize);
-      });
+      for (final paddingSource in ['default', 'theme', 'widget']) {
+        testWidgets(
+            'extended FAB preserves Material layout and centers its loader: '
+            '$withIcon $direction $paddingSource', (tester) async {
+          final iconKey = GlobalKey();
+          final icon = withIcon ? Icon(Icons.send, key: iconKey) : null;
+          const label = Text('Send');
+          final padding = paddingSource == 'widget'
+              ? const EdgeInsetsDirectional.only(start: 12, end: 18)
+              : null;
+          final spacing = paddingSource == 'widget' ? 12.0 : null;
+          const textStyle = TextStyle(fontSize: 16);
+          Widget host(Widget button) => MaterialApp(
+              theme: ThemeData(
+                floatingActionButtonTheme: paddingSource == 'default'
+                    ? const FloatingActionButtonThemeData()
+                    : const FloatingActionButtonThemeData(
+                        extendedPadding:
+                            EdgeInsetsDirectional.only(start: 10, end: 26),
+                        extendedIconLabelSpacing: 20,
+                      ),
+              ),
+              home: Scaffold(
+                  body: Center(
+                child: MediaQuery(
+                    data:
+                        const MediaQueryData(textScaler: TextScaler.linear(2)),
+                    child: Directionality(
+                        textDirection: direction,
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 180),
+                          child: KeyedSubtree(key: _buttonKey, child: button),
+                        ))),
+              )));
+          await tester.pumpWidget(host(FloatingActionButton.extended(
+            onPressed: () {},
+            label: label,
+            icon: icon,
+            extendedPadding: padding,
+            extendedIconLabelSpacing: spacing,
+            extendedTextStyle: textStyle,
+          )));
+          final materialSize = tester.getSize(find.byKey(_buttonKey));
+          Widget button(bool loading) => AsyncFloatingActionButton.extended(
+                onPressed: () {},
+                label: label,
+                icon: icon,
+                loading: loading,
+                extendedPadding: padding,
+                extendedIconLabelSpacing: spacing,
+                extendedTextStyle: textStyle,
+              );
+          await tester.pumpWidget(host(button(false)));
+          expect(tester.getSize(find.byKey(_buttonKey)), materialSize);
+          final labelRect = tester.getRect(find.text('Send'));
+          final contentRect = withIcon
+              ? labelRect.expandToInclude(tester.getRect(find.byKey(iconKey)))
+              : labelRect;
+          if (withIcon) {
+            final labelX = labelRect.center.dx;
+            final iconX = tester.getCenter(find.byKey(iconKey)).dx;
+            expect(
+                direction == TextDirection.ltr
+                    ? iconX < labelX
+                    : iconX > labelX,
+                isTrue);
+          }
+          await tester.pumpWidget(host(button(true)));
+          await tester.pump(_duration);
+          expect(tester.takeException(), isNull);
+          expect(tester.getSize(find.byKey(_buttonKey)), materialSize);
+          expect(tester.getCenter(find.byType(CircularProgressIndicator)).dx,
+              closeTo(contentRect.center.dx, 0.01));
+          await tester.pumpWidget(host(button(false)));
+          await tester.pump(_duration);
+          expect(tester.getSize(find.byKey(_buttonKey)), materialSize);
+        });
+      }
     }
   }
 

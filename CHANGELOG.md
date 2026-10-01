@@ -1,5 +1,9 @@
 ## Unreleased
 
+* Smoothly resize buttons in AnimatedSwitcher transitions when idle and loading
+  content have different sizes.
+* Center extended FAB stack loaders across the full icon-and-label area while
+  retaining idle sizing and native padding and spacing.
 * Block pointer input, focus, and semantics on inactive content in built-in
   loading transitions, including outgoing AnimatedSwitcher content in both
   directions. Current custom loading content remains usable.

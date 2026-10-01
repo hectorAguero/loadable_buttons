@@ -325,9 +325,17 @@ class AsyncFloatingActionButton extends StatefulWidget {
 }
 
 class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton> {
+  static const _extendedPaddingWithIcon =
+      EdgeInsetsDirectional.only(start: 16, end: 20);
+
   bool _internalLoading = false;
 
   bool get _isLoading => _internalLoading || widget.loading;
+
+  bool get _useCombinedExtendedContent =>
+      widget.transitionType == TransitionAnimationType.stack &&
+      widget.isExtended &&
+      widget.child != null;
 
   Future<void> _handlePressed() async {
     // If the async callback is provided, use it.
@@ -471,9 +479,15 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton> {
               focusNode: widget.focusNode,
               autofocus: widget.autofocus,
               extendedIconLabelSpacing: widget.extendedIconLabelSpacing,
-              extendedPadding: widget.extendedPadding,
+              // The combined row occupies the label slot; retain the native
+              // padding that Material would choose with an icon present.
+              extendedPadding: widget.extendedPadding ??
+                  (_useCombinedExtendedContent
+                      ? FloatingActionButtonTheme.of(context).extendedPadding ??
+                          _extendedPaddingWithIcon
+                      : null),
               extendedTextStyle: widget.extendedTextStyle,
-              icon: widget.child == null
+              icon: widget.child == null || _useCombinedExtendedContent
                   ? null
                   : _AsyncFloatingActionButtonChild(
                       child: widget.child ?? const SizedBox.shrink(),
@@ -485,6 +499,9 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton> {
                       loadingChild: const SizedBox.shrink(),
                       customBuilder: widget.customBuilder),
               label: _AsyncFloatingActionButtonChild(
+                  leadingIcon:
+                      _useCombinedExtendedContent ? widget.child : null,
+                  iconLabelSpacing: widget.extendedIconLabelSpacing,
                   child: AnimatedSize(
                       child: widget._extendedLabel ?? const SizedBox.shrink(),
                       duration: widget.animationDuration),
@@ -511,9 +528,15 @@ class _AsyncFloatingActionButtonChild extends StatelessWidget {
     required this.minimumChildOpacity,
     required this.loadingChild,
     required this.customBuilder,
+    this.leadingIcon,
+    this.iconLabelSpacing,
   });
 
+  static const double _defaultIconLabelSpacing = 8.0;
+
   final Widget child;
+  final Widget? leadingIcon;
+  final double? iconLabelSpacing;
   final Widget? loadingChild;
   final Color? color;
   final TransitionAnimationType transitionType;
@@ -529,8 +552,23 @@ class _AsyncFloatingActionButtonChild extends StatelessWidget {
       return customBuilder?.call(isLoading, child, loadingChild) ?? child;
     }
 
+    final icon = leadingIcon;
+
     return LoadingTransition(
-      child: child,
+      child: icon == null
+          ? child
+          : Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                icon,
+                SizedBox(
+                    width: iconLabelSpacing ??
+                        FloatingActionButtonTheme.of(context)
+                            .extendedIconLabelSpacing ??
+                        _defaultIconLabelSpacing),
+                child,
+              ],
+            ),
       loadingChild: loadingChild ?? _DefaultLoadingIndicator(color: color),
       isLoading: isLoading,
       transitionType: transitionType,

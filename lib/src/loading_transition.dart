@@ -82,34 +82,39 @@ class LoadingTransition extends StatelessWidget {
       );
     }
 
-    return AnimatedSwitcher(
+    // Animate the shared layout, including its shrink when an outgoing entry
+    // is removed. Per-entry size animations start fresh with each keyed child.
+    return AnimatedSize(
       duration: animationDuration,
-      child: KeyedSubtree(
-        key: ValueKey(isLoading),
-        child: isLoading ? loadingChild : child,
-      ),
-      transitionBuilder: (child, animation) => FadeTransition(
-        opacity: animation,
-        child: AnimatedSize(duration: animationDuration, child: child),
-      ),
-      // Re-evaluate outgoing content here instead of retaining an idle guard
-      // captured by transitionBuilder. Preserve each switcher entry's key.
-      layoutBuilder: (currentChild, previousChildren) => Stack(
-        alignment: Alignment.center,
-        children: [
-          for (final previousChild in previousChildren)
-            _InactiveContent(
-              key: previousChild.key,
-              active: false,
-              child: previousChild,
-            ),
-          if (currentChild != null)
-            _InactiveContent(
-              key: currentChild.key,
-              active: true,
-              child: currentChild,
-            ),
-        ],
+      child: AnimatedSwitcher(
+        duration: animationDuration,
+        child: KeyedSubtree(
+          key: ValueKey(isLoading),
+          child: isLoading ? loadingChild : child,
+        ),
+        transitionBuilder: (child, animation) => FadeTransition(
+          opacity: animation,
+          child: child,
+        ),
+        // Re-evaluate outgoing content here instead of retaining an idle guard
+        // captured by transitionBuilder. Preserve each switcher entry's key.
+        layoutBuilder: (currentChild, previousChildren) => Stack(
+          alignment: Alignment.center,
+          children: [
+            for (final previousChild in previousChildren)
+              _InactiveContent(
+                key: previousChild.key,
+                active: false,
+                child: previousChild,
+              ),
+            if (currentChild != null)
+              _InactiveContent(
+                key: currentChild.key,
+                active: true,
+                child: currentChild,
+              ),
+          ],
+        ),
       ),
     );
   }

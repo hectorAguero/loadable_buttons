@@ -26,6 +26,27 @@ void main() {
   };
 
   for (final entry in builders.entries) {
+    testWidgets('${entry.key} centers its loader over the icon and label',
+        (tester) async {
+      final pending = Completer<void>();
+      await tester.pumpWidget(_host(entry.value(
+        onPressed: () => pending.future,
+        icon: const Icon(Icons.add),
+        label: const Text('Run'),
+      )));
+      final contentRect = tester
+          .getRect(find.text('Run'))
+          .expandToInclude(tester.getRect(find.byIcon(Icons.add)));
+      await tester.tap(find.text('Run'));
+      await tester.pump();
+      await tester.pump(Durations.medium1);
+      expect(tester.getCenter(find.byType(CircularProgressIndicator)).dx,
+          closeTo(contentRect.center.dx, 0.01));
+      pending.complete();
+      await tester.pump();
+      await tester.pump(Durations.medium1);
+    });
+
     for (final hasIcon in [true, false]) {
       final icon = hasIcon ? const Icon(Icons.add) : null;
       group('${entry.key} with ${hasIcon ? 'an icon' : 'a null icon'}', () {
