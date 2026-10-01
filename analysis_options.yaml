@@ -118,10 +118,6 @@ linter:
     # Changing its signature would break package consumers.
     avoid_positional_boolean_parameters: false
 
-formatter:
-  # Preserve the existing format when adopting VGA's analyzer preset.
-  trailing_commas: preserve
-
 # These complement Solid; overlapping rules stay owned by Solid.
 dart_code_linter:
   rules:
