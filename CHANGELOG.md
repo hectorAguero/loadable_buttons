@@ -1,5 +1,8 @@
 ## Unreleased
 
+* Preserve native Material disabled behavior when `onPressed` is null in all
+  IconButton and floating action button variants.
+
 * Block long presses while Elevated, Filled (including tonal), Outlined, and
   Text buttons are loading, including callbacks captured before a rebuild.
   Loading now exposes disabled semantics and blocks keyboard activation; idle
