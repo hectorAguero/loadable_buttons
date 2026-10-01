@@ -54,9 +54,7 @@ class AsyncElevatedButton extends StatefulWidget {
     ButtonStyle? style,
     FocusNode? focusNode,
     Clip? clipBehavior,
-    // Retain the v1 public Material typedef until the v2 API migration.
-    // ignore: deprecated_member_use
-    MaterialStatesController? statesController,
+    WidgetStatesController? statesController,
     Widget? icon,
     IconAlignment? iconAlignment,
     Widget? loadingChild,
@@ -152,9 +150,7 @@ class AsyncElevatedButton extends StatefulWidget {
   final Clip? clipBehavior;
 
   /// The statesController of the button, ElevatedButton property.
-  // Retain the v1 public Material typedef until the v2 API migration.
-  // ignore: deprecated_member_use
-  final MaterialStatesController? statesController;
+  final WidgetStatesController? statesController;
 
   /// The animationDuration of the transition.
   final Duration animationDuration;

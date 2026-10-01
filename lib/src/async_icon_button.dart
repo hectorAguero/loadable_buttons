@@ -284,9 +284,7 @@ class AsyncIconButton extends StatefulWidget {
   /// Resolved on each build with [WidgetState] disabled when loading or when
   /// [onPressed] is null, and an empty state set otherwise. A null property
   /// preserves normal push-button behavior.
-  // Retain the v1 public Material typedef until the v2 API migration.
-  // ignore: deprecated_member_use
-  final MaterialStateProperty<bool>? isSelected;
+  final WidgetStateProperty<bool>? isSelected;
 
   /// The icon shown when [isSelected] resolves to true in Material 3.
   ///

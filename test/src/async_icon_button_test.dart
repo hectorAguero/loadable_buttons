@@ -1,6 +1,3 @@
-// Keep semantics assertions compatible with the package's Flutter 3.29 minimum.
-// ignore_for_file: deprecated_member_use
-
 import 'dart:async';
 import 'dart:ui' show PointerDeviceKind, SemanticsFlag;
 
@@ -154,6 +151,8 @@ void main() {
                 tester
                     .getSemantics(find.byType(IconButton))
                     .getSemanticsData()
+                    // flagsCollection is unavailable on Flutter 3.29.
+                    // ignore: deprecated_member_use
                     .hasFlag(SemanticsFlag.isSelected),
                 selected);
           }
@@ -186,6 +185,8 @@ void main() {
               tester
                   .getSemantics(find.byType(IconButton))
                   .getSemanticsData()
+                  // flagsCollection is unavailable on Flutter 3.29.
+                  // ignore: deprecated_member_use
                   .hasFlag(SemanticsFlag.isSelected),
               isTrue);
 
@@ -195,6 +196,8 @@ void main() {
               tester
                   .getSemantics(find.byType(IconButton))
                   .getSemanticsData()
+                  // flagsCollection is unavailable on Flutter 3.29.
+                  // ignore: deprecated_member_use
                   .hasFlag(SemanticsFlag.isSelected),
               isFalse);
 
@@ -231,6 +234,8 @@ void main() {
               tester
                   .getSemantics(find.byType(IconButton))
                   .getSemanticsData()
+                  // flagsCollection is unavailable on Flutter 3.29.
+                  // ignore: deprecated_member_use
                   .hasFlag(SemanticsFlag.isSelected),
               isTrue);
 

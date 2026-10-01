@@ -1,6 +1,3 @@
-// Keep compatibility with the package's Flutter 3.29 minimum.
-// ignore_for_file: deprecated_member_use
-
 import 'dart:async';
 import 'dart:ui' show SemanticsAction, SemanticsFlag;
 
@@ -116,10 +113,15 @@ void main() {
           .first;
       void expectDisabled() {
         final node = tester.getSemantics(button);
+        // flagsCollection is unavailable on Flutter 3.29.
+        // ignore: deprecated_member_use
         expect(node.getSemanticsData().hasFlag(SemanticsFlag.hasEnabledState),
             isTrue);
         expect(
-            node.getSemanticsData().hasFlag(SemanticsFlag.isEnabled), isFalse);
+            // flagsCollection is unavailable on Flutter 3.29.
+            // ignore: deprecated_member_use
+            node.getSemanticsData().hasFlag(SemanticsFlag.isEnabled),
+            isFalse);
         expect(node.getSemanticsData().hasAction(SemanticsAction.tap), isFalse);
       }
 
@@ -134,6 +136,8 @@ void main() {
           tester
               .getSemantics(button)
               .getSemanticsData()
+              // flagsCollection is unavailable on Flutter 3.29.
+              // ignore: deprecated_member_use
               .hasFlag(SemanticsFlag.isEnabled),
           isTrue);
       await tester.tap(button);

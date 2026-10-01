@@ -1,6 +1,3 @@
-// Keep accessibility checks compatible with the package's Flutter 3.29 floor.
-// ignore_for_file: deprecated_member_use
-
 import 'dart:async';
 import 'dart:ui' show SemanticsAction, SemanticsFlag;
 
@@ -206,7 +203,11 @@ void main() {
             ));
         void expectLoading() {
           final data = tester.getSemantics(materialButton).getSemanticsData();
+          // flagsCollection is unavailable on Flutter 3.29.
+          // ignore: deprecated_member_use
           expect(data.hasFlag(SemanticsFlag.hasEnabledState), isTrue);
+          // flagsCollection is unavailable on Flutter 3.29.
+          // ignore: deprecated_member_use
           expect(data.hasFlag(SemanticsFlag.isEnabled), isFalse);
           expect(data.hasAction(SemanticsAction.tap), isFalse);
         }
