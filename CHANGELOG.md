@@ -1,29 +1,35 @@
-## Unreleased
+## 1.0.1
 
-* Honor `isSelected`, `selectedIcon`, selection-dependent styling, and native
-  Material 3 selection semantics in all `AsyncIconButton` variants. Selected
-  icons use the configured loading transition and fall back to `icon` when
-  omitted.
+Bug fixes for the existing Flutter Material API. Public constructors and
+consumer SDK requirements are unchanged.
 
-* Forward `onLongPress`, `onHover`, `onFocusChange`, and `focusNode` through the
-  Elevated, Filled, Outlined, and Text `.icon` constructors when an icon is
-  provided, matching the null-icon fallback and Filled `.tonalIcon` behavior.
+### Fixed
 
-* Preserve native Material disabled behavior when `onPressed` is null in all
-  IconButton and floating action button variants.
-
+* Keep external `loading` and pending `onPressed` operations independent in all
+  button families. Clearing external loading no longer unlocks a pending
+  operation or allows duplicate execution.
+* Keep public keys on the async wrapper, preventing duplicate `GlobalKey`
+  errors. Rebuilding the same variant with the same key preserves its state
+  and pending operation.
 * Block long presses while Elevated, Filled (including tonal), Outlined, and
   Text buttons are loading, including callbacks captured before a rebuild.
-  Loading now exposes disabled semantics and blocks keyboard activation; idle
-  long-press-only buttons retain Material behavior.
+  Their loading state also disables keyboard activation and reports disabled
+  semantics; idle long-press-only buttons remain usable.
+* Preserve native Material disabled behavior for null `onPressed` callbacks in
+  IconButton and floating action button variants.
+* Forward `onLongPress`, `onHover`, `onFocusChange`, and `focusNode` through the
+  Elevated, Filled, Outlined, and Text `.icon` constructors when an icon is
+  supplied, matching the null-icon fallback and Filled `.tonalIcon` behavior.
+* Honor `isSelected`, `selectedIcon`, selection styling, and Material 3
+  selection semantics in every `AsyncIconButton` variant. Selected icons keep
+  their loading transitions and fall back to `icon` when omitted.
 
-* Fix duplicate `GlobalKey` errors in Filled, Outlined, Text, Icon, and floating
-  action buttons by keeping the public key on the async wrapper. Rebuilds with
-  the same key preserve the wrapper's state and pending operation.
+### Documentation and maintenance
 
-* Fix external `loading` updates clearing a pending `onPressed` operation in all
-  async button families. External and internal loading remain independent,
-  preventing duplicate execution until the operation finishes.
+* Rewrite the README with a runnable quick start, constructor variants, loading
+  and error handling guidance, selection examples, and transition sizing notes.
+* Update analyzer and lint tooling, and add package, test, and example analysis
+  to CI.
 
 ## 1.0.0
 
@@ -34,7 +40,7 @@
 * Added assertions for `customBuilder` and `splashRadius` in `AsyncIconButton`
 * Refactored `AsyncOutlinedButton` and `AsyncTextButton` tests for consistency
 * Added comprehensive tests for `AsyncFloatingActionButton` (various states and transitions)
-* Docs: Clarified `loadingChild` behavior with `TransitionAnimationType.stack` in README and added an 
+* Docs: Clarified `loadingChild` behavior with `TransitionAnimationType.stack` in README.
 
 ## 0.2.0
 

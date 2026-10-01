@@ -1,16 +1,19 @@
-# example
+# loadable_buttons example
 
-A new Flutter project.
+A Flutter application demonstrating the async button families, icon variants,
+loading transitions, and theme colors. It uses the package from the parent
+directory through a path dependency.
 
-## Getting Started
+From this directory, run:
 
-This project is a starting point for a Flutter application.
+```sh
+flutter pub get
+flutter run
+```
 
-A few resources to get you started if this is your first Flutter project:
+Use the floating action buttons to switch transitions, change the button text,
+and change the theme color. The simulated async operations show the built-in
+loading indicators.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+See the [package README](../README.md) for installation, external loading,
+selection, custom content, and error handling guidance.

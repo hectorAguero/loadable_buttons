@@ -1,68 +1,88 @@
 # loadable_buttons
 
-A Flutter package that provides enhanced buttons with built-in loading states and async functionality.
+Flutter Material buttons with automatic loading states, external loading control,
+and customizable indicators and transitions.
 
-![](https://raw.githubusercontent.com/hectorAguero/loadable_buttons/main/screenshots/preview.gif 'loadable_buttons')
+![Async Material button examples](https://raw.githubusercontent.com/hectorAguero/loadable_buttons/main/screenshots/preview.gif)
 
-## Features
+## Installation
 
-- 🔄 Built-in loading states for:
-  - ElevatedButton -> AsyncElevatedButton
-  - FilledButton -> AsyncFilledButton
-  - TextButton -> AsyncTextButton
-  - OutlinedButton -> AsyncOutlinedButton
-  - IconButton -> AsyncIconButton
-  - FloatingActionButton -> AsyncFloatingActionButton
-- ⚡ Async callback support
-- 🎨 Multiple transition animations
-- 🎯 Icon support with customizable alignment
-- 📱 Maintains all standard properties
-- ✨ Customizable loading indicators
-
-## Usage
-
-### Installation
-Add the following to your `pubspec.yaml` or run:
-```bash
+```sh
 flutter pub add loadable_buttons
 ```
 
-### Importing
+Requires Flutter **3.29.0+** and Dart **3.6.0+ (below 4.0.0)**.
+Version 1.x uses Flutter's Material library.
+
+## Quick start
+
+Paste this example into `lib/main.dart` in a Flutter application:
+
 ```dart
+import 'package:flutter/material.dart';
 import 'package:loadable_buttons/loadable_buttons.dart';
+
+void main() {
+  runApp(
+    MaterialApp(
+      theme: ThemeData(useMaterial3: true),
+      home: Scaffold(
+        body: Center(
+          child: AsyncElevatedButton(
+            onPressed: saveChanges,
+            loadingSemanticsLabel: 'Saving',
+            child: const Text('Save'),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+Future<void> saveChanges() async {
+  // Replace this delay with your application's async operation.
+  await Future<void>.delayed(const Duration(seconds: 2));
+}
 ```
 
-### Basic Usage
+The button shows a spinner and prevents repeated activation until the returned
+Future completes. The following examples reuse `saveChanges`.
+
+## Button families
+
+| Widget | Constructors |
+| --- | --- |
+| `AsyncElevatedButton` | Default, `.icon` |
+| `AsyncFilledButton` | Default, `.icon`, `.tonal`, `.tonalIcon` |
+| `AsyncOutlinedButton` | Default, `.icon` |
+| `AsyncTextButton` | Default, `.icon` |
+| `AsyncIconButton` | Default, `.filled`, `.filledTonal`, `.outlined` |
+| `AsyncFloatingActionButton` | Default, `.small`, `.large`, `.extended` |
+
+Use the corresponding Material options, such as `style` and `focusNode`.
+For each widget's supported properties, see the
+[API reference](https://pub.dev/documentation/loadable_buttons/latest/).
+
+For a button with an icon, use `label` instead of `child`:
+
 ```dart
-AsyncElevatedButton(
-  onPressed: () async {
-    // Your async operation here
-    await Future.delayed(const Duration(seconds: 2));
-  },
-  child: const Text('Click Me'),
+AsyncFilledButton.icon(
+  onPressed: saveChanges,
+  icon: const Icon(Icons.save_outlined),
+  label: const Text('Save changes'),
 );
 ```
 
-### Custom Loading Child
-```dart
-AsyncElevatedButton(
-  onPressed: () async {
-    await Future.delayed(const Duration(seconds: 2));
-  },
-  child: const Text('Submit'),
-  loadingChild: const Text('Loading...'),
-);
-```
+## Loading behavior
 
-### External Loading
+`onPressed` accepts synchronous or asynchronous callbacks. Return or await your
+async work so the button can track its completion.
 
-The `loading` property controls an external loading source independently of the
-button's own async callback. The button stays in its loading state while either
-`loading` is `true` or its `onPressed` operation is pending. Setting `loading` to
-`false` does not cancel or finish that operation, and completing the operation
-does not clear external loading.
+External `loading` and a pending callback are independent: the button stays
+loading while **either is active**.
 
 ```dart
+// isSaving is a bool managed by your application.
 AsyncElevatedButton(
   loading: isSaving,
   onPressed: saveChanges,
@@ -70,136 +90,95 @@ AsyncElevatedButton(
 );
 ```
 
-This applies to all async button families and their constructor variants.
-Elevated, Filled (including tonal), Outlined, and Text buttons disable both taps
-and long presses while loading. Their disabled state also applies to keyboard
-activation and accessibility semantics. Long-press-only buttons remain usable
-when idle.
+Setting `loading: false` does not cancel or unlock a pending callback. Likewise,
+finishing the callback does not clear external `loading: true`.
 
-The `.icon` constructors for Elevated, Filled, Outlined, and Text buttons, and
-Filled's `.tonalIcon`, forward `onLongPress`, `onHover`, `onFocusChange`, and
-`focusNode` to the Material button whether an icon is provided or null.
+Internal loading clears even if the callback throws. Exceptions are not swallowed;
+handle errors in your callback. Disposing the widget does not cancel the operation.
+Check `mounted` before updating your widget's state after an `await`.
 
-A null `onPressed` preserves the native Material disabled styling, focus, and
-accessibility behavior. Elevated, Filled, Outlined, and Text buttons remain
-usable with only `onLongPress` while idle; IconButton and floating action buttons
-require `onPressed` to be enabled.
+Set `onPressed: null` to disable a button. Elevated, Filled, Outlined, and Text
+buttons remain enabled if `onLongPress` is provided; loading blocks both
+callbacks. `onLongPress` is synchronous and does not start a loading state.
 
-The internal loading state is restored even when the callback throws; error
-handling remains the consumer's responsibility.
+## Customization
 
-The `key` passed to any async button belongs to the async wrapper. You can use a
-`GlobalKey` to access that wrapper, and rebuilding the same button variant with
-the same key preserves its state, including a pending `onPressed` operation.
-
-### Icon Button Selection
-
-All `AsyncIconButton` variants support Material 3 selection. Pass `isSelected`
-to enable selection styling and accessibility semantics, and `selectedIcon`
-to change the selected content. If `selectedIcon` is omitted, the original
-`icon` remains visible in both selection states.
+Replace the spinner with `loadingChild` and choose a transition:
 
 ```dart
+AsyncElevatedButton(
+  onPressed: saveChanges,
+  loadingChild: const Text('Saving...'),
+  transitionType: TransitionAnimationType.animatedSwitcher,
+  animationDuration: const Duration(milliseconds: 250),
+  child: const Text('Save'),
+);
+```
+
+| `TransitionAnimationType` | Behavior |
+| --- | --- |
+| `stack` (default) | Keeps idle content in the layout and fades loading content over it. |
+| `animatedSwitcher` | Fades between content with animated sizing. |
+| `customBuilder` | Uses your required `customBuilder(loading, child, loadingChild)`. |
+
+`animationDuration` defaults to `Durations.medium1`; `minimumChildOpacity`
+defaults to `0.0` for stack transitions. Custom builders must handle a nullable
+`loadingChild` and manage outgoing content, interaction, and semantics.
+
+Constrain loading content if you need a stable button size, and give custom
+indicators appropriate semantics. `AsyncElevatedButton` supports
+`loadingSemanticsLabel` for its default spinner.
+
+## IconButton selection
+
+With a Material 3 theme, use `isSelected` and `selectedIcon` on any
+`AsyncIconButton` variant. Wrap a bool in `WidgetStatePropertyAll`:
+
+```dart
+// In a State object's build method; isFavorite is a bool field.
 AsyncIconButton.filled(
+  tooltip: 'Toggle favorite',
   isSelected: WidgetStatePropertyAll(isFavorite),
   icon: const Icon(Icons.favorite_border),
   selectedIcon: const Icon(Icons.favorite),
-  onPressed: toggleFavorite,
-);
-```
-
-The selection property is resolved on each build with the disabled state while
-loading or when `onPressed` is null, and an empty state set otherwise. Both
-icons use the configured loading transition; when loading finishes, the button
-shows the icon for the current selection. A null `isSelected` preserves normal
-push-button behavior. Selection follows the native `IconButton` behavior and
-requires a Material 3 theme.
-
-### Transition Types
-
-The package supports three types of transitions:
-
-1. Stack (Default) : Maintains the size of the button while loading
-```dart
-AsyncElevatedButton(
-  // transitionType: TransitionAnimationType.stack,
-  onPressed: () async => await yourAsyncFunction(),
-  child: const Text('Stack Transition'),
-);
-```
-
-Note: When using `TransitionAnimationType.stack`, providing a `loadingChild` will show it during the loading state while preserving the button size. This is useful for keeping layout stable while showing a loader or message.
-
-Example with `loadingChild` and Stack transition:
-```dart
-AsyncElevatedButton(
-  transitionType: TransitionAnimationType.stack,
   onPressed: () async {
-    await Future.delayed(const Duration(seconds: 2));
-  },
-  child: const Text('Submit'),
-  loadingChild: const Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      SizedBox.square(
-        dimension: 16,
-        child: CircularProgressIndicator(strokeWidth: 2),
-      ),
-      SizedBox(width: 8),
-      Text('Submitting...'),
-    ],
-  ),
-);
-```
-
-2. AnimatedSwitcher : Animates the size of the button while loading
-```dart
-AsyncElevatedButton(
-  transitionType: TransitionAnimationType.animatedSwitcher,
-  onPressed: () async => await yourAsyncFunction(),
-  child: const Text('AnimatedSwitcher Transition'),
-);
-```
-
-3. CustomBuilder : Allows you to define your own custom transition
-```dart
-AsyncElevatedButton(
-  transitionType: TransitionAnimationType.customBuilder,
-  onPressed: () async => await yourAsyncFunction(),
-  child: const Text('Custom Transition'),
-  loadingChild: const Text('Loading...'),
-  customBuilder: (bool loading, Widget child, Widget? loadingChild) {
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 500),
-      curve: Curves.easeInOut,
-      child: loading
-          ? loadingChild!
-          : child,
-    );
+    await saveChanges();
+    if (!mounted) return;
+    setState(() => isFavorite = !isFavorite);
   },
 );
 ```
 
-## Additional Features
-- Customize animation duration
-- Control minimum opacity during loading state
-- Full access to ElevatedButton styling
-- Manual loading state control
-- Icon alignment customization
+Your application owns the selection state. If `selectedIcon` is omitted,
+`icon` is used for both states.
 
-### Properties
-| Property | Type | Description |
-|----------|------|-------------|
-| `onPressed` | `FutureOr<void> Function()?` | The callback that is called when the button is tapped |
-| `child` | `Widget` | The primary content of the button |
-| `loadingChild` | `Widget?` | Widget to show during loading state |
-| `loading` | `bool` | Manual control of loading state |
-| `transitionType` | `TransitionAnimationType` | Type of loading animation |
-| `animationDuration` | `Duration` | Duration of the loading animation |
-| `minimumChildOpacity` | `double` | Minimum opacity of child during loading |
+## FAQ
 
-## Compatibility Note
+<details>
+<summary>Can I copy a button into my project?</summary>
 
-This package is designed and tested for the latest Flutter stable version. Due to limitations in older Flutter versions regarding parameter handling, using this package with older versions might lead to unexpected behavior or limitations. Alternatively, since the package is MIT licensed, you can copy the relevant code into your project and adapt it for older versions.
+Yes! The code is [MIT licensed](LICENSE). Feel free to browse the
+[button implementations](https://github.com/hectorAguero/loadable_buttons/tree/main/lib/src),
+copy a button into your project, and adapt it, including for commercial use.
+Keep the copyright and MIT license notice with the copied code.
 
+Include any companion `part` files and referenced types, and update package
+imports to match your project.
 
+</details>
+
+<details>
+<summary>Do I need a controller or state management package?</summary>
+
+No. Return your operation's Future from `onPressed` and the button manages its
+loading state. Use `loading` when your application already manages that state.
+
+</details>
+
+## More
+
+- [Example application](https://github.com/hectorAguero/loadable_buttons/tree/main/example)
+- [Contributing and development checks](CONTRIBUTING.md)
+- [Changelog](CHANGELOG.md)
+- [Issues and feature requests](https://github.com/hectorAguero/loadable_buttons/issues)
+- [MIT license](LICENSE)
