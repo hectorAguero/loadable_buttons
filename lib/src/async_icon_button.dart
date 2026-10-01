@@ -12,7 +12,7 @@ enum _IconButtonVariant { standard, filled, filledTonal, outlined }
 /// AsyncIconButton is a custom widget that allows to load a child.
 class AsyncIconButton extends StatefulWidget {
   /// General constructor that allows both sync and async callbacks.
-  /// At least one callback must be non-null.
+  /// A null [onPressed] preserves the native Material disabled behavior.
   const AsyncIconButton({
     required this.icon,
     required this.onPressed,
@@ -334,7 +334,8 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
             highlightColor: widget.highlightColor,
             splashColor: widget.splashColor,
             disabledColor: widget.disabledColor,
-            onPressed: _isLoading ? null : () => _handlePressed(),
+            onPressed:
+                _isLoading || widget.onPressed == null ? null : _handlePressed,
             onHover: widget.onHover,
             onLongPress: widget.onLongPress,
             mouseCursor: widget.mouseCursor,
@@ -367,7 +368,8 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
             highlightColor: widget.highlightColor,
             splashColor: widget.splashColor,
             disabledColor: widget.disabledColor,
-            onPressed: _isLoading ? null : () => _handlePressed(),
+            onPressed:
+                _isLoading || widget.onPressed == null ? null : _handlePressed,
             onHover: widget.onHover,
             onLongPress: widget.onLongPress,
             mouseCursor: widget.mouseCursor,
@@ -400,7 +402,8 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
             highlightColor: widget.highlightColor,
             splashColor: widget.splashColor,
             disabledColor: widget.disabledColor,
-            onPressed: _isLoading ? null : () => _handlePressed(),
+            onPressed:
+                _isLoading || widget.onPressed == null ? null : _handlePressed,
             onHover: widget.onHover,
             onLongPress: widget.onLongPress,
             mouseCursor: widget.mouseCursor,
@@ -433,7 +436,8 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
             highlightColor: widget.highlightColor,
             splashColor: widget.splashColor,
             disabledColor: widget.disabledColor,
-            onPressed: _isLoading ? null : () => _handlePressed(),
+            onPressed:
+                _isLoading || widget.onPressed == null ? null : _handlePressed,
             onHover: widget.onHover,
             onLongPress: widget.onLongPress,
             mouseCursor: widget.mouseCursor,

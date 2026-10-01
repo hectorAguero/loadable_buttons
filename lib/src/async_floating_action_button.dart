@@ -18,7 +18,7 @@ class _DefaultHeroTag {
 /// AsyncFloatingActionButton is a custom widget that allows to load a child.
 class AsyncFloatingActionButton extends StatefulWidget {
   /// General constructor that allows both sync and async callbacks.
-  /// At least one callback must be non-null.
+  /// A null [onPressed] preserves the native Material disabled behavior.
   const AsyncFloatingActionButton({
     required this.child,
     required this.onPressed,
@@ -375,7 +375,9 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton> {
               hoverElevation: widget.hoverElevation,
               highlightElevation: widget.highlightElevation,
               disabledElevation: widget.disabledElevation,
-              onPressed: _isLoading ? null : () => _handlePressed(),
+              onPressed: _isLoading || widget.onPressed == null
+                  ? null
+                  : _handlePressed,
               mouseCursor: widget.mouseCursor,
               mini: widget.mini,
               shape: widget.shape,
@@ -408,7 +410,9 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton> {
               hoverElevation: widget.hoverElevation,
               highlightElevation: widget.highlightElevation,
               disabledElevation: widget.disabledElevation,
-              onPressed: _isLoading ? null : () => _handlePressed(),
+              onPressed: _isLoading || widget.onPressed == null
+                  ? null
+                  : _handlePressed,
               mouseCursor: widget.mouseCursor,
               shape: widget.shape,
               clipBehavior: widget.clipBehavior,
@@ -439,7 +443,9 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton> {
               hoverElevation: widget.hoverElevation,
               highlightElevation: widget.highlightElevation,
               disabledElevation: widget.disabledElevation,
-              onPressed: _isLoading ? null : () => _handlePressed(),
+              onPressed: _isLoading || widget.onPressed == null
+                  ? null
+                  : _handlePressed,
               mouseCursor: widget.mouseCursor,
               shape: widget.shape,
               clipBehavior: widget.clipBehavior,
@@ -460,7 +466,9 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton> {
               splashColor: widget.splashColor,
               highlightElevation: widget.highlightElevation,
               disabledElevation: widget.disabledElevation,
-              onPressed: _isLoading ? null : () => _handlePressed(),
+              onPressed: _isLoading || widget.onPressed == null
+                  ? null
+                  : _handlePressed,
               mouseCursor: widget.mouseCursor,
               shape: widget.shape,
               isExtended: widget.isExtended,

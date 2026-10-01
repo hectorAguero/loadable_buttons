@@ -76,6 +76,11 @@ and long presses while loading. Their disabled state also applies to keyboard
 activation and accessibility semantics. Long-press-only buttons remain usable
 when idle.
 
+A null `onPressed` preserves the native Material disabled styling, focus, and
+accessibility behavior. Elevated, Filled, Outlined, and Text buttons remain
+usable with only `onLongPress` while idle; IconButton and floating action buttons
+require `onPressed` to be enabled.
+
 The internal loading state is restored even when the callback throws; error
 handling remains the consumer's responsibility.
 
