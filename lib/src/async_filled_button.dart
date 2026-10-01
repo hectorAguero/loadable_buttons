@@ -10,6 +10,7 @@ import 'package:loadable_buttons/loadable_buttons.dart'
 import 'package:loadable_buttons/src/async_outlined_button.dart'
     show AsyncOutlinedButton;
 
+import 'package:loadable_buttons/src/loading_transition.dart';
 import 'package:loadable_buttons/src/transition_animation_type.dart';
 
 part 'async_filled_button_with_icon.dart';
@@ -387,7 +388,9 @@ class _DefaultLoadingIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CircularProgressIndicator(
-      color: _style?.foregroundColor?.resolve({MaterialState.selected}),
+      color: _style?.foregroundColor?.resolve(<MaterialState>{}) ??
+          IconTheme.of(context).color ??
+          DefaultTextStyle.of(context).style.color,
       strokeWidth: _defaultStrokeWidth,
       strokeCap: StrokeCap.round,
       constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
@@ -418,34 +421,17 @@ class _ChildContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return switch (transitionType) {
-      TransitionAnimationType.stack => Stack(
-          alignment: Alignment.center,
-          children: [
-            AnimatedOpacity(
-                child: AnimatedSize(child: child, duration: animationDuration),
-                opacity: isLoading ? minimumChildOpacity : 1.0,
-                duration: animationDuration),
-            AnimatedOpacity(
-                child: Visibility(
-                    child:
-                        loadingChild ?? _DefaultLoadingIndicator(style: style),
-                    visible: isLoading),
-                opacity: isLoading ? 1.0 : 0.0,
-                duration: animationDuration),
-          ],
-        ),
-      TransitionAnimationType.animatedSwitcher => AnimatedSwitcher(
-          child: !isLoading
-              ? IgnorePointer(ignoring: isLoading, child: child)
-              : loadingChild ?? _DefaultLoadingIndicator(style: style),
-          duration: animationDuration,
-          transitionBuilder: (child, animation) => FadeTransition(
-              key: ValueKey<Key?>(child.key),
-              opacity: animation,
-              child: AnimatedSize(child: child, duration: animationDuration))),
-      TransitionAnimationType.customBuilder =>
-        customBuilder != null ? customBuilder ?? child : child,
-    };
+    if (transitionType == TransitionAnimationType.customBuilder) {
+      return customBuilder ?? child;
+    }
+
+    return LoadingTransition(
+      child: child,
+      loadingChild: loadingChild ?? _DefaultLoadingIndicator(style: style),
+      isLoading: isLoading,
+      transitionType: transitionType,
+      animationDuration: animationDuration,
+      minimumChildOpacity: minimumChildOpacity,
+    );
   }
 }

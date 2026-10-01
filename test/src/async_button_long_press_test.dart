@@ -87,7 +87,6 @@ void main() {
       expect(
           tester.getSemantics(button),
           matchesSemantics(
-            label: 'Run',
             isFocused: true,
             isFocusable: true,
             hasFocusAction: true,

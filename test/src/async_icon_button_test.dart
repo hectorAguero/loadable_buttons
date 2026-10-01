@@ -107,41 +107,37 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsNothing);
     });
 
-    testWidgets('handles animatedSwitcher transition type', (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: AsyncIconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () async {
-              await Future<void>.delayed(const Duration(milliseconds: 100));
-            },
-            loadingChild: const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
-            ),
-            transitionType: TransitionAnimationType.animatedSwitcher,
-          ),
-        ),
-      );
-
-      expect(find.byIcon(Icons.add), findsOneWidget);
+    testWidgets('switcher completes both fades around a pending operation',
+        (tester) async {
+      final pending = Completer<void>();
+      const duration = Duration(milliseconds: 200);
+      await tester.pumpWidget(MaterialApp(
+        home: Scaffold(
+            body: Center(
+                child: AsyncIconButton(
+          icon: const Icon(Icons.add),
+          onPressed: () => pending.future,
+          transitionType: TransitionAnimationType.animatedSwitcher,
+          animationDuration: duration,
+        ))),
+      ));
       await tester.tap(find.byType(AsyncIconButton));
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 50));
-
-      // Only loading indicator should be present during switch.
+      // Start the newly mounted transition before advancing its clock.
+      await tester.pump();
+      // Advance past the duration so the outgoing controller completes.
+      await tester.pump(duration + const Duration(milliseconds: 1));
       expect(find.byIcon(Icons.add), findsNothing);
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
-
-      await tester.pump(const Duration(milliseconds: 100));
+      pending.complete();
       await tester.pump();
-
+      // Start the newly mounted transition before advancing its clock.
+      await tester.pump();
+      // Advance past the duration so the outgoing controller completes.
+      await tester.pump(duration + const Duration(milliseconds: 1));
       expect(find.byIcon(Icons.add), findsOneWidget);
       expect(find.byType(CircularProgressIndicator), findsNothing);
     });
-
-    // These variants are internal and not exposed via constructors in the code.
-    // Need to either expose them
-    // or use a different testing strategy if they are meant to be used.
 
     testWidgets('custom builder works correctly', (tester) async {
       await tester.pumpWidget(

@@ -1,14 +1,19 @@
 /// Enum to define the type of loading animation.
 enum TransitionAnimationType {
-  /// Stack loading animation, it allow to mantain the size of the button
-  /// based on the biggest child.
+  /// Fades loading content over idle content retained in the layout.
+  ///
+  /// Larger loading content can expand the button within its constraints.
+  /// Idle content is inactive while loading, even if partially visible.
   stack,
 
-  /// AnimatedSwitcher loading animation, it uses AnimatedSwitcher to
-  /// animate the loading animation, which replace the child and loadingChild.
+  /// Fades between idle and loading content.
+  ///
+  /// Outgoing content remains in the layout until its fade ends, with pointer
+  /// input, focus, and semantics excluded in both directions.
   animatedSwitcher,
 
-  /// Custom builder loading animation, it uses a custom builder to
-  /// animate the loading animation, which replace the child and loadingChild.
+  /// Uses the supplied custom builder to present the loading state.
+  ///
+  /// The builder owns sizing, interaction, focus, and semantics.
   customBuilder,
 }

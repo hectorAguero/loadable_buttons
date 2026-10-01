@@ -5,6 +5,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import 'package:loadable_buttons/src/loading_transition.dart';
 import 'package:loadable_buttons/src/transition_animation_type.dart';
 
 enum _IconButtonVariant { standard, filled, filledTonal, outlined }
@@ -497,36 +498,18 @@ class _AsyncIconButtonChild extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return switch (transitionType) {
-      TransitionAnimationType.stack => Stack(
-          alignment: Alignment.center,
-          children: [
-            AnimatedOpacity(
-                child: AnimatedSize(child: icon, duration: animationDuration),
-                opacity: isLoading ? minimumChildOpacity : 1.0,
-                duration: animationDuration),
-            AnimatedOpacity(
-                child: Visibility(
-                    child:
-                        loadingChild ?? _DefaultLoadingIndicator(style: style),
-                    visible: isLoading),
-                opacity: isLoading ? 1.0 : 0.0,
-                duration: animationDuration),
-          ],
-        ),
-      TransitionAnimationType.animatedSwitcher => AnimatedSwitcher(
-          child: !isLoading
-              ? IgnorePointer(ignoring: isLoading, child: icon)
-              : loadingChild ?? _DefaultLoadingIndicator(style: style),
-          duration: animationDuration,
-          transitionBuilder: (child, animation) => FadeTransition(
-              key: ValueKey<Key?>(child.key),
-              opacity: animation,
-              child: AnimatedSize(child: child, duration: animationDuration))),
-      TransitionAnimationType.customBuilder => customBuilder != null
-          ? customBuilder?.call(isLoading, icon, loadingChild) ?? icon
-          : icon
-    };
+    if (transitionType == TransitionAnimationType.customBuilder) {
+      return customBuilder?.call(isLoading, icon, loadingChild) ?? icon;
+    }
+
+    return LoadingTransition(
+      child: icon,
+      loadingChild: loadingChild ?? _DefaultLoadingIndicator(style: style),
+      isLoading: isLoading,
+      transitionType: transitionType,
+      animationDuration: animationDuration,
+      minimumChildOpacity: minimumChildOpacity,
+    );
   }
 }
 
@@ -541,7 +524,9 @@ class _DefaultLoadingIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CircularProgressIndicator(
-      color: _style?.foregroundColor?.resolve({MaterialState.selected}),
+      color: _style?.foregroundColor?.resolve(<MaterialState>{}) ??
+          IconTheme.of(context).color ??
+          DefaultTextStyle.of(context).style.color,
       strokeWidth: _defaultStrokeWidth,
       strokeCap: StrokeCap.round,
       constraints: const BoxConstraints(minWidth: 16, minHeight: 16),

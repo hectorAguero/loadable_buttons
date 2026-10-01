@@ -1,3 +1,18 @@
+## Unreleased
+
+### Fixed
+
+* Block pointer input, focus, and semantics on inactive content in built-in
+  loading transitions, including outgoing AnimatedSwitcher content in both
+  directions. Current custom loading content remains usable.
+* Mount extended FAB icons only once, preserve the native layout without an
+  icon, and forward extended padding, icon spacing, and text style.
+* Use the Material button's inherited foreground color for default spinners
+  when no explicit foreground color is supplied.
+
+Public defaults, constructors, and consumer SDK requirements are unchanged.
+Loading labels remain opt-in; custom indicators and builders own their semantics.
+
 ## 1.0.1
 
 Bug fixes for the existing Flutter Material API. Public constructors and

@@ -118,16 +118,41 @@ AsyncElevatedButton(
 | `TransitionAnimationType` | Behavior |
 | --- | --- |
 | `stack` (default) | Keeps idle content in the layout and fades loading content over it. |
-| `animatedSwitcher` | Fades between content with animated sizing. |
+| `animatedSwitcher` | Fades between content; outgoing content stays in the layout until its fade ends. |
 | `customBuilder` | Uses your required `customBuilder(loading, child, loadingChild)`. |
 
 `animationDuration` defaults to `Durations.medium1`; `minimumChildOpacity`
 defaults to `0.0` for stack transitions. Custom builders must handle a nullable
 `loadingChild` and manage outgoing content, interaction, and semantics.
 
-Constrain loading content if you need a stable button size, and give custom
-indicators appropriate semantics. `AsyncElevatedButton` supports
-`loadingSemanticsLabel` for its default spinner.
+Built-in transitions immediately block pointer input, keyboard focus, and
+semantics on inactive content, including outgoing switcher content. A nonzero
+`minimumChildOpacity` only changes appearance; idle content remains inactive
+while loading. Current custom loading content may still provide actions such as
+canceling an operation.
+
+A stack keeps idle content in the layout. Loading content that is larger can
+expand the button within its Material and parent constraints. Constrain both
+states if you need a stable size. Extended FABs keep their icon area with stack
+transitions and honor `extendedPadding`, `extendedIconLabelSpacing`, and
+`extendedTextStyle`. The default spinner uses an explicit foreground color when
+provided, then the foreground inherited from the Material button theme.
+
+Loading labels remain opt-in: the default is `null`, with no built-in localized
+announcement. `AsyncElevatedButton` supports `loadingSemanticsLabel` for its
+default spinner. Every family accepts a `loadingChild` with its own semantics:
+
+```dart
+loadingChild: const SizedBox.square(
+  dimension: 16,
+  child: CircularProgressIndicator(semanticsLabel: 'Saving'),
+),
+```
+
+Supply localized labels appropriate to your operation. When using `loadingChild`
+or `customBuilder`, your application owns the indicator's semantics and any
+announcements. See the [loading transition audit](docs/loading-transition-audit.md)
+for the confirmed failures and layout findings.
 
 ## IconButton selection
 
@@ -162,7 +187,8 @@ Yes! The code is [MIT licensed](LICENSE). Feel free to browse the
 copy a button into your project, and adapt it, including for commercial use.
 Keep the copyright and MIT license notice with the copied code.
 
-Include any companion `part` files and referenced types, and update package
+Include any companion `part` files, the shared `loading_transition.dart` helper,
+and referenced types, and update package
 imports to match your project.
 
 </details>
