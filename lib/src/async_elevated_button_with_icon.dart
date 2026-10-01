@@ -1,6 +1,3 @@
-// To support lower versions than 3.22.0 for MaterialState.
-// ignore_for_file: deprecated_member_use
-
 part of 'async_elevated_button.dart';
 
 class _AsyncElevatedButtonWithIcon extends AsyncElevatedButton {
@@ -27,14 +24,14 @@ class _AsyncElevatedButtonWithIcon extends AsyncElevatedButton {
     super.splashFactory,
     super.loadingSemanticsLabel,
   }) : super(
-          autofocus: autofocus ?? false,
-          child: _ElevatedButtonWithIconChild(
-            label: label,
-            icon: icon,
-            buttonStyle: style,
-            iconAlignment: iconAlignment,
-          ),
-        );
+         autofocus: autofocus ?? false,
+         child: _ElevatedButtonWithIconChild(
+           label: label,
+           icon: icon,
+           buttonStyle: style,
+           iconAlignment: iconAlignment,
+         ),
+       );
 }
 
 /// Copy of ElevatedButton.icon with the loading animation.
@@ -60,9 +57,10 @@ class _ElevatedButtonWithIconChild extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final defaultFontSize =
-        buttonStyle?.textStyle?.resolve(const <MaterialState>{})?.fontSize ??
-            _defaultFontSize;
-    final scale = clampDouble(
+        buttonStyle?.textStyle?.resolve(const <WidgetState>{})?.fontSize ??
+        _defaultFontSize;
+    final scale =
+        clampDouble(
           MediaQuery.textScalerOf(context).scale(defaultFontSize) /
               _defaultFontSize,
           1,
@@ -72,16 +70,18 @@ class _ElevatedButtonWithIconChild extends StatelessWidget {
     final gap =
         lerpDouble(_unscaledIconGap, _scaledIconGap, scale) ?? _fallbackIconGap;
     final elevatedButtonTheme = ElevatedButtonTheme.of(context);
-    final effectiveIconAlignment = iconAlignment ??
+    final effectiveIconAlignment =
+        iconAlignment ??
         elevatedButtonTheme.style?.iconAlignment ??
         buttonStyle?.iconAlignment ??
         IconAlignment.start;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
-      children: effectiveIconAlignment == IconAlignment.start
-          ? <Widget>[icon, SizedBox(width: gap), Flexible(child: label)]
-          : <Widget>[Flexible(child: label), SizedBox(width: gap), icon],
+      children:
+          effectiveIconAlignment == IconAlignment.start
+              ? <Widget>[icon, SizedBox(width: gap), Flexible(child: label)]
+              : <Widget>[Flexible(child: label), SizedBox(width: gap), icon],
     );
   }
 }

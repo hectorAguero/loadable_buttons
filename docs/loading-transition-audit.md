@@ -1,8 +1,10 @@
 # Loading transition audit (issue #12)
 
 Audited on October 1, 2026 against `2afc62c` (main), using Flutter 3.47.5
-stable and Dart 3.13.4. This base uses Flutter Material; consumer requirements
-remain Flutter >=3.29.0 and Dart ^3.6.0. The minimum SDK versions were not run.
+stable and Dart 3.13.4. This base uses Flutter Material; its declared consumer
+requirements were Flutter >=3.29.0 and Dart ^3.6.0. The minimum SDK versions
+were not run for this audit. See [the compatibility roadmap](compatibility-roadmap.md)
+for current release requirements and minimum SDK validation.
 
 ## Confirmed failures and fixes
 

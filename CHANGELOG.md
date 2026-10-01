@@ -1,23 +1,11 @@
-## Unreleased
+## 1.1.0
 
-* Preserve requested icon-button cursors when the fallback splash style is
-  created, including on Flutter 3.29.
-* Restore Flutter 3.29 compatibility for extended FAB padding and spacing by
-  reading `ThemeData.floatingActionButtonTheme`.
-* Validate dependency resolution, formatting, analysis, and tests on the declared
-  minimum Flutter SDK and stable in CI. Run modern lint plugins on stable.
-
-* Smoothly resize buttons in AnimatedSwitcher transitions when idle and loading
-  content have different sizes.
-* Center extended FAB stack loaders across the full icon-and-label area while
-  retaining idle sizing and native padding and spacing.
-* Block pointer input, focus, and semantics on inactive content in built-in
-  loading transitions, including outgoing AnimatedSwitcher content in both
-  directions. Current custom loading content remains usable.
-* Mount extended FAB icons only once, preserve the native layout without an
-  icon, and forward extended padding, icon spacing, and text style.
-* Use the normal foreground from an explicit style or button theme for default
-  spinners, falling back to the inherited Material foreground.
+* Clarify the Dart requirement as >=3.7.0 <4.0.0, matching the existing Flutter 3.29.0 minimum.
+* Preserve requested mouse cursors in all icon-button variants.
+* Fix extended floating action button padding, icon spacing, and text styling on Flutter 3.29.
+* Improve loading transitions with smooth resizing, centered extended FAB indicators, and correct layout when no icon is supplied.
+* Prevent inactive loading-transition content from receiving pointer input, focus, or accessibility actions.
+* Resolve default loading indicator colors from the button style or theme.
 
 ## 1.0.1
 

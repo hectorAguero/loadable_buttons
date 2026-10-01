@@ -34,24 +34,23 @@ class _MyAppState extends State<MyApp> {
           dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
         ),
       ),
-      home: Builder(builder: (context) {
-        return DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Theme.of(context).colorScheme.primaryContainer,
-                Theme.of(context).colorScheme.secondaryContainer,
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+      home: Builder(
+        builder: (context) {
+          return DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Theme.of(context).colorScheme.primaryContainer,
+                  Theme.of(context).colorScheme.secondaryContainer,
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
             ),
-          ),
-          child: _HomePage(
-            theme: _theme,
-            onThemeChanged: _changeTheme,
-          ),
-        );
-      }),
+            child: _HomePage(theme: _theme, onThemeChanged: _changeTheme),
+          );
+        },
+      ),
     );
   }
 }
@@ -95,15 +94,19 @@ class _HomePageState extends State<_HomePage> {
 
   void _setDuration(String value) {
     final seconds = double.tryParse(value);
-    final valid = seconds != null &&
+    final valid =
+        seconds != null &&
         seconds.isFinite &&
         seconds >= 0 &&
         seconds <= _maximumSeconds;
     setState(() {
-      _loadingDuration = valid
-          ? Duration(
-              milliseconds: (seconds * Duration.millisecondsPerSecond).round())
-          : null;
+      _loadingDuration =
+          valid
+              ? Duration(
+                milliseconds:
+                    (seconds * Duration.millisecondsPerSecond).round(),
+              )
+              : null;
       _durationError = valid ? null : 'Enter 0–60 seconds';
     });
   }
@@ -216,10 +219,7 @@ class _HomePageState extends State<_HomePage> {
                   ),
                 ],
               ),
-              Text(
-                "AsyncTextButton",
-                style: TextTheme.of(context).titleLarge,
-              ),
+              Text("AsyncTextButton", style: TextTheme.of(context).titleLarge),
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
@@ -264,10 +264,7 @@ class _HomePageState extends State<_HomePage> {
                   ),
                 ],
               ),
-              Text(
-                "AsyncIconButton",
-                style: TextTheme.of(context).titleLarge,
-              ),
+              Text("AsyncIconButton", style: TextTheme.of(context).titleLarge),
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
@@ -355,77 +352,79 @@ class _ExampleControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
-        builder: (_, constraints) {
-          final width = constraints.maxWidth < _controlWidth
+    builder: (_, constraints) {
+      final width =
+          constraints.maxWidth < _controlWidth
               ? constraints.maxWidth
               : _controlWidth;
 
-          return Wrap(
-            alignment: WrapAlignment.center,
-            spacing: 16,
-            runSpacing: 16,
-            children: [
-              SizedBox(
-                width: width,
-                child: _ControlDropdown(
-                  label: 'Animation mode',
-                  value: transitionType,
-                  onChanged: onTransitionChanged,
-                  items: const [
-                    DropdownMenuItem(
-                      value: TransitionAnimationType.stack,
-                      child: Text('Stack'),
-                    ),
-                    DropdownMenuItem(
-                      value: TransitionAnimationType.animatedSwitcher,
-                      child: Text('Animated switcher'),
-                    ),
-                  ],
+      return Wrap(
+        alignment: WrapAlignment.center,
+        spacing: 16,
+        runSpacing: 16,
+        children: [
+          SizedBox(
+            width: width,
+            child: _ControlDropdown(
+              label: 'Animation mode',
+              value: transitionType,
+              onChanged: onTransitionChanged,
+              items: const [
+                DropdownMenuItem(
+                  value: TransitionAnimationType.stack,
+                  child: Text('Stack'),
                 ),
-              ),
-              SizedBox(
-                width: width,
-                child: _ControlDropdown(
-                  label: 'Theme',
-                  value: theme,
-                  onChanged: onThemeChanged,
-                  items: [
-                    for (final option in _ExampleTheme.values)
-                      DropdownMenuItem(
-                        value: option,
-                        child: Row(
-                          children: [
-                            Icon(Icons.circle, color: option.color, size: 16),
-                            const SizedBox(width: 8),
-                            Text(option.label),
-                          ],
-                        ),
-                      ),
-                  ],
+                DropdownMenuItem(
+                  value: TransitionAnimationType.animatedSwitcher,
+                  child: Text('Animated switcher'),
                 ),
-              ),
-              SizedBox(
-                width: width,
-                child: TextFormField(
-                  initialValue: '1',
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  inputFormatters: [
-                    FilteringTextInputFormatter.allow(RegExp('[0-9.]')),
-                  ],
-                  decoration: InputDecoration(
-                    labelText: 'Loading duration',
-                    suffixText: 'seconds',
-                    border: const OutlineInputBorder(),
-                    errorText: durationError,
+              ],
+            ),
+          ),
+          SizedBox(
+            width: width,
+            child: _ControlDropdown(
+              label: 'Theme',
+              value: theme,
+              onChanged: onThemeChanged,
+              items: [
+                for (final option in _ExampleTheme.values)
+                  DropdownMenuItem(
+                    value: option,
+                    child: Row(
+                      children: [
+                        Icon(Icons.circle, color: option.color, size: 16),
+                        const SizedBox(width: 8),
+                        Text(option.label),
+                      ],
+                    ),
                   ),
-                  onChanged: onDurationChanged,
-                ),
+              ],
+            ),
+          ),
+          SizedBox(
+            width: width,
+            child: TextFormField(
+              initialValue: '1',
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
               ),
-            ],
-          );
-        },
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp('[0-9.]')),
+              ],
+              decoration: InputDecoration(
+                labelText: 'Loading duration',
+                suffixText: 'seconds',
+                border: const OutlineInputBorder(),
+                errorText: durationError,
+              ),
+              onChanged: onDurationChanged,
+            ),
+          ),
+        ],
       );
+    },
+  );
 }
 
 class _ControlDropdown<T extends Object> extends StatelessWidget {
@@ -443,18 +442,18 @@ class _ControlDropdown<T extends Object> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => InputDecorator(
-        decoration: InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(),
-        ),
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<T>(
-            value: value,
-            items: items,
-            isDense: true,
-            isExpanded: true,
-            onChanged: onChanged,
-          ),
-        ),
-      );
+    decoration: InputDecoration(
+      labelText: label,
+      border: const OutlineInputBorder(),
+    ),
+    child: DropdownButtonHideUnderline(
+      child: DropdownButton<T>(
+        value: value,
+        items: items,
+        isDense: true,
+        isExpanded: true,
+        onChanged: onChanged,
+      ),
+    ),
+  );
 }

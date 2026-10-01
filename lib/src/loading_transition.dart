@@ -66,9 +66,13 @@ class LoadingTransition extends StatelessWidget {
           AnimatedOpacity(
             opacity: isLoading ? minimumChildOpacity : 1.0,
             duration: animationDuration,
-            child: animateChildSize
-                ? AnimatedSize(duration: animationDuration, child: idleContent)
-                : idleContent,
+            child:
+                animateChildSize
+                    ? AnimatedSize(
+                      duration: animationDuration,
+                      child: idleContent,
+                    )
+                    : idleContent,
           ),
           AnimatedOpacity(
             opacity: isLoading ? 1.0 : 0.0,
@@ -92,47 +96,50 @@ class LoadingTransition extends StatelessWidget {
           key: ValueKey(isLoading),
           child: isLoading ? loadingChild : child,
         ),
-        transitionBuilder: (child, animation) => FadeTransition(
-          opacity: animation,
-          child: child,
-        ),
+        transitionBuilder:
+            (child, animation) =>
+                FadeTransition(opacity: animation, child: child),
         // Re-evaluate outgoing content here instead of retaining an idle guard
         // captured by transitionBuilder. Preserve each switcher entry's key.
-        layoutBuilder: (currentChild, previousChildren) => Stack(
-          alignment: Alignment.center,
-          children: [
-            for (final previousChild in previousChildren)
-              _InactiveContent(
-                key: previousChild.key,
-                active: false,
-                child: previousChild,
-              ),
-            if (currentChild != null)
-              _InactiveContent(
-                key: currentChild.key,
-                active: true,
-                child: currentChild,
-              ),
-          ],
-        ),
+        layoutBuilder:
+            (currentChild, previousChildren) => Stack(
+              alignment: Alignment.center,
+              children: [
+                for (final previousChild in previousChildren)
+                  _InactiveContent(
+                    key: previousChild.key,
+                    active: false,
+                    child: previousChild,
+                  ),
+                if (currentChild != null)
+                  _InactiveContent(
+                    key: currentChild.key,
+                    active: true,
+                    child: currentChild,
+                  ),
+              ],
+            ),
       ),
     );
   }
 }
 
 class _InactiveContent extends StatelessWidget {
-  const _InactiveContent(
-      {required this.active, required this.child, super.key});
+  const _InactiveContent({
+    required this.active,
+    required this.child,
+    super.key,
+  });
 
   final bool active;
   final Widget child;
 
   @override
   Widget build(BuildContext context) => IgnorePointer(
-        ignoring: !active,
-        child: ExcludeFocus(
-          excluding: !active,
-          child: ExcludeSemantics(excluding: !active, child: child),
-        ),
-      );
+    ignoring: !active,
+    child: ExcludeFocus(
+      excluding: !active,
+      child: ExcludeSemantics(excluding: !active, child: child),
+    ),
+  );
 }

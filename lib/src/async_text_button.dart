@@ -1,11 +1,9 @@
-// To support lower versions than 3.22.0 for MaterialState.
-// ignore_for_file: deprecated_member_use
-
 import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+import 'package:loadable_buttons/src/async_button_helpers.dart';
 import 'package:loadable_buttons/src/loading_transition.dart';
 
 part 'async_text_button_with_icon.dart';
@@ -33,15 +31,15 @@ class AsyncTextButton extends StatefulWidget {
     this.customBuilder,
     this.splashFactory,
     super.key,
-  })  : assert(
-          transitionType != TransitionAnimationType.customBuilder ||
-              customBuilder != null,
-          'customBuilder must be provided when transitionType is customBuilder',
-        ),
-        assert(
-          splashFactory == null || style == null,
-          'splashFactory and style cannot be used together, use style',
-        );
+  }) : assert(
+         transitionType != TransitionAnimationType.customBuilder ||
+             customBuilder != null,
+         'customBuilder must be provided when transitionType is customBuilder',
+       ),
+       assert(
+         splashFactory == null || style == null,
+         'splashFactory and style cannot be used together, use style',
+       );
 
   /// AsyncTextButton.icon is a custom widget that allows to load a child
   /// and an icon.
@@ -55,7 +53,7 @@ class AsyncTextButton extends StatefulWidget {
     ButtonStyle? style,
     FocusNode? focusNode,
     Clip? clipBehavior,
-    MaterialStatesController? statesController,
+    WidgetStatesController? statesController,
     Widget? icon,
     IconAlignment? iconAlignment,
     Widget? loadingChild,
@@ -65,52 +63,54 @@ class AsyncTextButton extends StatefulWidget {
     double minimumChildOpacity = 0.0,
     TransitionAnimationType transitionType = TransitionAnimationType.stack,
     Widget Function(bool loading, Widget child, Widget? loadingChild)?
-        customBuilder,
+    customBuilder,
     InteractiveInkFeatureFactory? splashFactory,
   }) {
     if (icon == null) {
       return AsyncTextButton(
-          child: label,
-          onPressed: onPressed,
-          loadingChild: loadingChild,
-          loading: loading,
-          autofocus: autofocus,
-          clipBehavior: clipBehavior,
-          statesController: statesController,
-          style: style,
-          focusNode: focusNode,
-          onLongPress: onLongPress,
-          onHover: onHover,
-          onFocusChange: onFocusChange,
-          animationDuration: animationDuration,
-          minimumChildOpacity: minimumChildOpacity,
-          transitionType: transitionType,
-          customBuilder: customBuilder,
-          splashFactory: splashFactory,
-          key: key);
-    }
-
-    return _AsyncTextButtonWithIcon(
-        label: label,
-        icon: icon,
+        child: label,
         onPressed: onPressed,
-        loading: loading,
         loadingChild: loadingChild,
-        key: key,
+        loading: loading,
+        autofocus: autofocus,
+        clipBehavior: clipBehavior,
+        statesController: statesController,
+        style: style,
+        focusNode: focusNode,
         onLongPress: onLongPress,
         onHover: onHover,
         onFocusChange: onFocusChange,
-        focusNode: focusNode,
-        style: style,
-        iconAlignment: iconAlignment,
-        autofocus: autofocus,
-        clipBehavior: clipBehavior ?? Clip.none,
-        statesController: statesController,
         animationDuration: animationDuration,
         minimumChildOpacity: minimumChildOpacity,
         transitionType: transitionType,
         customBuilder: customBuilder,
-        splashFactory: splashFactory);
+        splashFactory: splashFactory,
+        key: key,
+      );
+    }
+
+    return _AsyncTextButtonWithIcon(
+      label: label,
+      icon: icon,
+      onPressed: onPressed,
+      loading: loading,
+      loadingChild: loadingChild,
+      key: key,
+      onLongPress: onLongPress,
+      onHover: onHover,
+      onFocusChange: onFocusChange,
+      focusNode: focusNode,
+      style: style,
+      iconAlignment: iconAlignment,
+      autofocus: autofocus,
+      clipBehavior: clipBehavior ?? Clip.none,
+      statesController: statesController,
+      animationDuration: animationDuration,
+      minimumChildOpacity: minimumChildOpacity,
+      transitionType: transitionType,
+      customBuilder: customBuilder,
+      splashFactory: splashFactory,
+    );
   }
 
   /// The child of the button, same a the [TextButton.child].
@@ -147,7 +147,7 @@ class AsyncTextButton extends StatefulWidget {
   final Clip? clipBehavior;
 
   /// The statesController of the button, TextButton property.
-  final MaterialStatesController? statesController;
+  final WidgetStatesController? statesController;
 
   /// The animationDuration of the transition.
   final Duration animationDuration;
@@ -162,7 +162,7 @@ class AsyncTextButton extends StatefulWidget {
   /// The custom builder of the loading animation,
   /// when TransitionAnimationType.customBuilder is selected.
   final Widget Function(bool loading, Widget child, Widget? loadingChild)?
-      customBuilder;
+  customBuilder;
 
   /// Optional SplashFactory to customize the splash effect.
   /// Use NoSplash.splashFactory to disable flutter default splash effect.
@@ -173,83 +173,54 @@ class AsyncTextButton extends StatefulWidget {
   State<AsyncTextButton> createState() => _AsyncTextButtonState();
 }
 
-class _AsyncTextButtonState extends State<AsyncTextButton> {
-  bool _internalLoading = false;
+class _AsyncTextButtonState extends State<AsyncTextButton>
+    with AsyncButtonState<AsyncTextButton> {
+  @override
+  bool get externalLoading => widget.loading;
 
-  bool get _isLoading => _internalLoading || widget.loading;
-
-  Future<void> _handlePressed() async {
-    // If the async callback is provided, use it.
-    if (widget.onPressed != null) {
-      // Prevent multiple presses.
-      if (_isLoading) return;
-      setState(() => _internalLoading = true);
-
-      try {
-        await widget.onPressed?.call();
-      } finally {
-        // Ensure that state is updated even if an exception occurs.
-        if (mounted) setState(() => _internalLoading = false);
-      }
-    }
-  }
+  @override
+  FutureOr<void> Function()? get asyncOnPressed => widget.onPressed;
 
   void _handleLongPress() {
-    if (_isLoading) return;
+    if (isLoading) return;
     widget.onLongPress?.call();
   }
 
   @override
   Widget build(BuildContext context) => TextButton(
-        onPressed:
-            _isLoading || widget.onPressed == null ? null : _handlePressed,
-        onLongPress:
-            _isLoading || widget.onLongPress == null ? null : _handleLongPress,
-        onHover: widget.onHover,
-        onFocusChange: widget.onFocusChange,
-        style: widget.style ??
-            TextButton.styleFrom(splashFactory: widget.splashFactory),
-        focusNode: widget.focusNode,
-        autofocus: widget.autofocus,
-        clipBehavior: widget.clipBehavior,
-        statesController: widget.statesController,
-        child: widget.transitionType == TransitionAnimationType.customBuilder
-            ? widget.customBuilder
-                    ?.call(_isLoading, widget.child, widget.loadingChild) ??
+    onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
+    onLongPress:
+        isLoading || widget.onLongPress == null ? null : _handleLongPress,
+    onHover: widget.onHover,
+    onFocusChange: widget.onFocusChange,
+    style:
+        widget.style ??
+        TextButton.styleFrom(splashFactory: widget.splashFactory),
+    focusNode: widget.focusNode,
+    autofocus: widget.autofocus,
+    clipBehavior: widget.clipBehavior,
+    statesController: widget.statesController,
+    child:
+        widget.transitionType == TransitionAnimationType.customBuilder
+            ? widget.customBuilder?.call(
+                  isLoading,
+                  widget.child,
+                  widget.loadingChild,
+                ) ??
                 widget.child
             : LoadingTransition(
-                child: widget.child,
-                loadingChild: widget.loadingChild ??
-                    _DefaultLoadingIndicator(style: widget.style),
-                isLoading: _isLoading,
-                transitionType: widget.transitionType,
-                animationDuration: widget.animationDuration,
-                minimumChildOpacity: widget.minimumChildOpacity,
-              ),
-      );
-}
-
-class _DefaultLoadingIndicator extends StatelessWidget {
-  const _DefaultLoadingIndicator({required ButtonStyle? style})
-      : _style = style;
-
-  static const double _defaultStrokeWidth = 3.0;
-
-  final ButtonStyle? _style;
-
-  @override
-  Widget build(BuildContext context) {
-    return CircularProgressIndicator(
-      color: _style?.foregroundColor?.resolve(<MaterialState>{}) ??
-          TextButtonTheme.of(context)
-              .style
-              ?.foregroundColor
-              ?.resolve(<MaterialState>{}) ??
-          IconTheme.of(context).color ??
-          DefaultTextStyle.of(context).style.color,
-      strokeWidth: _defaultStrokeWidth,
-      strokeCap: StrokeCap.round,
-      constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
-    );
-  }
+              child: widget.child,
+              loadingChild:
+                  widget.loadingChild ??
+                  DefaultLoadingIndicator(
+                    style: widget.style,
+                    themeStyleOf:
+                        (context) => TextButtonTheme.of(context).style,
+                  ),
+              isLoading: isLoading,
+              transitionType: widget.transitionType,
+              animationDuration: widget.animationDuration,
+              minimumChildOpacity: widget.minimumChildOpacity,
+            ),
+  );
 }

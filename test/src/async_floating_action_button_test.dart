@@ -6,20 +6,25 @@ import 'package:loadable_buttons/loadable_buttons.dart';
 
 void main() {
   group('AsyncFloatingActionButton', () {
-    testWidgets('switcher completes both fades around a pending operation',
-        (tester) async {
+    testWidgets('switcher completes both fades around a pending operation', (
+      tester,
+    ) async {
       final pending = Completer<void>();
       const duration = Duration(milliseconds: 200);
-      await tester.pumpWidget(MaterialApp(
-        home: Scaffold(
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
             body: Center(
-                child: AsyncFloatingActionButton(
-          child: const Icon(Icons.add),
-          onPressed: () => pending.future,
-          transitionType: TransitionAnimationType.animatedSwitcher,
-          animationDuration: duration,
-        ))),
-      ));
+              child: AsyncFloatingActionButton(
+                child: const Icon(Icons.add),
+                onPressed: () => pending.future,
+                transitionType: TransitionAnimationType.animatedSwitcher,
+                animationDuration: duration,
+              ),
+            ),
+          ),
+        ),
+      );
       await tester.tap(find.byType(AsyncFloatingActionButton));
       await tester.pump();
       // Start the newly mounted transition before advancing its clock.
@@ -38,20 +43,23 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsNothing);
     });
 
-    test('asserts when customBuilder is not provided with custom transition',
-        () {
-      expect(
-        () => AsyncFloatingActionButton(
-          child: const Icon(Icons.add),
-          onPressed: () {},
-          transitionType: TransitionAnimationType.customBuilder,
-        ),
-        throwsAssertionError,
-      );
-    });
+    test(
+      'asserts when customBuilder is not provided with custom transition',
+      () {
+        expect(
+          () => AsyncFloatingActionButton(
+            child: const Icon(Icons.add),
+            onPressed: () {},
+            transitionType: TransitionAnimationType.customBuilder,
+          ),
+          throwsAssertionError,
+        );
+      },
+    );
 
-    testWidgets('default loading indicator color uses foregroundColor',
-        (tester) async {
+    testWidgets('default loading indicator color uses foregroundColor', (
+      tester,
+    ) async {
       final pending = Completer<void>();
       await tester.pumpWidget(
         MaterialApp(

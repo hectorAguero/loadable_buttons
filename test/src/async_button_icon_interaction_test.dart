@@ -6,15 +6,16 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:loadable_buttons/loadable_buttons.dart';
 
-typedef _IconButtonBuilder = Widget Function({
-  required FutureOr<void> Function()? onPressed,
-  required Widget label,
-  Widget? icon,
-  VoidCallback? onLongPress,
-  ValueChanged<bool>? onHover,
-  ValueChanged<bool>? onFocusChange,
-  FocusNode? focusNode,
-});
+typedef _IconButtonBuilder =
+    Widget Function({
+      required FutureOr<void> Function()? onPressed,
+      required Widget label,
+      Widget? icon,
+      VoidCallback? onLongPress,
+      ValueChanged<bool>? onHover,
+      ValueChanged<bool>? onFocusChange,
+      FocusNode? focusNode,
+    });
 
 void main() {
   final builders = <String, _IconButtonBuilder>{
@@ -26,22 +27,29 @@ void main() {
   };
 
   for (final entry in builders.entries) {
-    testWidgets('${entry.key} centers its loader over the icon and label',
-        (tester) async {
+    testWidgets('${entry.key} centers its loader over the icon and label', (
+      tester,
+    ) async {
       final pending = Completer<void>();
-      await tester.pumpWidget(_host(entry.value(
-        onPressed: () => pending.future,
-        icon: const Icon(Icons.add),
-        label: const Text('Run'),
-      )));
+      await tester.pumpWidget(
+        _host(
+          entry.value(
+            onPressed: () => pending.future,
+            icon: const Icon(Icons.add),
+            label: const Text('Run'),
+          ),
+        ),
+      );
       final contentRect = tester
           .getRect(find.text('Run'))
           .expandToInclude(tester.getRect(find.byIcon(Icons.add)));
       await tester.tap(find.text('Run'));
       await tester.pump();
       await tester.pump(Durations.medium1);
-      expect(tester.getCenter(find.byType(CircularProgressIndicator)).dx,
-          closeTo(contentRect.center.dx, 0.01));
+      expect(
+        tester.getCenter(find.byType(CircularProgressIndicator)).dx,
+        closeTo(contentRect.center.dx, 0.01),
+      );
       pending.complete();
       await tester.pump();
       await tester.pump(Durations.medium1);
@@ -50,46 +58,60 @@ void main() {
     for (final hasIcon in [true, false]) {
       final icon = hasIcon ? const Icon(Icons.add) : null;
       group('${entry.key} with ${hasIcon ? 'an icon' : 'a null icon'}', () {
-        testWidgets('delivers long presses with and without onPressed',
-            (tester) async {
+        testWidgets('delivers long presses with and without onPressed', (
+          tester,
+        ) async {
           var longPresses = 0;
           var presses = 0;
           void onLongPress() {
             longPresses++;
           }
 
-          await tester.pumpWidget(_host(entry.value(
-            onPressed: () {
-              presses++;
-            },
-            onLongPress: onLongPress,
-            icon: icon,
-            label: const Text('Run'),
-          )));
+          await tester.pumpWidget(
+            _host(
+              entry.value(
+                onPressed: () {
+                  presses++;
+                },
+                onLongPress: onLongPress,
+                icon: icon,
+                label: const Text('Run'),
+              ),
+            ),
+          );
           await tester.longPress(find.text('Run'));
           expect(longPresses, 1);
           expect(presses, 0);
 
-          await tester.pumpWidget(_host(entry.value(
-            onPressed: null,
-            onLongPress: onLongPress,
-            icon: icon,
-            label: const Text('Run'),
-          )));
+          await tester.pumpWidget(
+            _host(
+              entry.value(
+                onPressed: null,
+                onLongPress: onLongPress,
+                icon: icon,
+                label: const Text('Run'),
+              ),
+            ),
+          );
           await tester.longPress(find.text('Run'));
           expect(longPresses, 2);
         });
 
         testWidgets('reports mouse enter and exit', (tester) async {
           final hoverChanges = <bool>[];
-          await tester.pumpWidget(_host(entry.value(
-            onPressed: () {},
-            onHover: hoverChanges.add,
-            icon: icon,
-            label: const Text('Run'),
-          )));
-          final mouse =
-              await tester.createGesture(kind: PointerDeviceKind.mouse);
+          await tester.pumpWidget(
+            _host(
+              entry.value(
+                onPressed: () {},
+                onHover: hoverChanges.add,
+                icon: icon,
+                label: const Text('Run'),
+              ),
+            ),
+          );
+          final mouse = await tester.createGesture(
+            kind: PointerDeviceKind.mouse,
+          );
           addTearDown(mouse.removePointer);
           await mouse.addPointer(location: Offset.zero);
           await mouse.moveTo(tester.getCenter(find.text('Run')));
@@ -101,21 +123,26 @@ void main() {
           expect(hoverChanges, [true, false]);
         });
 
-        testWidgets('uses requested focus and reports focus changes',
-            (tester) async {
+        testWidgets('uses requested focus and reports focus changes', (
+          tester,
+        ) async {
           final focusNode = FocusNode();
           addTearDown(focusNode.dispose);
           final focusChanges = <bool>[];
           var presses = 0;
-          await tester.pumpWidget(_host(entry.value(
-            onPressed: () {
-              presses++;
-            },
-            focusNode: focusNode,
-            onFocusChange: focusChanges.add,
-            icon: icon,
-            label: const Text('Run'),
-          )));
+          await tester.pumpWidget(
+            _host(
+              entry.value(
+                onPressed: () {
+                  presses++;
+                },
+                focusNode: focusNode,
+                onFocusChange: focusChanges.add,
+                icon: icon,
+                label: const Text('Run'),
+              ),
+            ),
+          );
 
           focusNode.requestFocus();
           await tester.pump();
@@ -135,6 +162,5 @@ void main() {
   }
 }
 
-Widget _host(Widget button) => MaterialApp(
-      home: Scaffold(body: Center(child: button)),
-    );
+Widget _host(Widget button) =>
+    MaterialApp(home: Scaffold(body: Center(child: button)));

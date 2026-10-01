@@ -1,10 +1,8 @@
-// To support lower versions than 3.22.0 for MaterialState.
-// ignore_for_file: deprecated_member_use
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import 'package:loadable_buttons/src/async_button_helpers.dart';
 import 'package:loadable_buttons/src/loading_transition.dart';
 
 enum _IconButtonVariant { standard, filled, filledTonal, outlined }
@@ -46,16 +44,16 @@ class AsyncIconButton extends StatefulWidget {
     this.selectedIcon,
     this.splashFactory,
     super.key,
-  })  : assert(
-          transitionType != TransitionAnimationType.customBuilder ||
-              customBuilder != null,
-          'customBuilder must be provided when transitionType is customBuilder',
-        ),
-        assert(
-          splashFactory == null || style == null,
-          'splashFactory and style cannot be used together, use style',
-        ),
-        _variant = _IconButtonVariant.standard;
+  }) : assert(
+         transitionType != TransitionAnimationType.customBuilder ||
+             customBuilder != null,
+         'customBuilder must be provided when transitionType is customBuilder',
+       ),
+       assert(
+         splashFactory == null || style == null,
+         'splashFactory and style cannot be used together, use style',
+       ),
+       _variant = _IconButtonVariant.standard;
 
   /// Constructor for AsyncIconButton with filled variant.
   const AsyncIconButton.filled({
@@ -91,16 +89,16 @@ class AsyncIconButton extends StatefulWidget {
     this.selectedIcon,
     this.splashFactory,
     super.key,
-  })  : assert(
-          transitionType != TransitionAnimationType.customBuilder ||
-              customBuilder != null,
-          'customBuilder must be provided when transitionType is customBuilder',
-        ),
-        assert(
-          splashFactory == null || style == null,
-          'splashFactory and style cannot be used together, use style',
-        ),
-        _variant = _IconButtonVariant.filled;
+  }) : assert(
+         transitionType != TransitionAnimationType.customBuilder ||
+             customBuilder != null,
+         'customBuilder must be provided when transitionType is customBuilder',
+       ),
+       assert(
+         splashFactory == null || style == null,
+         'splashFactory and style cannot be used together, use style',
+       ),
+       _variant = _IconButtonVariant.filled;
 
   /// Constructor for AsyncIconButton with filled tonal variant.
   const AsyncIconButton.filledTonal({
@@ -136,17 +134,17 @@ class AsyncIconButton extends StatefulWidget {
     this.selectedIcon,
     this.splashFactory,
     super.key,
-  })  : assert(
-          transitionType != TransitionAnimationType.customBuilder ||
-              customBuilder != null,
-          'customBuilder must be provided when transitionType is customBuilder',
-        ),
-        assert(
-          splashFactory == null || style == null,
-          'splashFactory and style cannot be used together, use style',
-        ),
-        assert(splashRadius == null || splashRadius > 0),
-        _variant = _IconButtonVariant.filledTonal;
+  }) : assert(
+         transitionType != TransitionAnimationType.customBuilder ||
+             customBuilder != null,
+         'customBuilder must be provided when transitionType is customBuilder',
+       ),
+       assert(
+         splashFactory == null || style == null,
+         'splashFactory and style cannot be used together, use style',
+       ),
+       assert(splashRadius == null || splashRadius > 0),
+       _variant = _IconButtonVariant.filledTonal;
 
   /// Constructor for AsyncIconButton with outlined variant.
   const AsyncIconButton.outlined({
@@ -182,17 +180,17 @@ class AsyncIconButton extends StatefulWidget {
     this.selectedIcon,
     this.splashFactory,
     super.key,
-  })  : assert(
-          transitionType != TransitionAnimationType.customBuilder ||
-              customBuilder != null,
-          'customBuilder must be provided when transitionType is customBuilder',
-        ),
-        assert(
-          splashFactory == null || style == null,
-          'splashFactory and style cannot be used together, use style',
-        ),
-        assert(splashRadius == null || splashRadius > 0),
-        _variant = _IconButtonVariant.outlined;
+  }) : assert(
+         transitionType != TransitionAnimationType.customBuilder ||
+             customBuilder != null,
+         'customBuilder must be provided when transitionType is customBuilder',
+       ),
+       assert(
+         splashFactory == null || style == null,
+         'splashFactory and style cannot be used together, use style',
+       ),
+       assert(splashRadius == null || splashRadius > 0),
+       _variant = _IconButtonVariant.outlined;
 
   /// The icon of the button, same as the [IconButton.icon].
   final Widget icon;
@@ -234,7 +232,7 @@ class AsyncIconButton extends StatefulWidget {
   /// The custom builder of the loading animation,
   /// when TransitionAnimationType.customBuilder is selected.
   final Widget Function(bool loading, Widget child, Widget? loadingChild)?
-      customBuilder;
+  customBuilder;
 
   /// Size of the icon button.
   final double? iconSize;
@@ -283,10 +281,10 @@ class AsyncIconButton extends StatefulWidget {
 
   /// The selection state of the Material 3 icon button.
   ///
-  /// Resolved on each build with [MaterialState] disabled when loading or when
+  /// Resolved on each build with [WidgetState] disabled when loading or when
   /// [onPressed] is null, and an empty state set otherwise. A null property
   /// preserves normal push-button behavior.
-  final MaterialStateProperty<bool>? isSelected;
+  final WidgetStateProperty<bool>? isSelected;
 
   /// The icon shown when [isSelected] resolves to true in Material 3.
   ///
@@ -306,35 +304,22 @@ class AsyncIconButton extends StatefulWidget {
   State<AsyncIconButton> createState() => _AsyncIconButtonState();
 }
 
-class _AsyncIconButtonState extends State<AsyncIconButton> {
-  bool _internalLoading = false;
+class _AsyncIconButtonState extends State<AsyncIconButton>
+    with AsyncButtonState<AsyncIconButton> {
+  @override
+  bool get externalLoading => widget.loading;
 
-  bool get _isLoading => _internalLoading || widget.loading;
-
-  Future<void> _handlePressed() async {
-    // If the async callback is provided, use it.
-    if (widget.onPressed != null) {
-      // Prevent multiple presses.
-      if (_isLoading) return;
-      setState(() => _internalLoading = true);
-
-      try {
-        await widget.onPressed?.call();
-      } finally {
-        // Ensure that state is updated even if an exception occurs.
-        if (mounted) setState(() => _internalLoading = false);
-      }
-    }
-  }
+  @override
+  FutureOr<void> Function()? get asyncOnPressed => widget.onPressed;
 
   @override
   Widget build(BuildContext context) {
     final isSelected = widget.isSelected?.resolve({
-      if (_isLoading || widget.onPressed == null) MaterialState.disabled,
+      if (isLoading || widget.onPressed == null) WidgetState.disabled,
     });
     final icon = _AsyncIconButtonChild(
       icon: widget.icon,
-      isLoading: _isLoading,
+      isLoading: isLoading,
       transitionType: widget.transitionType,
       animationDuration: widget.animationDuration,
       minimumChildOpacity: widget.minimumChildOpacity,
@@ -343,22 +328,24 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
       customBuilder: widget.customBuilder,
     );
     final selectedIcon = widget.selectedIcon;
-    final selectedChild = selectedIcon == null
-        ? null
-        : _AsyncIconButtonChild(
-            icon: selectedIcon,
-            isLoading: _isLoading,
-            transitionType: widget.transitionType,
-            animationDuration: widget.animationDuration,
-            minimumChildOpacity: widget.minimumChildOpacity,
-            loadingChild: widget.loadingChild,
-            style: widget.style,
-            customBuilder: widget.customBuilder,
-          );
+    final selectedChild =
+        selectedIcon == null
+            ? null
+            : _AsyncIconButtonChild(
+              icon: selectedIcon,
+              isLoading: isLoading,
+              transitionType: widget.transitionType,
+              animationDuration: widget.animationDuration,
+              minimumChildOpacity: widget.minimumChildOpacity,
+              loadingChild: widget.loadingChild,
+              style: widget.style,
+              customBuilder: widget.customBuilder,
+            );
 
     // Flutter 3.29 styleFrom supplies a default cursor that would otherwise
     // override IconButton's forwarded mouseCursor when these styles merge.
-    final style = widget.style ??
+    final style =
+        widget.style ??
         IconButton.styleFrom(
           splashFactory: widget.splashFactory,
           enabledMouseCursor: widget.mouseCursor,
@@ -367,113 +354,109 @@ class _AsyncIconButtonState extends State<AsyncIconButton> {
 
     return switch (widget._variant) {
       _IconButtonVariant.standard => IconButton(
-          iconSize: widget.iconSize,
-          visualDensity: widget.visualDensity,
-          padding: widget.padding,
-          alignment: widget.alignment,
-          splashRadius: widget.splashRadius,
-          color: widget.color,
-          focusColor: widget.focusColor,
-          hoverColor: widget.hoverColor,
-          highlightColor: widget.highlightColor,
-          splashColor: widget.splashColor,
-          disabledColor: widget.disabledColor,
-          onPressed:
-              _isLoading || widget.onPressed == null ? null : _handlePressed,
-          onHover: widget.onHover,
-          onLongPress: widget.onLongPress,
-          mouseCursor: widget.mouseCursor,
-          focusNode: widget.focusNode,
-          autofocus: widget.autofocus,
-          tooltip: widget.tooltip,
-          enableFeedback: widget.enableFeedback,
-          constraints: widget.constraints,
-          style: style,
-          isSelected: isSelected,
-          selectedIcon: selectedChild,
-          icon: icon,
-        ),
+        iconSize: widget.iconSize,
+        visualDensity: widget.visualDensity,
+        padding: widget.padding,
+        alignment: widget.alignment,
+        splashRadius: widget.splashRadius,
+        color: widget.color,
+        focusColor: widget.focusColor,
+        hoverColor: widget.hoverColor,
+        highlightColor: widget.highlightColor,
+        splashColor: widget.splashColor,
+        disabledColor: widget.disabledColor,
+        onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
+        onHover: widget.onHover,
+        onLongPress: widget.onLongPress,
+        mouseCursor: widget.mouseCursor,
+        focusNode: widget.focusNode,
+        autofocus: widget.autofocus,
+        tooltip: widget.tooltip,
+        enableFeedback: widget.enableFeedback,
+        constraints: widget.constraints,
+        style: style,
+        isSelected: isSelected,
+        selectedIcon: selectedChild,
+        icon: icon,
+      ),
       _IconButtonVariant.filled => IconButton.filled(
-          iconSize: widget.iconSize,
-          visualDensity: widget.visualDensity,
-          padding: widget.padding,
-          alignment: widget.alignment,
-          splashRadius: widget.splashRadius,
-          color: widget.color,
-          focusColor: widget.focusColor,
-          hoverColor: widget.hoverColor,
-          highlightColor: widget.highlightColor,
-          splashColor: widget.splashColor,
-          disabledColor: widget.disabledColor,
-          onPressed:
-              _isLoading || widget.onPressed == null ? null : _handlePressed,
-          onHover: widget.onHover,
-          onLongPress: widget.onLongPress,
-          mouseCursor: widget.mouseCursor,
-          focusNode: widget.focusNode,
-          autofocus: widget.autofocus,
-          tooltip: widget.tooltip,
-          enableFeedback: widget.enableFeedback,
-          constraints: widget.constraints,
-          style: style,
-          isSelected: isSelected,
-          selectedIcon: selectedChild,
-          icon: icon,
-        ),
+        iconSize: widget.iconSize,
+        visualDensity: widget.visualDensity,
+        padding: widget.padding,
+        alignment: widget.alignment,
+        splashRadius: widget.splashRadius,
+        color: widget.color,
+        focusColor: widget.focusColor,
+        hoverColor: widget.hoverColor,
+        highlightColor: widget.highlightColor,
+        splashColor: widget.splashColor,
+        disabledColor: widget.disabledColor,
+        onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
+        onHover: widget.onHover,
+        onLongPress: widget.onLongPress,
+        mouseCursor: widget.mouseCursor,
+        focusNode: widget.focusNode,
+        autofocus: widget.autofocus,
+        tooltip: widget.tooltip,
+        enableFeedback: widget.enableFeedback,
+        constraints: widget.constraints,
+        style: style,
+        isSelected: isSelected,
+        selectedIcon: selectedChild,
+        icon: icon,
+      ),
       _IconButtonVariant.filledTonal => IconButton.filledTonal(
-          iconSize: widget.iconSize,
-          visualDensity: widget.visualDensity,
-          padding: widget.padding,
-          alignment: widget.alignment,
-          splashRadius: widget.splashRadius,
-          color: widget.color,
-          focusColor: widget.focusColor,
-          hoverColor: widget.hoverColor,
-          highlightColor: widget.highlightColor,
-          splashColor: widget.splashColor,
-          disabledColor: widget.disabledColor,
-          onPressed:
-              _isLoading || widget.onPressed == null ? null : _handlePressed,
-          onHover: widget.onHover,
-          onLongPress: widget.onLongPress,
-          mouseCursor: widget.mouseCursor,
-          focusNode: widget.focusNode,
-          autofocus: widget.autofocus,
-          tooltip: widget.tooltip,
-          enableFeedback: widget.enableFeedback,
-          constraints: widget.constraints,
-          style: style,
-          isSelected: isSelected,
-          selectedIcon: selectedChild,
-          icon: icon,
-        ),
+        iconSize: widget.iconSize,
+        visualDensity: widget.visualDensity,
+        padding: widget.padding,
+        alignment: widget.alignment,
+        splashRadius: widget.splashRadius,
+        color: widget.color,
+        focusColor: widget.focusColor,
+        hoverColor: widget.hoverColor,
+        highlightColor: widget.highlightColor,
+        splashColor: widget.splashColor,
+        disabledColor: widget.disabledColor,
+        onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
+        onHover: widget.onHover,
+        onLongPress: widget.onLongPress,
+        mouseCursor: widget.mouseCursor,
+        focusNode: widget.focusNode,
+        autofocus: widget.autofocus,
+        tooltip: widget.tooltip,
+        enableFeedback: widget.enableFeedback,
+        constraints: widget.constraints,
+        style: style,
+        isSelected: isSelected,
+        selectedIcon: selectedChild,
+        icon: icon,
+      ),
       _IconButtonVariant.outlined => IconButton.outlined(
-          iconSize: widget.iconSize,
-          visualDensity: widget.visualDensity,
-          padding: widget.padding,
-          alignment: widget.alignment,
-          splashRadius: widget.splashRadius,
-          color: widget.color,
-          focusColor: widget.focusColor,
-          hoverColor: widget.hoverColor,
-          highlightColor: widget.highlightColor,
-          splashColor: widget.splashColor,
-          disabledColor: widget.disabledColor,
-          onPressed:
-              _isLoading || widget.onPressed == null ? null : _handlePressed,
-          onHover: widget.onHover,
-          onLongPress: widget.onLongPress,
-          mouseCursor: widget.mouseCursor,
-          focusNode: widget.focusNode,
-          autofocus: widget.autofocus,
-          tooltip: widget.tooltip,
-          enableFeedback: widget.enableFeedback,
-          constraints: widget.constraints,
-          style: style,
-          isSelected: isSelected,
-          selectedIcon: selectedChild,
-          icon: icon,
-        ),
+        iconSize: widget.iconSize,
+        visualDensity: widget.visualDensity,
+        padding: widget.padding,
+        alignment: widget.alignment,
+        splashRadius: widget.splashRadius,
+        color: widget.color,
+        focusColor: widget.focusColor,
+        hoverColor: widget.hoverColor,
+        highlightColor: widget.highlightColor,
+        splashColor: widget.splashColor,
+        disabledColor: widget.disabledColor,
+        onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
+        onHover: widget.onHover,
+        onLongPress: widget.onLongPress,
+        mouseCursor: widget.mouseCursor,
+        focusNode: widget.focusNode,
+        autofocus: widget.autofocus,
+        tooltip: widget.tooltip,
+        enableFeedback: widget.enableFeedback,
+        constraints: widget.constraints,
+        style: style,
+        isSelected: isSelected,
+        selectedIcon: selectedChild,
+        icon: icon,
+      ),
     };
   }
 }
@@ -498,7 +481,7 @@ class _AsyncIconButtonChild extends StatelessWidget {
   final Duration animationDuration;
   final double minimumChildOpacity;
   final Widget Function(bool loading, Widget icon, Widget? loadingChild)?
-      customBuilder;
+  customBuilder;
 
   @override
   Widget build(BuildContext context) {
@@ -508,36 +491,16 @@ class _AsyncIconButtonChild extends StatelessWidget {
 
     return LoadingTransition(
       child: icon,
-      loadingChild: loadingChild ?? _DefaultLoadingIndicator(style: style),
+      loadingChild:
+          loadingChild ??
+          DefaultLoadingIndicator(
+            style: style,
+            themeStyleOf: (context) => IconButtonTheme.of(context).style,
+          ),
       isLoading: isLoading,
       transitionType: transitionType,
       animationDuration: animationDuration,
       minimumChildOpacity: minimumChildOpacity,
-    );
-  }
-}
-
-class _DefaultLoadingIndicator extends StatelessWidget {
-  const _DefaultLoadingIndicator({required ButtonStyle? style})
-      : _style = style;
-
-  static const double _defaultStrokeWidth = 3.0;
-
-  final ButtonStyle? _style;
-
-  @override
-  Widget build(BuildContext context) {
-    return CircularProgressIndicator(
-      color: _style?.foregroundColor?.resolve(<MaterialState>{}) ??
-          IconButtonTheme.of(context)
-              .style
-              ?.foregroundColor
-              ?.resolve(<MaterialState>{}) ??
-          IconTheme.of(context).color ??
-          DefaultTextStyle.of(context).style.color,
-      strokeWidth: _defaultStrokeWidth,
-      strokeCap: StrokeCap.round,
-      constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
     );
   }
 }
