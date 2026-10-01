@@ -2,49 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:loadable_buttons/loadable_buttons.dart';
 
-typedef _ButtonBuilder = Widget Function({
-  required bool loading,
-  required Future<void> Function() onPressed,
-});
+import '../support/async_button_fixture.dart';
 
 void main() {
-  final builders = <String, _ButtonBuilder>{
-    'Elevated': ({required loading, required onPressed}) => AsyncElevatedButton(
-          loading: loading,
-          onPressed: onPressed,
-          child: const Text('Run'),
-        ),
-    'Filled': ({required loading, required onPressed}) => AsyncFilledButton(
-          loading: loading,
-          onPressed: onPressed,
-          child: const Text('Run'),
-        ),
-    'Outlined': ({required loading, required onPressed}) => AsyncOutlinedButton(
-          loading: loading,
-          onPressed: onPressed,
-          child: const Text('Run'),
-        ),
-    'Text': ({required loading, required onPressed}) => AsyncTextButton(
-          loading: loading,
-          onPressed: onPressed,
-          child: const Text('Run'),
-        ),
-    'Icon': ({required loading, required onPressed}) => AsyncIconButton(
-          loading: loading,
-          onPressed: onPressed,
-          icon: const Text('Run'),
-        ),
-    'Floating action': ({required loading, required onPressed}) =>
-        AsyncFloatingActionButton(
-          loading: loading,
-          onPressed: onPressed,
-          child: const Text('Run'),
-        ),
-  };
-
-  for (final entry in builders.entries) {
+  for (final entry in asyncButtonBuilders.entries) {
     group('${entry.key} loading ownership', () {
       testWidgets('external updates keep a pending operation locked', (
         tester,
@@ -57,8 +19,8 @@ void main() {
           return pending.future;
         }
 
-        Widget host(bool loading) =>
-            _host(entry.value(loading: loading, onPressed: onPressed));
+        Widget host(bool loading) => buttonHost(entry.value(
+            child: const Text('Run'), loading: loading, onPressed: onPressed));
 
         await tester.pumpWidget(host(false));
         final position = tester.getCenter(find.text('Run'));
@@ -91,8 +53,8 @@ void main() {
           return pending.future;
         }
 
-        Widget host(bool loading) =>
-            _host(entry.value(loading: loading, onPressed: onPressed));
+        Widget host(bool loading) => buttonHost(entry.value(
+            child: const Text('Run'), loading: loading, onPressed: onPressed));
 
         await tester.pumpWidget(host(false));
         final position = tester.getCenter(find.text('Run'));
@@ -114,7 +76,3 @@ void main() {
     });
   }
 }
-
-Widget _host(Widget button) => MaterialApp(
-      home: Scaffold(body: Center(child: button)),
-    );
