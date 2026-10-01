@@ -21,6 +21,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Select Flutter SDK
         id: flutter
@@ -84,4 +86,14 @@ jobs:
         run: flutter test --no-pub
 
       - name: Check Whitespace
-        run: git diff --check
+        env:
+          DIFF_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+          DIFF_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = pull_request ]; then
+            DIFF_BASE=$(git merge-base "$DIFF_BASE" "$DIFF_HEAD")
+          elif [ "$DIFF_BASE" = 0000000000000000000000000000000000000000 ]; then
+            DIFF_BASE=$(git hash-object -t tree /dev/null)
+          fi
+          git diff --check "$DIFF_BASE" "$DIFF_HEAD"
+          git diff --check
