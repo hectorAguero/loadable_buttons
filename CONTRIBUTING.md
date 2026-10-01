@@ -1,37 +1,44 @@
 # Development and linting
 
-Use Flutter stable with Dart **3.12 or newer** when working on this repository.
-Solid Lints 1.0.0 requires Dart 3.12. These lint tools are development
-dependencies; package consumers retain the SDK constraints in `pubspec.yaml`.
+Use Flutter stable with Dart **3.13 or newer** when working on this repository.
+Very Good Analysis 11.0.0 requires Dart 3.13; Solid Lints 1.0.0 requires Dart 3.12.
+These lint tools are development dependencies; package consumers retain the SDK
+constraints in `pubspec.yaml`.
 
-## Why both linters
+## Why these three lint packages
 
 | Tool | Role in this package |
 | --- | --- |
-| [Solid Lints 1.0.0](https://pub.dev/packages/solid_lints) | Shared Dart/Flutter analyzer rules, strict typing, public API documentation, null safety, context usage, and code complexity. |
+| [Very Good Analysis 11.0.0](https://pub.dev/packages/very_good_analysis) | Base preset for built-in Dart/Flutter analyzer rules, strict typing, public API documentation, async handling, and safe public signatures. |
+| [Solid Lints 1.0.0](https://pub.dev/packages/solid_lints) | Custom checks for null safety, context usage, code complexity, and widget/lifecycle conventions. |
 | [Dart Code Linter 4.4.0](https://pub.dev/packages/dart_code_linter) | A small complementary set for listener cleanup, redundant `async`, `async`/`await` style, test assertions, and test filenames. |
 
 These were the latest stable releases checked on September 30, 2026. Version
-constraints appear in both `pubspec.yaml` and the root plugin configuration;
-update both together when upgrading. We use the modern analysis server plugin
-system, so the IDE and `dart analyze` can run both plugins. Restart the Dart
-Analysis Server after changing plugin configuration.
+constraints for Solid and DCL appear in both `pubspec.yaml` and the root plugin
+configuration; update both together when upgrading. VGA is a configuration
+preset, so it needs no plugin entry or separate CLI. We use the modern analysis
+server plugin system, so the IDE and `dart analyze` can run both plugins. Restart
+the Dart Analysis Server after changing plugin configuration.
 
-DCL's `all` preset is intentionally replaced by an explicit rule list. Solid
-owns overlapping rules; DCL adds only rules Solid does not supply. CI also runs
+DCL's `all` preset is intentionally replaced by an explicit rule list. VGA owns
+built-in rules, Solid owns its custom checks, and DCL adds selected complementary
+checks. We include VGA's preset and explicitly configure Solid's diagnostics,
+so switching the base preset preserves Solid's rule settings. CI also runs
 the DCL CLI to check its configuration directly. Test-rule include patterns are
 relative to `test/analysis_options.yaml`, so the test policy uses `**/*.dart`
 instead of the default `test/**` pattern.
 
 ## Package rules
 
-`analysis_options.yaml` includes Solid's shared preset and enables strict casts,
+`analysis_options.yaml` includes VGA's shared preset and enables strict casts,
 strict inference, and strict raw types. Public API documentation and public type
 annotations remain enabled because this is a reusable package.
 
-The Solid preset supplies checks such as `unawaited_futures`,
-`use_build_context_synchronously`, `cancel_subscriptions`, `close_sinks`,
-`avoid_non_null_assertion`, `proper_super_calls`, and `use_nearest_context`.
+VGA supplies checks such as `unawaited_futures`, `discarded_futures`,
+`use_build_context_synchronously`, `cancel_subscriptions`,
+`library_private_types_in_public_api`, `document_ignores`, and
+`unnecessary_ignore`. Solid supplies `avoid_non_null_assertion`,
+`proper_super_calls`, and `use_nearest_context`.
 Complexity is limited to 10 outside `build()` methods, and functions are limited
 to 200 lines. Widget `build()` methods are exempt from complexity because the
 metric counts nullable style fallbacks and declarative widget branches. Callback
@@ -55,6 +62,20 @@ The package overrides policies that conflict with its API or structure:
   to named parameters would break consumers.
 - Trailing-comma lints and child-argument ordering: formatting and
   existing argument order do not need a second style policy.
+- Cascades, `forEach`, quote selection, constructor placement, and field
+  initialization placement: preserve existing readable source conventions.
+- Omitting local and closure-parameter types: explicit types can clarify
+  fixtures and callback contracts.
+- Integer literal preferences: Solid already checks double literal formatting,
+  and explicit `0.0` values are useful in Flutter layout code.
+- Mandatory assertion messages: Flutter-style named parameter assertions can
+  omit the optional message.
+- Redundant `async` and preferences for uninitialized `late` fields: DCL owns
+  the async check, while Solid discourages `late` outside test fixtures.
+- Declaring parameters and null-aware collection elements: these require newer
+  Dart language features than the package's consumer SDK floor of 3.6.
+
+VGA's formatter setting is overridden to preserve the existing trailing commas.
 
 DCL enables `always-remove-listener`, `avoid-redundant-async`,
 `prefer-async-await`, `missing-test-assertion`, and
