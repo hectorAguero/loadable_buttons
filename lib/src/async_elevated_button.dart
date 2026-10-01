@@ -254,11 +254,15 @@ class _DefaultLoadingIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Resolve default/normal state color, fall back to content color.
+    // Resolve explicit and themed foregrounds in the normal state.
     final Color? fallbackContentColor =
         IconTheme.of(context).color ?? DefaultTextStyle.of(context).style.color;
     final Color? resolvedColor =
         _style?.foregroundColor?.resolve(<MaterialState>{}) ??
+            ElevatedButtonTheme.of(context)
+                .style
+                ?.foregroundColor
+                ?.resolve(<MaterialState>{}) ??
             fallbackContentColor;
 
     return CircularProgressIndicator(

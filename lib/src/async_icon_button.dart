@@ -524,6 +524,10 @@ class _DefaultLoadingIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     return CircularProgressIndicator(
       color: _style?.foregroundColor?.resolve(<MaterialState>{}) ??
+          IconButtonTheme.of(context)
+              .style
+              ?.foregroundColor
+              ?.resolve(<MaterialState>{}) ??
           IconTheme.of(context).color ??
           DefaultTextStyle.of(context).style.color,
       strokeWidth: _defaultStrokeWidth,
