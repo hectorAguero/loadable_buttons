@@ -1,7 +1,5 @@
 ## Unreleased
 
-### Fixed
-
 * Block pointer input, focus, and semantics on inactive content in built-in
   loading transitions, including outgoing AnimatedSwitcher content in both
   directions. Current custom loading content remains usable.
@@ -10,15 +8,7 @@
 * Use the Material button's inherited foreground color for default spinners
   when no explicit foreground color is supplied.
 
-Public defaults, constructors, and consumer SDK requirements are unchanged.
-Loading labels remain opt-in; custom indicators and builders own their semantics.
-
 ## 1.0.1
-
-Bug fixes for the existing Flutter Material API. Public constructors and
-consumer SDK requirements are unchanged.
-
-### Fixed
 
 * Keep external `loading` and pending `onPressed` operations independent in all
   button families. Clearing external loading no longer unlocks a pending
@@ -39,10 +29,6 @@ consumer SDK requirements are unchanged.
   selection semantics in every `AsyncIconButton` variant. Selected icons keep
   their loading transitions and fall back to `icon` when omitted.
 
-### Documentation and maintenance
-
-* Rewrite the README with a runnable quick start, constructor variants, loading
-  and error handling guidance, selection examples, and transition sizing notes.
 * Update analyzer and lint tooling, and add package, test, and example analysis
   to CI.
 

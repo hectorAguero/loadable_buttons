@@ -7,7 +7,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 import 'package:loadable_buttons/src/loading_transition.dart';
-import 'package:loadable_buttons/src/transition_animation_type.dart';
 
 part 'async_outlined_button_with_icon.dart';
 

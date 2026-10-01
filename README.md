@@ -187,9 +187,12 @@ Yes! The code is [MIT licensed](LICENSE). Feel free to browse the
 copy a button into your project, and adapt it, including for commercial use.
 Keep the copyright and MIT license notice with the copied code.
 
-Include any companion `part` files, the shared `loading_transition.dart` helper,
-and referenced types, and update package
-imports to match your project.
+Include any companion `part` files and `loading_transition.dart`, which contains
+the transition enum and widgets. Update package imports to match your project.
+
+For a self-contained button, you can inline the transition with a ternary and
+switch expression, as in the earlier implementations. Keep the pointer, focus,
+and semantics guards for inactive and outgoing content.
 
 </details>
 

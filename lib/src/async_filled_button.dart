@@ -11,7 +11,6 @@ import 'package:loadable_buttons/src/async_outlined_button.dart'
     show AsyncOutlinedButton;
 
 import 'package:loadable_buttons/src/loading_transition.dart';
-import 'package:loadable_buttons/src/transition_animation_type.dart';
 
 part 'async_filled_button_with_icon.dart';
 

@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:loadable_buttons/src/loading_transition.dart';
-import 'package:loadable_buttons/src/transition_animation_type.dart';
 
 enum _FloatingActionButtonType { regular, small, large, extended }
 
