@@ -353,7 +353,6 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton> {
         data: Theme.of(context).copyWith(splashFactory: widget.splashFactory),
         child: switch (widget._floatingActionButtonType) {
           _FloatingActionButtonType.regular => FloatingActionButton(
-              key: widget.key,
               child: _AsyncFloatingActionButtonChild(
                   child: widget.child ?? const SizedBox.shrink(),
                   color: widget.foregroundColor ??
@@ -387,7 +386,6 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton> {
               isExtended: widget.isExtended,
               enableFeedback: widget.enableFeedback),
           _FloatingActionButtonType.small => FloatingActionButton.small(
-              key: widget.key,
               child: _AsyncFloatingActionButtonChild(
                   child: widget.child ?? const SizedBox.shrink(),
                   color: widget.foregroundColor ??
@@ -419,7 +417,6 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton> {
               materialTapTargetSize: widget.materialTapTargetSize,
               enableFeedback: widget.enableFeedback),
           _FloatingActionButtonType.large => FloatingActionButton.large(
-              key: widget.key,
               child: _AsyncFloatingActionButtonChild(
                   child: widget.child ?? const SizedBox.shrink(),
                   color: widget.foregroundColor ??
@@ -451,7 +448,6 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton> {
               materialTapTargetSize: widget.materialTapTargetSize,
               enableFeedback: widget.enableFeedback),
           _FloatingActionButtonType.extended => FloatingActionButton.extended(
-              key: widget.key,
               tooltip: widget.tooltip,
               foregroundColor: widget.foregroundColor,
               backgroundColor: widget.backgroundColor,

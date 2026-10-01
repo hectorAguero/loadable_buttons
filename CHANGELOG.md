@@ -1,5 +1,9 @@
 ## Unreleased
 
+* Fix duplicate `GlobalKey` errors in Filled, Outlined, Text, Icon, and floating
+  action buttons by keeping the public key on the async wrapper. Rebuilds with
+  the same key preserve the wrapper's state and pending operation.
+
 * Fix external `loading` updates clearing a pending `onPressed` operation in all
   async button families. External and internal loading remain independent,
   preventing duplicate execution until the operation finishes.
