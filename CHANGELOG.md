@@ -5,8 +5,8 @@
   directions. Current custom loading content remains usable.
 * Mount extended FAB icons only once, preserve the native layout without an
   icon, and forward extended padding, icon spacing, and text style.
-* Use the Material button's inherited foreground color for default spinners
-  when no explicit foreground color is supplied.
+* Use the normal foreground from an explicit style or button theme for default
+  spinners, falling back to the inherited Material foreground.
 
 ## 1.0.1
 

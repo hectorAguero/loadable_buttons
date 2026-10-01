@@ -365,16 +365,17 @@ void main() {
   for (final entry in _builders.entries) {
     testWidgets('${entry.key} spinner follows the Material foreground theme',
         (tester) async {
-      const style = ButtonStyle(
-        foregroundColor: WidgetStatePropertyAll(Colors.teal),
+      final style = ButtonStyle(
+        foregroundColor: WidgetStateProperty.resolveWith((states) =>
+            states.contains(WidgetState.disabled) ? Colors.grey : Colors.teal),
       );
       await tester.pumpWidget(MaterialApp(
         theme: ThemeData(
-          elevatedButtonTheme: const ElevatedButtonThemeData(style: style),
-          filledButtonTheme: const FilledButtonThemeData(style: style),
-          outlinedButtonTheme: const OutlinedButtonThemeData(style: style),
-          textButtonTheme: const TextButtonThemeData(style: style),
-          iconButtonTheme: const IconButtonThemeData(style: style),
+          elevatedButtonTheme: ElevatedButtonThemeData(style: style),
+          filledButtonTheme: FilledButtonThemeData(style: style),
+          outlinedButtonTheme: OutlinedButtonThemeData(style: style),
+          textButtonTheme: TextButtonThemeData(style: style),
+          iconButtonTheme: IconButtonThemeData(style: style),
           floatingActionButtonTheme:
               const FloatingActionButtonThemeData(foregroundColor: Colors.teal),
           progressIndicatorTheme:
@@ -395,6 +396,40 @@ void main() {
           tester.widget<CircularProgressIndicator>(spinner).color, Colors.teal);
     });
   }
+
+  testWidgets('spinner resolves each foreground before applying precedence',
+      (tester) async {
+    final themeStyle = ButtonStyle(
+      foregroundColor: WidgetStateProperty.resolveWith((states) =>
+          states.contains(WidgetState.disabled) ? Colors.grey : Colors.teal),
+    );
+    for (final foreground in <Color?>[Colors.green, null]) {
+      await tester.pumpWidget(MaterialApp(
+        theme: ThemeData(
+          filledButtonTheme: FilledButtonThemeData(style: themeStyle),
+        ),
+        home: Scaffold(
+            body: Center(
+                child: AsyncFilledButton(
+          child: const Text('Send'),
+          onPressed: Future<void>.value,
+          loading: true,
+          style: ButtonStyle(
+            foregroundColor: WidgetStateProperty.resolveWith((states) =>
+                states.contains(WidgetState.disabled)
+                    ? Colors.purple
+                    : foreground),
+          ),
+        ))),
+      ));
+      expect(
+          tester
+              .widget<CircularProgressIndicator>(
+                  find.byType(CircularProgressIndicator))
+              .color,
+          foreground ?? Colors.teal);
+    }
+  });
 
   testWidgets('stack sizing respects custom content and parent constraints',
       (tester) async {
