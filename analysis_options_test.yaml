@@ -15,6 +15,8 @@ linter:
   rules:
     public_member_api_docs: false
     avoid_redundant_argument_values: false
+    # Named callback signatures keep parameterized fixtures readable.
+    avoid_private_typedef_functions: false
     # Test diagnostics may print; production code still uses logging.
     avoid_print: false
 

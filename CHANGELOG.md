@@ -1,5 +1,12 @@
 ## Unreleased
 
+* Preserve requested icon-button cursors when the fallback splash style is
+  created, including on Flutter 3.29.
+* Restore Flutter 3.29 compatibility for extended FAB padding and spacing by
+  reading `ThemeData.floatingActionButtonTheme`.
+* Validate dependency resolution, formatting, analysis, and tests on the declared
+  minimum Flutter SDK and stable in CI. Run modern lint plugins on stable.
+
 * Smoothly resize buttons in AnimatedSwitcher transitions when idle and loading
   content have different sizes.
 * Center extended FAB stack loaders across the full icon-and-label area while

@@ -1,23 +1,31 @@
 # Development and linting
 
-Use Flutter stable with Dart **3.13 or newer** when working on this repository.
-Very Good Analysis 11.0.0 requires Dart 3.13; Solid Lints 1.0.0 requires Dart 3.12.
-These lint tools are development dependencies; package consumers retain the SDK
-constraints in `pubspec.yaml`.
+The 1.0.x and 1.1.x compatibility lines support Flutter **3.29.0+** and Dart
+**3.6.0+**. CI tests the exact Flutter minimum declared in `pubspec.yaml` and the
+moving stable channel. See [the compatibility roadmap](docs/compatibility-roadmap.md).
+
+Use current Flutter stable with Dart **3.13 or newer** for the full plugin checks.
+Flutter 3.29 ships Dart 3.7, which can run the built-in analyzer baseline but
+cannot run the modern analyzer plugins. The minimum job deliberately omits only
+the plugin activation block; it still analyzes package, test, and example sources
+with strict casts, inference, and raw types, and treats infos and warnings as
+failures. The script restores the original configuration even if analysis fails.
 
 ## Why these three lint packages
 
 | Tool | Role in this package |
 | --- | --- |
-| [Very Good Analysis 11.0.0](https://pub.dev/packages/very_good_analysis) | Base preset for built-in Dart/Flutter analyzer rules, strict typing, public API documentation, async handling, and safe public signatures. |
-| [Solid Lints 1.0.0](https://pub.dev/packages/solid_lints) | Custom checks for null safety, context usage, code complexity, and widget/lifecycle conventions. |
-| [Dart Code Linter 4.4.0](https://pub.dev/packages/dart_code_linter) | A small complementary set for listener cleanup, redundant `async`, `async`/`await` style, test assertions, and test filenames. |
+| [Very Good Analysis](https://pub.dev/packages/very_good_analysis) | The versioned 8.0.0 preset provides the same Dart 3.7-compatible built-in rules on both SDKs, including public API documentation and strict types. |
+| [Solid Lints 1.0.0](https://pub.dev/packages/solid_lints) | Stable-only custom checks for null safety, context usage, code complexity, and widget/lifecycle conventions. |
+| [Dart Code Linter 4.4.0](https://pub.dev/packages/dart_code_linter) | Stable-only complementary checks for listener cleanup, redundant `async`, `async`/`await` style, test assertions, and test filenames. |
 
-These were the latest stable releases checked on September 30, 2026. Version
-constraints for Solid and DCL appear in both `pubspec.yaml` and the root plugin
-configuration; update both together when upgrading. VGA is a configuration
-preset, so it needs no plugin entry or separate CLI. We use the modern analysis
-server plugin system, so the IDE and `dart analyze` can run both plugins. Restart
+The package and example allow VGA >=8.0.0 <12.0.0 so Pub can select a release
+compatible with each SDK, while the included preset stays fixed at 8.0.0.
+The root analyzer configuration enables the modern plugins directly by version;
+they resolve their own dependencies and do not need root development dependencies.
+The DCL CLI has a separate dependency graph in `tool/dcl/pubspec.yaml` so it cannot
+raise the package's test SDK floor. Update its constraint and the plugin entry
+together when upgrading DCL. No legacy `analyzer.plugins` block is used. Restart
 the Dart Analysis Server after changing plugin configuration.
 
 DCL's `all` preset is intentionally replaced by an explicit rule list. VGA owns
@@ -30,8 +38,8 @@ instead of the default `test/**` pattern.
 
 ## Package rules
 
-`analysis_options.yaml` includes VGA's shared preset and enables strict casts,
-strict inference, and strict raw types. Public API documentation and public type
+`analysis_options.yaml` includes VGA's versioned 8.0.0 preset and enables strict
+casts, strict inference, and strict raw types. Public API documentation and public type
 annotations remain enabled because this is a reusable package.
 
 VGA supplies checks such as `unawaited_futures`, `discarded_futures`,
@@ -72,10 +80,12 @@ The package overrides policies that conflict with its API or structure:
   omit the optional message.
 - Redundant `async` and preferences for uninitialized `late` fields: DCL owns
   the async check, while Solid discourages `late` outside test fixtures.
-- Declaring parameters and null-aware collection elements: these require newer
-  Dart language features than the package's consumer SDK floor of 3.6.
+- Newer syntax lints: the versioned baseline avoids requiring language features
+  above the package's consumer Dart 3.6 floor. Unsupported newer lint overrides
+  are omitted rather than suppressing analyzer warnings.
 
-VGA's formatter setting is overridden to preserve the existing trailing commas.
+The shared preset avoids formatter options unsupported by Dart 3.7. Both CI
+jobs check formatting using the package's declared Dart language version.
 
 DCL enables `always-remove-listener`, `avoid-redundant-async`,
 `prefer-async-await`, `missing-test-assertion`, and
@@ -100,27 +110,43 @@ Like Solid's supplied test preset, it relaxes function length, complexity, and
 disabled by the package policy. It also permits widget-producing fixtures,
 empty stub callbacks, literal expected values, diagnostic printing, and explicit
 default arguments. Public API documentation is unnecessary for test helpers.
-Strict types, async/lifecycle checks, test assertions, and test filename checks
-remain active. Lints can detect missing assertions, but reviewing the behavior a
-test protects is still necessary.
+Strict types and built-in async/lifecycle checks remain active on both SDKs.
+Plugin test-assertion and filename checks run on stable. Named callback typedefs
+remain allowed to keep parameterized fixtures readable. Lints can detect missing
+assertions, but reviewing the behavior a test protects is still necessary.
 
 The example inherits the package policy, with a function-length exception only
 for `_HomePageState.build`, which showcases all button variants.
 
 ## Local checks
 
-Run the same checks as CI:
+Run the stable checks with one SDK selected on `PATH`:
 
 ```sh
-flutter pub get
+flutter --version
+flutter pub get --no-example
+(cd example && flutter pub get)
+dart format --output=none --set-exit-if-changed lib test example/lib
 bash tool/analyze.sh
-dart run dart_code_linter:metrics analyze lib test example/lib --fatal-style --fatal-performance
+(cd tool/dcl && dart pub get)
+bash tool/check_dcl.sh
 flutter test --no-pub
+git diff --check
 ```
 
-The analysis script checks package-wide diagnostics, then explicitly targets
-every Dart source file in `lib/`, `test/`, and `example/lib/`. This also collects
-Solid plugin diagnostics that directory-wide analysis can miss on Dart 3.13.4.
+For Flutter 3.29.0, use `bash tool/analyze.sh --minimum` and omit the two DCL CLI
+steps. This mode requires Python 3 to select the supported analyzer configuration.
+Do not claim minimum compatibility from a stable-only run.
 
-The package root lockfile remains ignored, as appropriate for a published
-library. The example app keeps its own lockfile.
+After changing SDKs or moving a checkout, run both dependency-resolution steps
+again. Do not reuse `.dart_tool/package_config.json` from a different SDK: it
+contains absolute paths. The analysis script checks package-wide diagnostics,
+then explicitly targets every Dart source file in `lib/`, `test/`, and
+`example/lib/`. This collects plugin diagnostics that directory-wide analysis
+can miss on Dart 3.13.4.
+
+The package and CLI-tool lockfiles remain ignored. The example app keeps its
+tracked lockfile; different Flutter SDKs may resolve different SDK-pinned package
+versions. CI permits those expected resolutions without overwriting the committed
+lockfile. Review any local lockfile diff before committing it, and finish with the
+stable example resolution when updating its baseline.

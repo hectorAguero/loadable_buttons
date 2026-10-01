@@ -1,0 +1,2 @@
+# This package contains only CLI dependencies, with no Dart source files.
+# The CLI reads the lint policy from the source packages it analyzes.

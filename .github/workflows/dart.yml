@@ -1,30 +1,87 @@
-name: Run Tests
+name: Validate Flutter Package
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [main]
   pull_request:
-    branches: [ "main" ]
+    branches: [main]
+
+permissions:
+  contents: read
 
 jobs:
-  build:
+  validate:
+    name: Flutter ${{ matrix.sdk }}
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk: [minimum, stable]
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Select Flutter SDK
+        id: flutter
+        env:
+          SDK_TARGET: ${{ matrix.sdk }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import re
+          from pathlib import Path
+
+          version = ''
+          if os.environ['SDK_TARGET'] == 'minimum':
+              pubspec = Path('pubspec.yaml').read_text()
+              match = re.search(r'^  flutter: [\'"]?>=(\d+\.\d+\.\d+)[\'"]?$', pubspec, re.MULTILINE)
+              if match is None:
+                  raise SystemExit('Expected an explicit >=x.y.z Flutter minimum in pubspec.yaml')
+              version = match.group(1)
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write(f'version={version}\n')
+          PY
+
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+          flutter-version: ${{ steps.flutter.outputs.version }}
           cache: true
 
-      - name: Get Dependencies
+      - name: Show SDK Versions
+        run: |
+          flutter --version
+          dart --version
+
+      # Resolve anew after selecting the SDK, including the example's own graph.
+      # Do not cache .dart_tool: it contains SDK and checkout-specific paths.
+      - name: Resolve Package Dependencies
+        run: flutter pub get --no-example
+
+      - name: Resolve Example Dependencies
+        working-directory: example
         run: flutter pub get
 
+      - name: Check Formatting
+        run: dart format --output=none --set-exit-if-changed lib test example/lib
+
       - name: Analyze Package, Tests, and Example
-        run: bash tool/analyze.sh
+        run: bash tool/analyze.sh ${{ matrix.sdk == 'minimum' && '--minimum' || '' }}
+
+      # Modern plugins and their CLI require a newer Dart SDK than Flutter 3.29.
+      # Built-in analysis still runs on minimum, with the same strict baseline.
+      - name: Resolve Stable Lint Tools
+        if: matrix.sdk == 'stable'
+        working-directory: tool/dcl
+        run: dart pub get
 
       - name: Check Dart Code Linter Rules
-        run: dart run dart_code_linter:metrics analyze lib test example/lib --fatal-style --fatal-performance
+        if: matrix.sdk == 'stable'
+        run: bash tool/check_dcl.sh
 
       - name: Run Tests
         run: flutter test --no-pub
+
+      - name: Check Whitespace
+        run: git diff --check

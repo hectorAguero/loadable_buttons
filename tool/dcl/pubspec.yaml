@@ -1,0 +1,9 @@
+name: loadable_buttons_lint_tools
+description: CLI checks for the loadable_buttons repository.
+publish_to: none
+
+environment:
+  sdk: ^3.13.0
+
+dependencies:
+  dart_code_linter: ^4.4.0
