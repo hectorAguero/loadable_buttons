@@ -1,7 +1,8 @@
 ## 2.0.0 (unreleased)
 
 * Add native `AsyncCupertinoButton`, `.filled`, and `.tinted` with Cupertino
-  indicators, loading/error/accessibility contracts, and a standalone example.
+  indicators sized to the button text, loading/error/accessibility contracts,
+  and a standalone example.
   Add design-specific `cupertino.dart` and `material.dart` entry points while
   preserving the combined barrel. Depend directly on `cupertino_ui >=1.0.0 <2.0.0`
   and validate both design libraries at exact lower bounds and latest compatible

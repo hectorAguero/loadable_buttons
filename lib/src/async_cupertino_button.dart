@@ -10,19 +10,16 @@ enum _AsyncCupertinoButtonVariant { plain, filled, tinted }
 /// A native [CupertinoButton] with external and async loading states.
 ///
 /// Effective loading is [loading] or a pending [onPressed] or [onError].
-/// Loading
-/// disables outer activation; built-in transitions exclude inactive content
-/// from
-/// pointer input, focus, and semantics. Unhandled errors propagate with their
-/// original stack trace. Return or await all work to be tracked. Disposal does
-/// not cancel that work or its captured error handler.
+/// Loading disables outer activation; built-in transitions exclude inactive
+/// content from pointer input, focus, and semantics. Unhandled errors propagate
+/// with their original stack trace. Return or await all work to be tracked.
+/// Disposal does not cancel that work or its captured error handler.
 ///
 /// Works under [CupertinoApp] without a Material ancestor. Native sizes,
-/// padding,
-/// colors, focus, and press feedback are preserved. Larger [loadingChild]
-/// content
-/// can affect layout within native and parent constraints. [customBuilder] owns
-/// sizing and all content interaction, focus, and semantics.
+/// padding, colors, focus, and press feedback are preserved. Larger
+/// [loadingChild] content can affect layout within native and parent
+/// constraints. [customBuilder] owns sizing and all content interaction, focus,
+/// and semantics.
 class AsyncCupertinoButton extends StatefulWidget {
   /// Creates an iOS-style button with tracked async activation.
   ///
@@ -156,8 +153,7 @@ class AsyncCupertinoButton extends StatefulWidget {
   ///
   /// Return or await async work to keep loading until it and [onError] finish.
   /// Null disables activation unless [onLongPress] is supplied. Unhandled
-  /// errors
-  /// propagate with their original stack trace. Unreturned Futures are
+  /// errors propagate with their original stack trace. Unreturned Futures are
   /// untracked.
   final FutureOr<void> Function()? onPressed;
 
@@ -178,7 +174,9 @@ class AsyncCupertinoButton extends StatefulWidget {
   /// Optional loading content, replacing the default
   /// [CupertinoActivityIndicator].
   ///
-  /// Owns its accessible labels. Larger content may change the button size.
+  /// The default indicator is sized to the native button text, so stack loading
+  /// keeps the idle size for text content. Custom content owns its accessible
+  /// labels and may change the button size.
   /// A custom builder receives this value unchanged, including null.
   final Widget? loadingChild;
 
@@ -200,12 +198,14 @@ class AsyncCupertinoButton extends StatefulWidget {
 
   /// The native foreground color, also used by the default loading indicator.
   ///
-  /// When null, the indicator uses [CupertinoThemeData.primaryContrastingColor]
-  /// for filled buttons and [CupertinoThemeData.primaryColor] for other
-  /// variants.
+  /// When null, the indicator uses [CupertinoThemeData.primaryColor] for every
+  /// variant. Loading disables the native button, so filled and tinted buttons
+  /// show [disabledColor]; an explicit color should remain readable on it.
   final Color? foregroundColor;
 
   /// The native disabled background color, with variant-specific defaults.
+  ///
+  /// Filled and tinted buttons also show it while loading.
   final Color disabledColor;
 
   /// The native minimum button size.
@@ -336,9 +336,6 @@ class _AsyncCupertinoButtonState extends State<AsyncCupertinoButton>
                           )) ??
                     _CupertinoLoadingIndicator(
                       foregroundColor: widget.foregroundColor,
-                      filled:
-                          widget._variant ==
-                          _AsyncCupertinoButtonVariant.filled,
                       loadingSemanticsLabel: widget.loadingSemanticsLabel,
                     ),
                 isLoading: isLoading,
@@ -354,25 +351,30 @@ class _AsyncCupertinoButtonState extends State<AsyncCupertinoButton>
 class _CupertinoLoadingIndicator extends StatelessWidget {
   const _CupertinoLoadingIndicator({
     required this.foregroundColor,
-    required this.filled,
     required this.loadingSemanticsLabel,
   });
 
+  // CupertinoActivityIndicator's default, used only without a text size.
+  static const double _defaultRadius = 10.0;
+
   final Color? foregroundColor;
-  final bool filled;
   final String? loadingSemanticsLabel;
 
   @override
   Widget build(BuildContext context) {
-    final theme = CupertinoTheme.of(context);
-    final color =
-        foregroundColor ??
-        (filled ? theme.primaryContrastingColor : theme.primaryColor);
+    // Loading disables the native button, so filled and tinted backgrounds use
+    // disabledColor. The contrasting color can disappear on that light fill.
+    final color = foregroundColor ?? CupertinoTheme.of(context).primaryColor;
+    // Match the native text size so stack loading keeps the idle text layout.
+    final fontSize = DefaultTextStyle.of(context).style.fontSize;
 
     return Semantics(
       label: loadingSemanticsLabel,
       child: CupertinoActivityIndicator(
         color: CupertinoDynamicColor.resolve(color, context),
+        radius: fontSize == null
+            ? _defaultRadius
+            : MediaQuery.textScalerOf(context).scale(fontSize) / 2,
       ),
     );
   }

@@ -24,7 +24,7 @@ and its indicator remain together in `async_cupertino_button.dart` for copying.
 | Stack, switcher, and custom-builder content; nullable custom loading content | `async_button_contract_test.dart` shared matrix | Missing current content, applying a builder outside custom mode, or substituting an unwanted default indicator. |
 | Localized default loading label, null default, locale updates, disabled outer role, and keyboard/semantics activation | `async_button_contract_test.dart` shared matrix | Hidden labels remaining accessible or loading buttons advertising activation. |
 | Inactive content cannot receive pointer input, focus, or semantics actions; current loading content remains actionable | `async_cupertino_button_test.dart` | Cupertino wiring bypassing guards or disabling a custom Cancel action. |
-| Default Cupertino spinner color follows the theme and explicit foreground overrides | `async_cupertino_button_test.dart` | Material indicator dependency or unreadable filled-button spinner. |
+| Default Cupertino spinner uses the theme primary color or explicit foreground on every variant, and stays within the idle text size across native sizes and text scaling | `async_cupertino_button_test.dart` | Material indicator dependency, a contrasting spinner disappearing on the disabled fill shown while loading, or stack loading resizing the button. |
 
 All tests observe public widget behavior or the native renderer, with no
 production API or keys added solely for testing. Existing contract matrices are

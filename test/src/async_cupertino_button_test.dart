@@ -327,13 +327,45 @@ void main() {
           final indicator = tester.widget<CupertinoActivityIndicator>(
             find.byType(CupertinoActivityIndicator),
           );
-          expect(
-            indicator.color,
-            foreground ??
-                (entry.key == 'filled'
-                    ? CupertinoColors.white
-                    : CupertinoColors.systemPurple),
-          );
+          // Loading shows the disabled fill, where white would disappear.
+          expect(indicator.color, foreground ?? CupertinoColors.systemPurple);
+        }
+      },
+    );
+
+    testWidgets(
+      '${entry.key} default spinner keeps the idle text size while loading',
+      (tester) async {
+        for (final size in CupertinoButtonSize.values) {
+          for (final scale in [1.0, 2.0]) {
+            Widget host({required bool loading}) => MediaQuery(
+              data: MediaQueryData(textScaler: TextScaler.linear(scale)),
+              child: _host(
+                entry.value.$2(
+                  sizeStyle: size,
+                  loading: loading,
+                  onPressed: () {},
+                  child: const Text('Save'),
+                ),
+              ),
+            );
+            await tester.pumpWidget(host(loading: false));
+            // Let the retained idle content finish resizing from the last case.
+            await tester.pump(const Duration(milliseconds: 300));
+            final native = find.byType(CupertinoButton);
+            final idle = tester.getSize(native);
+            await tester.pumpWidget(host(loading: true));
+            await tester.pump(const Duration(milliseconds: 300));
+            expect(
+              tester.getSize(native),
+              idle,
+              reason: '${size.name} at text scale $scale',
+            );
+            expect(
+              tester.getSize(find.byType(CupertinoActivityIndicator)).height,
+              lessThanOrEqualTo(tester.getSize(find.text('Save')).height),
+            );
+          }
         }
       },
     );

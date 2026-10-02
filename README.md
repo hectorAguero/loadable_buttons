@@ -88,10 +88,12 @@ Future<void> saveChanges() async {
 
 The default, filled, and tinted constructors preserve native Cupertino sizes,
 padding, colors, press feedback, focus, and disabled behavior. They use
-`CupertinoActivityIndicator` with the theme's primary color (contrasting color
-for filled buttons), or your explicit `foregroundColor`. No Material ancestor
-is needed. The same loading, error, transition, and accessibility contracts
-below apply. Use `minimumSize`; the deprecated native `minSize` is omitted.
+`CupertinoActivityIndicator` sized to the button text, with the theme's primary
+color or your explicit `foregroundColor`. Loading disables the native button, so
+filled and tinted buttons show `disabledColor`; keep an explicit foreground
+readable on it. No Material ancestor is needed. The same loading, error,
+transition, and accessibility contracts below apply. Use `minimumSize`; the
+deprecated native `minSize` is omitted.
 
 Run the [Cupertino example](example/lib/cupertino_main.dart) with
 `cd example && flutter run -t lib/cupertino_main.dart` for all three variants,
