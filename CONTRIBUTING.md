@@ -164,6 +164,13 @@ stable example resolution when updating its baseline.
 
 ## Consumer agent skill
 
+The [v2 release-validation procedure](doc/release-validation.md) records the
+candidate matrix, archive review, consumer installation, and separately
+authorized publication and post-release checks. Run `dart pub publish --dry-run`
+on stable/latest before release; CI keeps its output for inspection. Keep the
+[migration guide](doc/migration-v2.md) and availability notes aligned with the
+implemented API and actual hosted release.
+
 `skills/loadable-buttons-usage/` is published with the package and installed
 into consumer projects by the [skills CLI](https://pub.dev/packages/skills).
 Its directory and frontmatter `name` must start with `loadable-buttons-`;

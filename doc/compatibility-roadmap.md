@@ -32,8 +32,14 @@ resolution.
 `tool/resolve_design_ui.sh` uses temporary overrides in both package roots for
 the exact lower-bound check and verifies the resolved versions. Analysis,
 formatting, and the full contract suite run against each resolved graph. See
-[the migration guide](../README.md#migrating-from-1x) for downstream import/type
+[the migration guide](migration-v2.md) for downstream import/type
 changes and the compatibility bridge for legacy dependencies.
+
+The 1.1.x line remains available for built-in Material applications; applicable
+compatibility fixes are backported and validated on Flutter 3.29 and stable.
+Its patch releases do not adopt v2 APIs or raise the SDK floor. See
+[release availability and candidate validation](release-validation.md) for the
+unreleased v2 source versus published archives and the final release checklist.
 
 Development dependencies use Very Good Analysis >=10.3.0 <12.0.0, resolving
 10.3.0 on the minimum SDK and 11.0.0 on stable. Both use the versioned 10.3.0

@@ -3,7 +3,13 @@
 Flutter Material and Cupertino buttons with automatic loading states,
 external loading control, and customizable indicators and transitions.
 
-![Async Material button examples](https://raw.githubusercontent.com/hectorAguero/loadable_buttons/main/screenshots/preview.gif)
+This branch describes **2.0.0 (unreleased)**. As checked October 2, 2026,
+[pub.dev](https://pub.dev/packages/loadable_buttons/versions) provides **1.1.1**.
+Use a local path dependency to try v2; the hosted installation commands below
+apply to v2 after publication. See the [1.x migration guide](doc/migration-v2.md)
+and [release status](doc/release-validation.md).
+
+![Material gallery preview; Cupertino has a separate runnable example](screenshots/preview.gif)
 
 ## Installation
 
@@ -20,7 +26,9 @@ and standalone **material_ui >=1.0.0 <2.0.0** and
 releases for your SDK; Material UI 1.4.0 and newer require Flutter 3.47 / Dart 3.13.
 Cupertino UI 1.1.1 also requires Flutter 3.47 / Dart 3.13.
 Version 1.x remains the compatibility line for Flutter 3.29 and the built-in
-Material library. See the [compatibility roadmap](doc/compatibility-roadmap.md).
+Material library. 1.1.x receives applicable compatibility fixes without adopting
+v2 APIs or raising its SDK floor in patch releases. See the
+[compatibility roadmap](doc/compatibility-roadmap.md).
 
 ## Quick start
 
@@ -101,6 +109,10 @@ external loading, long presses, custom loading content, and handled errors.
 
 ## Migrating from 1.x
 
+Follow the [complete migration guide](doc/migration-v2.md) for release-line
+selection and before/after examples covering plain/icon buttons, loading labels,
+error hooks, custom transitions, and Cupertino.
+
 Add `material_ui` as a direct dependency and replace
 `package:flutter/material.dart` imports with `package:material_ui/material_ui.dart`.
 Create `MaterialApp`, themes, styles, and ink factories from that package too.
@@ -123,7 +135,8 @@ MaterialApp(
 );
 ```
 
-The bridge supplies legacy themes and localizations; it does not convert legacy
+The bridge is a temporary, deprecated migration utility. It supplies legacy
+themes and localizations; it does not convert legacy
 style arguments to standalone types. See the
 [official Material UI migration guide](https://pub.dev/packages/material_ui#migrating-existing-code-to-this-package).
 
@@ -143,7 +156,9 @@ Use native Material options such as `style`, or Cupertino options such as
 `sizeStyle`, `minimumSize`, `padding`, and `foregroundColor`. Both support
 `focusNode`.
 For each widget's supported properties, see the
-[API reference](https://pub.dev/documentation/loadable_buttons/latest/).
+[v2 source API declarations](https://github.com/hectorAguero/loadable_buttons/tree/main/lib/src). The
+[hosted API reference](https://pub.dev/documentation/loadable_buttons/latest/)
+still describes the published 1.x release until v2 is published.
 
 For a button with an icon, use `label` instead of `child`:
 
@@ -458,7 +473,8 @@ The package ships a `loadable-buttons-usage` skill that teaches coding agents
 its imports, constructors, loading and error contracts, accessibility, theming,
 and custom loading content. Install it from your application's root with the
 [skills CLI](https://pub.dev/packages/skills); select your agent with `--agent`
-(for example `claude`, `codex`, `copilot`, `cursor`, or `generic`):
+(for example `claude`, `codex`, `copilot`, `cursor`, or `generic`). The skill
+ships with v2; before publication use a path dependency on this checkout:
 
 ```sh
 dart run skills@ get --package loadable_buttons --agent claude
@@ -520,6 +536,8 @@ loading state. Use `loading` when your application already manages that state.
 
 ## More
 
+- [Migration from 1.x](doc/migration-v2.md)
+- [Release availability and validation](doc/release-validation.md)
 - [Example application](https://github.com/hectorAguero/loadable_buttons/tree/main/example)
 - [Contributing and development checks](CONTRIBUTING.md)
 - [Changelog](CHANGELOG.md)

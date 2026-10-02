@@ -1,5 +1,11 @@
 ## 2.0.0 (unreleased)
 
+* Add a before/after 1.x migration guide and release-validation procedure,
+  distinguish repository APIs from hosted availability, retain the 1.x
+  compatibility maintenance line, and verify the publish dry run in CI.
+  Exclude generated coverage and maintainer agent instructions from the archive
+  while retaining consumer skills and runnable examples.
+
 * Add nullable Material style shortcuts for padding, minimum size, alignment,
   enabled/disabled colors, and mouse cursors to Elevated, Filled, Outlined, and
   Text buttons, including icon, tonal, and null-icon variants. Preserve supplied
@@ -39,8 +45,8 @@
   extended FAB stack transitions, matching the native standalone button.
 * Preserve native icon padding, loading ownership, selection, keyboard,
   semantics, and custom loading-content behavior across the migration.
-* Validate exact Material UI 1.0.0 and the newest compatible resolution on
-  both the minimum Flutter SDK and current stable. Run Solid Lints 1.0.0 and
+* Validate exact Material UI and Cupertino UI 1.0.0 and their newest compatible
+  resolution on both the minimum Flutter SDK and current stable. Run Solid Lints 1.0.0 and
   DCL 4.4.0 plugin checks on both SDKs, with an isolated DCL CLI graph that
   also supports Dart 3.12.
 * Raise the Very Good Analysis development dependency minimum to 10.3.0 and

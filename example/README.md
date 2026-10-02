@@ -4,8 +4,11 @@ A Flutter application demonstrating the async button families, icon variants,
 loading transitions, and theme colors. It uses the package from the parent
 directory through a path dependency.
 
-Requires Flutter 3.44.0 / Dart 3.12.0 or newer and imports standalone
-`package:material_ui/material_ui.dart`, matching the package's v2 API.
+Requires Flutter 3.44.0 / Dart 3.12.0 or newer, standalone Material UI and
+Cupertino UI >=1.0.0 <2.0.0, and uses the implemented, unreleased v2 API.
+The parent path dependency deliberately runs repository source even while
+pub.dev still provides 1.x. See the [migration guide](../doc/migration-v2.md)
+and [release validation](../doc/release-validation.md).
 
 From this directory, run:
 
@@ -25,9 +28,10 @@ The **Loading contracts** card provides runnable examples:
   that the button remains locked until **Finish operation** or **Fail operation**.
   Finish with external loading still on to see that callback completion does not
   clear the external source. Turn external loading off to unlock the button.
-- **Fail operation** simulates an error caught by the application's callback.
-  The result text shows the chosen feedback; the button restores its internal
-  state. Real callbacks must handle their own errors and cancellation policy.
+- **Fail operation** simulates an error consumed by the supplied `onError`
+  handler. The result text shows the chosen feedback; the button restores its
+  internal state. Omitting `onError` lets callback errors propagate. Applications
+  still own reporting, user feedback, and cancellation policy.
 - Turn **Disable demo buttons** on to supply null callbacks. Long-press
   **Start operation** while idle to increment its counter without starting a
   Future. Loading and disabled states block that callback. Use Tab and keyboard
@@ -48,6 +52,11 @@ these labels and announcements in your application.
 
 See the [package README](../README.md) for installation, external loading,
 selection, custom content, and error handling guidance.
+
+For a migration smoke check, activate a plain and icon button, repeat the loading
+ownership sequence above, and try the custom builder and handled failure. Inspect
+the disabled outer button and the loading label with platform accessibility tools.
+Custom content supplies its own labels; the package adds no live announcement.
 
 The standalone Cupertino example uses no Material ancestor:
 

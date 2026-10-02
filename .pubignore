@@ -1,0 +1,28 @@
+# Pub prefers this file to .gitignore; preserve its generated/local exclusions.
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+migrate_working_dir/
+*.iml
+*.ipr
+*.iws
+.idea/
+.vscode/
+/pubspec.lock
+/tool/dcl/pubspec.lock
+**/doc/api/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+build/
+**/pubspec_overrides.yaml
+
+# Maintainer instructions and generated coverage are not consumer artifacts.
+/AGENTS.md
+/coverage/

@@ -5,7 +5,9 @@ description: Use when writing, reviewing, or migrating Flutter code that uses th
 
 # Using loadable_buttons
 
-This skill describes loadable_buttons 2.x. Each button wraps the native
+This skill describes the implemented loadable_buttons 2.0 API. In a repository
+checkout, check `CHANGELOG.md` for release status; an unreleased source version
+does not mean the API is available on pub.dev. Each button wraps the native
 standalone Material UI or Cupertino UI button, shows loading content while
 work is pending, and blocks repeated activation. Only use the APIs listed here
 or in the package API reference; do not invent controllers, adaptive buttons,
@@ -36,6 +38,10 @@ flutter pub add loadable_buttons cupertino_ui
   `package:flutter/material.dart`) for `MaterialApp`, `ThemeData`,
   `ButtonStyle`, `Icons`, `IconAlignment`, and ink factories. Legacy Flutter
   Material types are distinct and are rejected by v2 constructors.
+- For legacy third-party subtrees under a standalone `MaterialApp`, the official
+  `MaterialUiCompatibilityBridge` temporarily supplies legacy themes and
+  localizations. It is deprecated migration infrastructure, does not convert
+  public style types, and should be removed when dependencies migrate.
 - Import `package:cupertino_ui/cupertino_ui.dart` for Cupertino apps and types.
   `AsyncCupertinoButton` needs no Material ancestor.
 - Projects still on built-in Flutter Material (Flutter below 3.44) must use
