@@ -162,6 +162,26 @@ versions. CI permits those expected resolutions without overwriting the committe
 lockfile. Review any local lockfile diff before committing it, and finish with the
 stable example resolution when updating its baseline.
 
+## Consumer agent skill
+
+`skills/loadable-buttons-usage/` is published with the package and installed
+into consumer projects by the [skills CLI](https://pub.dev/packages/skills).
+Its directory and frontmatter `name` must start with `loadable-buttons-`;
+`test/src/package_skill_test.dart` checks the naming and relative links. Keep
+it consumer-facing: maintainer workflows belong in this file and `AGENTS.md`.
+
+When a change affects public constructors, imports, loading, error, semantics,
+theming, or sizing behavior, update the skill alongside the README and API
+documentation. Describe only released or implemented APIs. Before release,
+confirm the archive with `dart pub publish --dry-run`, then verify installation
+from an isolated consumer project with a path dependency on this checkout:
+
+```sh
+dart run skills@ get --package loadable_buttons --agent generic --all
+```
+
+Analyze the skill's snippets in that consumer project when examples change.
+
 ## Optional structural audits
 
 For a maintainability review, run the pinned
