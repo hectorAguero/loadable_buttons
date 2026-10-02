@@ -8,7 +8,7 @@ import '../support/async_button_fixture.dart';
 
 void main() {
   // Constructor forwarding is a distinct risk from the shared error policy.
-  for (final entry in asyncButtonErrorBuilders.entries) {
+  for (final entry in asyncButtonConstructorBuilders.entries) {
     for (final asynchronous in [false, true]) {
       final failureName = asynchronous ? 'failed Future' : 'synchronous throw';
       testWidgets('${entry.key} consumes $failureName once and allows retry', (

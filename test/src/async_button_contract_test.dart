@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:ui' show SemanticsAction, SemanticsFlag;
+import 'dart:ui' show SemanticsAction, SemanticsFlag, Tristate;
 
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -13,41 +13,6 @@ const _duration = Duration(milliseconds: 200);
 void main() {
   for (final entry in asyncButtonBuilders.entries) {
     group(entry.key, () {
-      testWidgets('default indicator clears on completion and allows retry', (
-        tester,
-      ) async {
-        final pending = Completer<void>();
-        var calls = 0;
-        await tester.pumpWidget(
-          buttonHost(
-            entry.value(
-              child: const Text('Run'),
-              onPressed: () {
-                calls++;
-
-                return pending.future;
-              },
-            ),
-          ),
-        );
-        expect(find.text('Run'), findsOneWidget);
-        expect(find.byType(CircularProgressIndicator), findsNothing);
-        await tester.tap(materialButton);
-        await tester.pump();
-        expect(find.byType(CircularProgressIndicator), findsOneWidget);
-        pending.complete();
-        await tester.pumpAndSettle();
-        expect(find.byType(CircularProgressIndicator), findsNothing);
-        expect(find.text('Run'), findsOneWidget);
-        // Accessibility activation must also reach the restored callback.
-        tester.semantics.performAction(
-          find.semantics.byLabel('Run'),
-          SemanticsAction.tap,
-        );
-        await tester.pumpAndSettle();
-        expect(calls, 2);
-      });
-
       for (final transition in TransitionAnimationType.values) {
         testWidgets(
           '${transition.name} presents custom loading and idle content',
@@ -59,6 +24,7 @@ void main() {
                 entry.value(
                   child: const Text('Run'),
                   loadingChild: const Text('Busy'),
+                  loadingSemanticsLabel: 'Ignored default label',
                   onPressed: () => pending.future,
                   transitionType: transition,
                   animationDuration: _duration,
@@ -91,6 +57,10 @@ void main() {
             await tester.pumpAndSettle();
             expect(find.bySemanticsLabel(RegExp('Run')), findsNothing);
             expect(find.bySemanticsLabel(RegExp('Busy')), findsOneWidget);
+            expect(
+              find.semantics.byLabel(RegExp('Ignored default label')),
+              findsNothing,
+            );
             if (transition == TransitionAnimationType.customBuilder) {
               expect(
                 tester.getSemantics(materialButton).getSemanticsData().label,
@@ -129,6 +99,7 @@ void main() {
               entry.value(
                 child: const Text('Run'),
                 onPressed: () => pending.future,
+                loadingSemanticsLabel: 'Ignored default label',
                 transitionType: TransitionAnimationType.customBuilder,
                 customBuilder: (loading, child, loadingChild) =>
                     loading ? loadingChild ?? const Text('Fallback') : child,
@@ -140,7 +111,12 @@ void main() {
           await tester.tap(materialButton);
           await tester.pumpAndSettle();
           expect(find.text('Run'), findsNothing);
-          expect(find.text('Fallback'), findsOneWidget);
+          expect(find.bySemanticsLabel('Fallback'), findsOneWidget);
+          expect(
+            find.semantics.byLabel(RegExp('Ignored default label')),
+            findsNothing,
+          );
+          expect(find.byType(CircularProgressIndicator), findsNothing);
           pending.complete();
           await tester.pumpAndSettle();
           expect(find.text('Run'), findsOneWidget);
@@ -226,6 +202,116 @@ void main() {
         expect(find.text('Removed'), findsOneWidget);
       });
     });
+  }
+
+  // One owner for default-indicator labels, including factory fallbacks and
+  // selected icons. Check actual accessibility output during both loading
+  // sources and fades, without depending on the transition's widget structure.
+  for (final entry in asyncButtonSemanticsBuilders.entries) {
+    for (final transition in [
+      TransitionAnimationType.stack,
+      TransitionAnimationType.animatedSwitcher,
+    ]) {
+      testWidgets(
+        '${entry.key} ${transition.name} exposes only the current '
+        'loading label',
+        (tester) async {
+          final semantics = tester.ensureSemantics();
+          try {
+            final pending = Completer<void>();
+            var calls = 0;
+            Widget host(bool loading, {String? label = 'Guardando cambios'}) =>
+                buttonHost(
+                  entry.value(
+                    child: const Text('Run'),
+                    onPressed: () {
+                      calls++;
+
+                      return pending.future;
+                    },
+                    loading: loading,
+                    loadingSemanticsLabel: label,
+                    transitionType: transition,
+                    animationDuration: _duration,
+                    minimumChildOpacity: 0.5,
+                  ),
+                );
+            void expectLoadingLabel(String label) {
+              final labels = find.semantics.byLabel(RegExp(label));
+              expect(labels, findsOne);
+              final data = labels.evaluate().single.getSemanticsData();
+              // Exact text also detects duplicate labels merged onto one node.
+              expect(data.label, label);
+              // Material may merge progress into the outer disabled button.
+              // There must still be only one button role in the semantics tree.
+              expect(find.semantics.byFlag(SemanticsFlag.isButton), findsOne);
+              expect(data.flagsCollection.isLiveRegion, isFalse);
+              expect(data.hasAction(SemanticsAction.tap), isFalse);
+              expect(find.semantics.byLabel('Run'), findsNothing);
+              final outer = tester
+                  .getSemantics(materialButton)
+                  .getSemanticsData();
+              expect(outer.flagsCollection.isButton, isTrue);
+              expect(outer.flagsCollection.isEnabled, Tristate.isFalse);
+              expect(outer.hasAction(SemanticsAction.tap), isFalse);
+            }
+
+            await tester.pumpWidget(host(false));
+            expect(find.semantics.byLabel('Run'), findsOne);
+            expect(find.semantics.byLabel('Guardando cambios'), findsNothing);
+
+            // Null leaves progress unlabeled, with no English default.
+            await tester.pumpWidget(host(true, label: null));
+            await tester.pump(_duration ~/ 2);
+            expect(
+              tester
+                  .getSemantics(find.byType(CircularProgressIndicator))
+                  .getSemanticsData()
+                  .label,
+              isEmpty,
+            );
+            await tester.pumpWidget(host(false));
+            await tester.pumpAndSettle();
+
+            tester.semantics.performAction(
+              find.semantics.byLabel('Run'),
+              SemanticsAction.tap,
+            );
+            await tester.pump();
+            await tester.pump(_duration ~/ 2);
+            expectLoadingLabel('Guardando cambios');
+
+            // Completing internal work leaves externally owned loading intact.
+            await tester.pumpWidget(host(true));
+            pending.complete();
+            await tester.pump(_duration);
+            expectLoadingLabel('Guardando cambios');
+            expect(calls, 1);
+
+            // Locale changes update the current label without making it live.
+            await tester.pumpWidget(host(true, label: 'Enregistrement'));
+            expectLoadingLabel('Enregistrement');
+            expect(find.semantics.byLabel('Guardando cambios'), findsNothing);
+
+            await tester.pumpWidget(host(false));
+            // Outgoing loading content is inaccessible during its fade.
+            expect(find.semantics.byLabel('Enregistrement'), findsNothing);
+            await tester.pump(_duration ~/ 2);
+            expect(find.semantics.byLabel('Run'), findsOne);
+            await tester.pumpAndSettle();
+            expect(find.byType(CircularProgressIndicator), findsNothing);
+            tester.semantics.performAction(
+              find.semantics.byLabel('Run'),
+              SemanticsAction.tap,
+            );
+            await tester.pumpAndSettle();
+            expect(calls, 2);
+          } finally {
+            semantics.dispose();
+          }
+        },
+      );
+    }
   }
 
   // Text-button keyboard/loading semantics are already owned by #8. IconButton

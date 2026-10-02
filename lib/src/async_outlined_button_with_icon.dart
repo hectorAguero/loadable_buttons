@@ -7,6 +7,7 @@ class _AsyncOutlinedButtonWithIcon extends AsyncOutlinedButton {
     required super.onPressed,
     required super.loading,
     required super.loadingChild,
+    super.loadingSemanticsLabel,
     super.onError,
     super.key,
     super.onLongPress,

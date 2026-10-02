@@ -227,26 +227,87 @@ constrain both idle and loading content when a stable size is required.
 
 ### Accessible loading content
 
-Supply a localized label for your operation. `AsyncElevatedButton` supports
-`loadingSemanticsLabel` on its default spinner, including `.icon`. Other families
-can use a labeled custom indicator:
+Every constructor accepts `loadingSemanticsLabel` for its default spinner,
+including icon, tonal, selected IconButton, and extended FAB variants. The
+default is `null`; the package supplies no English text. Use your application's
+localized strings for both the idle action and the loading operation:
+
+```dart
+// l10n is your application's localization object for the current context.
+AsyncFilledButton.icon(
+  onPressed: saveChanges,
+  loadingSemanticsLabel: l10n.savingChanges,
+  icon: const Icon(Icons.save_outlined),
+  label: Text(l10n.save),
+);
+```
+
+The label follows the current locale when the widget rebuilds. It is exposed
+only while loading, for either external `loading` or a pending callback.
+The outer button keeps its disabled button semantics; the spinner adds no
+button role or activation action.
+
+Custom content owns its accessible labels and progress values. For example,
+the following uses your application's localized strings and a progress value
+between `0.0` and `1.0`:
 
 ```dart
 AsyncFilledButton(
   onPressed: saveChanges,
-  loadingChild: const SizedBox.square(
+  loadingChild: SizedBox.square(
     dimension: 20,
-    child: CircularProgressIndicator(semanticsLabel: 'Saving changes'),
+    child: CircularProgressIndicator(
+      value: progress,
+      semanticsLabel: l10n.savingChanges,
+      semanticsValue: l10n.percentComplete((progress * 100).round()),
+    ),
   ),
-  child: const Text('Save'),
+  child: Text(l10n.save),
 );
 ```
 
 `loadingSemanticsLabel` is ignored when you supply `loadingChild` or use a custom
-builder. Consumers own custom content labels, progress values, and any live
-announcements; the package adds no default localized announcement. Built-in
-transitions exclude inactive content from semantics, so a hidden idle label is
-not a substitute for labeling the loading content.
+builder, so custom labels are never silently duplicated. This includes builders
+that receive a null `loadingChild`; the package supplies neither a default
+spinner nor a semantics wrapper in custom-builder mode. Built-in transitions
+exclude inactive content from semantics, so a hidden idle label is not a
+substitute for labeling the loading content.
+
+The package does not request live announcements. If your application needs
+them, opt in separately, such as a `Semantics(liveRegion: true)` status message
+whose text changes when an operation starts or finishes. Trigger explicit
+announcements from operation state changes, never from `build` or animation
+frames. See the [shared loading semantics policy](doc/loading-semantics-policy.md)
+for the contract future Cupertino/adaptive constructors must follow.
+
+An intentional Cancel action may remain accessible inside current loading
+content, while the outer button stays disabled:
+
+```dart
+AsyncOutlinedButton(
+  onPressed: saveChanges,
+  loadingChild: Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      SizedBox.square(
+        dimension: 20,
+        child: CircularProgressIndicator(semanticsLabel: l10n.savingChanges),
+      ),
+      TextButton(
+        onPressed: cancelSave,
+        child: Text(l10n.cancel),
+      ),
+    ],
+  ),
+  child: Text(l10n.save),
+);
+```
+
+`cancelSave` belongs to your operation's cancellation API. The callback Future
+must finish before internal loading clears, and external loading must be cleared
+by its owner. A Cancel label alone does not cancel work. The
+[example application](example/lib/loading_contract_demo.dart) demonstrates this
+with a controlled Future, accessible custom progress, and a Cancel action.
 
 ### Custom builders
 

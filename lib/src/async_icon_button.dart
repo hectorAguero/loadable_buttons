@@ -27,6 +27,7 @@ class AsyncIconButton extends StatefulWidget {
     required this.onPressed,
     this.onError,
     this.loadingChild,
+    this.loadingSemanticsLabel,
     this.loading = false,
     this.autofocus = false,
     this.style,
@@ -73,6 +74,7 @@ class AsyncIconButton extends StatefulWidget {
     required this.onPressed,
     this.onError,
     this.loadingChild,
+    this.loadingSemanticsLabel,
     this.loading = false,
     this.autofocus = false,
     this.style,
@@ -119,6 +121,7 @@ class AsyncIconButton extends StatefulWidget {
     required this.onPressed,
     this.onError,
     this.loadingChild,
+    this.loadingSemanticsLabel,
     this.loading = false,
     this.autofocus = false,
     this.style,
@@ -166,6 +169,7 @@ class AsyncIconButton extends StatefulWidget {
     required this.onPressed,
     this.onError,
     this.loadingChild,
+    this.loadingSemanticsLabel,
     this.loading = false,
     this.autofocus = false,
     this.style,
@@ -216,6 +220,13 @@ class AsyncIconButton extends StatefulWidget {
   /// semantics for custom content; larger content can change the button's size.
   /// A custom builder receives this value unchanged, including null.
   final Widget? loadingChild;
+
+  /// The accessible label for the default loading spinner.
+  ///
+  /// Defaults to `null`; supply a localized description of the operation.
+  /// Ignored with [loadingChild] or [TransitionAnimationType.customBuilder],
+  /// whose content owns its semantics and any live announcements.
+  final String? loadingSemanticsLabel;
 
   /// The synchronous or asynchronous activation callback.
   ///
@@ -377,6 +388,7 @@ class _AsyncIconButtonState extends State<AsyncIconButton>
       animationDuration: widget.animationDuration,
       minimumChildOpacity: widget.minimumChildOpacity,
       loadingChild: widget.loadingChild,
+      loadingSemanticsLabel: widget.loadingSemanticsLabel,
       style: widget.style,
       customBuilder: widget.customBuilder,
     );
@@ -390,6 +402,7 @@ class _AsyncIconButtonState extends State<AsyncIconButton>
             animationDuration: widget.animationDuration,
             minimumChildOpacity: widget.minimumChildOpacity,
             loadingChild: widget.loadingChild,
+            loadingSemanticsLabel: widget.loadingSemanticsLabel,
             style: widget.style,
             customBuilder: widget.customBuilder,
           );
@@ -521,12 +534,14 @@ class _AsyncIconButtonChild extends StatelessWidget {
     required this.animationDuration,
     required this.minimumChildOpacity,
     this.loadingChild,
+    this.loadingSemanticsLabel,
     this.style,
     this.customBuilder,
   });
 
   final Widget icon;
   final Widget? loadingChild;
+  final String? loadingSemanticsLabel;
   final ButtonStyle? style;
   final TransitionAnimationType transitionType;
   final bool isLoading;
@@ -547,6 +562,7 @@ class _AsyncIconButtonChild extends StatelessWidget {
           loadingChild ??
           DefaultLoadingIndicator(
             style: style,
+            loadingSemanticsLabel: loadingSemanticsLabel,
             themeStyleOf: (context) => IconButtonTheme.of(context).style,
           ),
       isLoading: isLoading,

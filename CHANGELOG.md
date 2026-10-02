@@ -1,5 +1,10 @@
 ## 2.0.0 (unreleased)
 
+* Add optional localized `loadingSemanticsLabel` to every Material constructor,
+  including tonal, selected-icon, and extended FAB loading paths. Labels apply
+  only to default spinners; custom loading content owns its semantics and live
+  announcements. Preserve null defaults and disabled outer button semantics.
+
 * Add optional `onError` to every constructor with a shared
   `AsyncButtonErrorHandler` typedef. Successful handlers explicitly consume
   activation errors; absent handlers preserve the original error and stack trace.

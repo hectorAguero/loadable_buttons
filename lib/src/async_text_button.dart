@@ -29,6 +29,7 @@ class AsyncTextButton extends StatefulWidget {
     required this.onPressed,
     this.onError,
     this.loadingChild,
+    this.loadingSemanticsLabel,
     this.loading = false,
     this.autofocus = false,
     this.clipBehavior,
@@ -71,6 +72,7 @@ class AsyncTextButton extends StatefulWidget {
     Widget? icon,
     IconAlignment? iconAlignment,
     Widget? loadingChild,
+    String? loadingSemanticsLabel,
     bool loading = false,
     bool autofocus = false,
     Duration animationDuration = Durations.medium1,
@@ -86,6 +88,7 @@ class AsyncTextButton extends StatefulWidget {
         onPressed: onPressed,
         onError: onError,
         loadingChild: loadingChild,
+        loadingSemanticsLabel: loadingSemanticsLabel,
         loading: loading,
         autofocus: autofocus,
         clipBehavior: clipBehavior,
@@ -111,6 +114,7 @@ class AsyncTextButton extends StatefulWidget {
       onError: onError,
       loading: loading,
       loadingChild: loadingChild,
+      loadingSemanticsLabel: loadingSemanticsLabel,
       key: key,
       onLongPress: onLongPress,
       onHover: onHover,
@@ -138,6 +142,13 @@ class AsyncTextButton extends StatefulWidget {
   /// semantics for custom content; larger content can change the button's size.
   /// A custom builder receives this value unchanged, including null.
   final Widget? loadingChild;
+
+  /// The accessible label for the default loading spinner.
+  ///
+  /// Defaults to `null`; supply a localized description of the operation.
+  /// Ignored with [loadingChild] or [TransitionAnimationType.customBuilder],
+  /// whose content owns its semantics and any live announcements.
+  final String? loadingSemanticsLabel;
 
   /// The synchronous or asynchronous activation callback.
   ///
@@ -274,6 +285,7 @@ class _AsyncTextButtonState extends State<AsyncTextButton>
                   widget.loadingChild ??
                   DefaultLoadingIndicator(
                     style: widget.style,
+                    loadingSemanticsLabel: widget.loadingSemanticsLabel,
                     themeStyleOf: (context) =>
                         TextButtonTheme.of(context).style,
                   ),

@@ -23,7 +23,7 @@ class LoadingContractDemo extends StatefulWidget {
 }
 
 class _LoadingContractDemoState extends State<LoadingContractDemo> {
-  Completer<void>? _operation;
+  Completer<bool>? _operation;
   bool _externalLoading = false;
   bool _disabled = false;
   bool _selected = false;
@@ -33,14 +33,20 @@ class _LoadingContractDemoState extends State<LoadingContractDemo> {
   String _result = 'No operation started';
 
   Future<void> _startOperation() async {
-    final operation = Completer<void>();
+    final operation = Completer<bool>();
     setState(() {
       _operation = operation;
       _result = 'Operation pending';
     });
     try {
-      await operation.future;
-      if (mounted) setState(() => _result = 'Operation completed');
+      final completed = await operation.future;
+      if (mounted) {
+        setState(
+          () => _result = completed
+              ? 'Operation completed'
+              : 'Operation cancelled',
+        );
+      }
     } finally {
       if (mounted) setState(() => _operation = null);
     }
@@ -52,13 +58,13 @@ class _LoadingContractDemoState extends State<LoadingContractDemo> {
     if (mounted) setState(() => _result = 'Handled error: $error');
   }
 
-  void _finishOperation({bool fail = false}) {
+  void _finishOperation({bool fail = false, bool cancel = false}) {
     final operation = _operation;
     if (operation == null || operation.isCompleted) return;
     if (fail) {
       operation.completeError(Exception('Simulated save failure'));
     } else {
-      operation.complete();
+      operation.complete(!cancel);
     }
   }
 
@@ -72,7 +78,7 @@ class _LoadingContractDemoState extends State<LoadingContractDemo> {
     // Release this demo's controlled Future when leaving the page.
     // Real operations need their own cancellation policy.
     final operation = _operation;
-    if (operation != null && !operation.isCompleted) operation.complete();
+    if (operation != null && !operation.isCompleted) operation.complete(false);
     super.dispose();
   }
 
@@ -151,7 +157,20 @@ class _LoadingContractDemoState extends State<LoadingContractDemo> {
                     AsyncElevatedButton(
                       loading: _externalLoading,
                       transitionType: widget.transitionType,
-                      loadingChild: loadingContent,
+                      // Progress owns its label; Cancel is a separate action.
+                      // External loading still belongs to the switch above.
+                      loadingChild: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          loadingContent,
+                          TextButton(
+                            onPressed: _operation == null
+                                ? null
+                                : () => _finishOperation(cancel: true),
+                            child: const Text('Cancel'),
+                          ),
+                        ],
+                      ),
                       onPressed: _disabled ? null : _startOperation,
                       onError: _handleOperationError,
                       onLongPress: _disabled
@@ -187,12 +206,7 @@ class _LoadingContractDemoState extends State<LoadingContractDemo> {
                       tooltip: 'Toggle favorite',
                       loading: _externalLoading,
                       transitionType: widget.transitionType,
-                      loadingChild: const SizedBox.square(
-                        dimension: 20,
-                        child: CircularProgressIndicator(
-                          semanticsLabel: 'Updating favorite',
-                        ),
-                      ),
+                      loadingSemanticsLabel: 'Updating favorite',
                       isSelected: WidgetStatePropertyAll(_selected),
                       icon: const Icon(Icons.favorite_border),
                       selectedIcon: const Icon(Icons.favorite),

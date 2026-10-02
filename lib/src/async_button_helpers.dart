@@ -140,7 +140,7 @@ class DefaultLoadingIndicator extends StatelessWidget {
   /// The explicit FAB foreground color.
   final Color? color;
 
-  /// Elevated's optional accessibility label.
+  /// The optional localized accessibility label for the default spinner.
   final String? loadingSemanticsLabel;
 
   @override

@@ -22,32 +22,6 @@ typedef _IconButtonBuilder =
 
 void main() {
   group('AsyncIconButton', () {
-    testWidgets('default indicator covers selected content and restores it', (
-      tester,
-    ) async {
-      final pending = Completer<void>();
-      await tester.pumpWidget(
-        _host(
-          AsyncIconButton(
-            icon: const Icon(Icons.add),
-            selectedIcon: const Icon(Icons.check, semanticLabel: 'Selected'),
-            isSelected: const WidgetStatePropertyAll(true),
-            onPressed: () => pending.future,
-          ),
-        ),
-      );
-      expect(find.bySemanticsLabel('Selected'), findsOneWidget);
-      expect(find.byType(CircularProgressIndicator), findsNothing);
-      await tester.tap(find.byType(AsyncIconButton));
-      await tester.pump();
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
-      expect(find.bySemanticsLabel('Selected'), findsNothing);
-      pending.complete();
-      await tester.pumpAndSettle();
-      expect(find.byType(CircularProgressIndicator), findsNothing);
-      expect(find.bySemanticsLabel('Selected'), findsOneWidget);
-    });
-
     testWidgets('switcher completes both fades around a pending operation', (
       tester,
     ) async {
