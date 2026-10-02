@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:loadable_buttons/src/async_button_error_handler.dart';
 import 'package:loadable_buttons/src/loading_transition.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -16,16 +17,24 @@ mixin AsyncButtonState<ButtonWidget extends StatefulWidget>
   /// The current callback supplied by the consumer.
   FutureOr<void> Function()? get asyncOnPressed;
 
+  /// The optional error handler supplied by the consumer.
+  AsyncButtonErrorHandler? get asyncOnError;
+
   /// External updates never clear an operation that is still pending.
   bool get isLoading => _internalLoading || externalLoading;
 
   /// Locks synchronously and releases only the operation's own loading state.
   Future<void> handlePressed() async {
-    if (asyncOnPressed == null || isLoading) return;
+    final callback = asyncOnPressed;
+    if (!mounted || callback == null || isLoading) return;
+    final errorHandler = asyncOnError;
     setState(() => _internalLoading = true);
 
     try {
-      await asyncOnPressed?.call();
+      await callback();
+    } on Object catch (error, stackTrace) {
+      if (errorHandler == null) rethrow;
+      await errorHandler(error, stackTrace);
     } finally {
       // Consumer exceptions propagate even when the button has been disposed.
       if (mounted) setState(() => _internalLoading = false);

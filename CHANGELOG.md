@@ -1,5 +1,11 @@
 ## 2.0.0 (unreleased)
 
+* Add optional `onError` to every constructor with a shared
+  `AsyncButtonErrorHandler` typedef. Successful handlers explicitly consume
+  activation errors; absent handlers preserve the original error and stack trace.
+  Async handlers retain the loading lock, handler failures propagate, and captured
+  handlers still run after disposal without changing disposed widget state.
+
 * **Breaking:** use standalone `material_ui >=1.0.0 <2.0.0` for all Material
   widgets and public types. Applications must import
   `package:material_ui/material_ui.dart` for themes and `ButtonStyle` values.

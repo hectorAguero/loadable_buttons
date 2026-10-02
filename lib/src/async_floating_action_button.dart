@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:loadable_buttons/src/async_button_error_handler.dart';
 import 'package:loadable_buttons/src/async_button_helpers.dart';
 import 'package:loadable_buttons/src/loading_transition.dart';
 import 'package:material_ui/material_ui.dart';
@@ -14,11 +15,12 @@ class _DefaultHeroTag {
 
 /// A Material [FloatingActionButton] with external and async loading states.
 ///
-/// Effective loading is [loading] or a pending [onPressed] callback. Loading
-/// disables outer button activation; built-in transitions exclude inactive
-/// content from pointer input, focus, and semantics. Internal loading clears
-/// when the callback completes or throws, but errors are not swallowed.
-/// Handle errors in the callback and return or await all work to be tracked.
+/// Effective loading is [loading] or a pending [onPressed] or [onError].
+/// Loading disables outer button activation; built-in transitions exclude
+/// inactive content from pointer input, focus, and semantics. Internal loading
+/// clears when both callbacks finish. [onError] explicitly consumes errors when
+/// it succeeds. Unhandled errors propagate with their original stack trace.
+/// Return or await all work to be tracked.
 /// Disposing the widget does not cancel that work.
 ///
 /// Larger [loadingChild] content can affect layout within Material and parent
@@ -30,6 +32,7 @@ class AsyncFloatingActionButton extends StatefulWidget {
   const AsyncFloatingActionButton({
     required this.child,
     required this.onPressed,
+    this.onError,
     this.tooltip,
     this.foregroundColor,
     this.backgroundColor,
@@ -76,6 +79,7 @@ class AsyncFloatingActionButton extends StatefulWidget {
   const AsyncFloatingActionButton.small({
     required this.child,
     required this.onPressed,
+    this.onError,
     this.tooltip,
     this.foregroundColor,
     this.backgroundColor,
@@ -125,6 +129,7 @@ class AsyncFloatingActionButton extends StatefulWidget {
   const AsyncFloatingActionButton.large({
     required this.child,
     required this.onPressed,
+    this.onError,
     this.tooltip,
     this.foregroundColor,
     this.backgroundColor,
@@ -174,6 +179,7 @@ class AsyncFloatingActionButton extends StatefulWidget {
   const AsyncFloatingActionButton.extended({
     required this.onPressed,
     required Widget label,
+    this.onError,
     this.tooltip,
     this.foregroundColor,
     this.backgroundColor,
@@ -234,17 +240,29 @@ class AsyncFloatingActionButton extends StatefulWidget {
   /// The synchronous or asynchronous activation callback.
   ///
   /// Return or await async work to keep the button loading until it completes.
-  /// Internal loading clears on completion or error; exceptions propagate.
-  /// Handle errors here according to the application's policy.
+  /// Internal loading clears after this callback and any [onError] finish.
+  /// Errors propagate with their original stack trace unless [onError] consumes
+  /// them. Unreturned or unawaited Futures cannot be tracked.
   ///
   /// Null disables the button.
   final FutureOr<void> Function()? onPressed;
 
+  /// The optional handler that explicitly consumes errors from [onPressed].
+  ///
+  /// Called once with the original error and stack trace. Loading stays active
+  /// until the handler finishes. Handler failures propagate without invoking
+  /// it again. Null preserves the original error propagation.
+  ///
+  /// Captured when activation starts and still called after disposal; check
+  /// your own lifecycle before using captured state or context. See
+  /// [AsyncButtonErrorHandler] for the shared policy across all constructors.
+  final AsyncButtonErrorHandler? onError;
+
   /// Whether the application requests external loading.
   ///
   /// Defaults to false. Effective loading combines this flag with a pending
-  /// [onPressed] callback. Setting it to false neither cancels nor unlocks that
-  /// callback; callback completion does not clear this flag.
+  /// [onPressed] or [onError]. Setting it to false neither cancels nor unlocks
+  /// that work; completing either callback does not clear this flag.
   final bool loading;
 
   /// The focusNode of the button.
@@ -372,6 +390,9 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton>
 
   @override
   FutureOr<void> Function()? get asyncOnPressed => widget.onPressed;
+
+  @override
+  AsyncButtonErrorHandler? get asyncOnError => widget.onError;
 
   bool get _useFullExtendedStack =>
       widget.transitionType == TransitionAnimationType.stack &&

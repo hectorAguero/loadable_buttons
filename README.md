@@ -111,7 +111,7 @@ AsyncFilledButton.icon(
 async work so the button can track its completion.
 
 External `loading` and a pending callback are independent: the button stays
-loading while **either is active**.
+loading while **either is active**, including any pending `onError` handler.
 
 ```dart
 // isSaving is a bool managed by your application.
@@ -125,28 +125,49 @@ AsyncElevatedButton(
 Setting `loading: false` does not cancel or unlock a pending callback. Likewise,
 finishing the callback does not clear external `loading: true`.
 
-Internal loading clears even if the callback throws. Exceptions are not swallowed;
-handle errors in your callback. Disposing the widget does not cancel the operation.
-Check `mounted` before updating your widget's state after an `await`.
+### Callback errors
 
-Choose the error policy in your application, for example:
+All constructors accept an optional `onError` callback using the exported
+`AsyncButtonErrorHandler` typedef:
+`FutureOr<void> Function(Object error, StackTrace stackTrace)`.
+
+Without `onError`, a synchronous throw or failed callback Future propagates
+with its original stack trace. Material activation accepts a synchronous
+callback, so unhandled errors reach the caller's zone through the package's
+handler Future.
+
+**Supplying `onError` explicitly consumes the callback error** when the handler
+completes successfully. The package does not also log or report it. Choose your
+application's feedback or reporting policy:
 
 ```dart
 AsyncElevatedButton(
-  onPressed: () async {
-    try {
-      await saveChanges();
-    } catch (error) {
-      // Replace this with your application's feedback or retry policy.
-      debugPrint('Saving failed: $error');
-    }
+  onPressed: saveChanges,
+  onError: (error, stackTrace) {
+    debugPrint('Saving failed: $error\n$stackTrace');
   },
   child: const Text('Save'),
 );
 ```
 
+The handler receives the original error and stack trace exactly once. It may be
+async; the button stays loading and locked until it finishes. Internal loading
+then clears, including when the handler itself throws or returns a failed Future.
+A handler failure propagates with its own stack trace and does not call `onError`
+again. External `loading` remains independent throughout. This hook handles only
+`onPressed` errors; synchronous `onLongPress` callbacks and presentation builders
+retain their normal behavior.
+
+Each activation captures its callback and handler before starting; rebuilding
+with a different handler affects the next activation. Disposing the widget does
+not cancel the operation or suppress the captured handler. No `BuildContext` is
+supplied. Check your own `mounted` before accessing captured state or context,
+including in `onError`.
+
 Launching work without returning or awaiting its Future ends the tracked callback
-early. The button cannot track that work or handle its later errors.
+early. The button cannot track that work or handle its later errors. See the
+[shared callback error policy](doc/callback-error-policy.md) for future controller
+and Cupertino/adaptive implementations.
 
 Set `onPressed: null` to disable a button. Elevated, Filled, Outlined, and Text
 buttons remain enabled if `onLongPress` is provided; loading blocks both

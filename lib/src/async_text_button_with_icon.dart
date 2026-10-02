@@ -7,6 +7,7 @@ class _AsyncTextButtonWithIcon extends AsyncTextButton {
     required super.onPressed,
     required super.loading,
     required super.loadingChild,
+    super.onError,
     super.key,
     super.onLongPress,
     super.onHover,
