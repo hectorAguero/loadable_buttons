@@ -39,6 +39,11 @@ typedef _AsyncBuilder =
       Widget? loadingChild,
       TransitionAnimationType transitionType,
       double minimumChildOpacity,
+      Color? focusColor,
+      FocusNode? focusNode,
+      ValueChanged<bool>? onFocusChange,
+      bool autofocus,
+      MouseCursor? mouseCursor,
     });
 
 final _variants = <String, (_NativeBuilder, _AsyncBuilder)>{
@@ -307,6 +312,37 @@ void main() {
         expect(find.semantics.byLabel('Idle action'), findsOne);
       });
     }
+
+    testWidgets('${entry.key} forwards native focus and cursor options', (
+      tester,
+    ) async {
+      final focusNode = FocusNode();
+      addTearDown(focusNode.dispose);
+      final focusChanges = <bool>[];
+      await tester.pumpWidget(
+        _host(
+          entry.value.$2(
+            child: const Text('Run'),
+            onPressed: () {},
+            focusColor: CupertinoColors.systemGreen,
+            focusNode: focusNode,
+            onFocusChange: focusChanges.add,
+            autofocus: true,
+            mouseCursor: SystemMouseCursors.help,
+          ),
+        ),
+      );
+      await tester.pump();
+      final native = tester.widget<CupertinoButton>(
+        find.byType(CupertinoButton),
+      );
+      expect(native.focusColor, CupertinoColors.systemGreen);
+      expect(native.focusNode, same(focusNode));
+      expect(native.autofocus, isTrue);
+      expect(native.mouseCursor, SystemMouseCursors.help);
+      expect(focusNode.hasFocus, isTrue);
+      expect(focusChanges, [true]);
+    });
 
     testWidgets(
       '${entry.key} uses Cupertino theme and explicit spinner colors',
