@@ -14,6 +14,7 @@ typedef AsyncButtonBuilder =
       AsyncButtonErrorHandler? onError,
       bool loading,
       Widget? loadingChild,
+      String? loadingSemanticsLabel,
       TransitionAnimationType transitionType,
       Duration animationDuration,
       double minimumChildOpacity,
@@ -29,6 +30,7 @@ typedef _LabelBuilder =
       Widget? icon,
       bool loading,
       Widget? loadingChild,
+      String? loadingSemanticsLabel,
       TransitionAnimationType transitionType,
       Duration animationDuration,
       double minimumChildOpacity,
@@ -40,9 +42,12 @@ typedef _IconBuilder =
     Widget Function({
       required Widget icon,
       required FutureOr<void> Function()? onPressed,
+      WidgetStateProperty<bool>? isSelected,
+      Widget? selectedIcon,
       AsyncButtonErrorHandler? onError,
       bool loading,
       Widget? loadingChild,
+      String? loadingSemanticsLabel,
       TransitionAnimationType transitionType,
       Duration animationDuration,
       double minimumChildOpacity,
@@ -76,7 +81,7 @@ final asyncButtonBuilders = <String, AsyncButtonBuilder>{
 };
 
 // Include both factory branches without multiplying unrelated contract tests.
-final asyncButtonErrorBuilders = <String, AsyncButtonBuilder>{
+final asyncButtonConstructorBuilders = <String, AsyncButtonBuilder>{
   ...asyncButtonBuilders,
   'Elevated.icon without icon': _withLabel(
     AsyncElevatedButton.icon,
@@ -97,6 +102,18 @@ final asyncButtonErrorBuilders = <String, AsyncButtonBuilder>{
   ),
 };
 
+// Selected IconButton content takes a separate indicator forwarding path.
+final asyncButtonSemanticsBuilders = <String, AsyncButtonBuilder>{
+  ...asyncButtonConstructorBuilders,
+  'Icon selected': _withIcon(AsyncIconButton.new, selected: true),
+  'Icon.filled selected': _withIcon(AsyncIconButton.filled, selected: true),
+  'Icon.filledTonal selected': _withIcon(
+    AsyncIconButton.filledTonal,
+    selected: true,
+  ),
+  'Icon.outlined selected': _withIcon(AsyncIconButton.outlined, selected: true),
+};
+
 AsyncButtonBuilder _withLabel(
   _LabelBuilder builder, {
   Widget? icon = const Icon(Icons.add),
@@ -107,6 +124,7 @@ AsyncButtonBuilder _withLabel(
       onError,
       loading = false,
       loadingChild,
+      loadingSemanticsLabel,
       transitionType = TransitionAnimationType.stack,
       animationDuration = Durations.medium1,
       minimumChildOpacity = 0.0,
@@ -119,6 +137,7 @@ AsyncButtonBuilder _withLabel(
       onError: onError,
       loading: loading,
       loadingChild: loadingChild,
+      loadingSemanticsLabel: loadingSemanticsLabel,
       transitionType: transitionType,
       animationDuration: animationDuration,
       minimumChildOpacity: minimumChildOpacity,
@@ -126,13 +145,14 @@ AsyncButtonBuilder _withLabel(
       focusNode: focusNode,
     );
 
-AsyncButtonBuilder _withIcon(_IconBuilder builder) =>
+AsyncButtonBuilder _withIcon(_IconBuilder builder, {bool selected = false}) =>
     ({
       required child,
       required onPressed,
       onError,
       loading = false,
       loadingChild,
+      loadingSemanticsLabel,
       transitionType = TransitionAnimationType.stack,
       animationDuration = Durations.medium1,
       minimumChildOpacity = 0.0,
@@ -140,10 +160,15 @@ AsyncButtonBuilder _withIcon(_IconBuilder builder) =>
       focusNode,
     }) => builder(
       icon: child,
+      isSelected: selected ? const WidgetStatePropertyAll(true) : null,
+      selectedIcon: selected
+          ? const Icon(Icons.check, semanticLabel: 'Selected')
+          : null,
       onPressed: onPressed,
       onError: onError,
       loading: loading,
       loadingChild: loadingChild,
+      loadingSemanticsLabel: loadingSemanticsLabel,
       transitionType: transitionType,
       animationDuration: animationDuration,
       minimumChildOpacity: minimumChildOpacity,

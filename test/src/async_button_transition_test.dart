@@ -683,47 +683,6 @@ void main() {
     await tester.pump(_duration);
     expect(tester.getSize(find.byKey(_buttonKey)), idleSize);
   });
-
-  for (final transition in [
-    TransitionAnimationType.stack,
-    TransitionAnimationType.animatedSwitcher,
-  ]) {
-    testWidgets('Elevated $transition exposes only the current loading label', (
-      tester,
-    ) async {
-      final semantics = tester.ensureSemantics();
-      try {
-        Widget host(bool loading, {Widget? loadingChild}) => _host(
-          AsyncElevatedButton(
-            onPressed: () {},
-            loading: loading,
-            transitionType: transition,
-            animationDuration: _duration,
-            loadingSemanticsLabel: 'Saving',
-            loadingChild: loadingChild,
-            child: const Text('Save'),
-          ),
-        );
-        await tester.pumpWidget(host(false));
-        expect(find.semantics.byLabel(RegExp('Saving')), findsNothing);
-        await tester.pumpWidget(host(true));
-        await tester.pump(_halfDuration);
-        expect(find.semantics.byLabel(RegExp('Saving')), findsOne);
-        expect(find.semantics.byLabel('Save'), findsNothing);
-        await tester.pumpWidget(host(false));
-        expect(find.semantics.byLabel(RegExp('Saving')), findsNothing);
-        await tester.pump(_duration);
-        await tester.pumpWidget(
-          host(true, loadingChild: const Text('Working')),
-        );
-        await tester.pump(_duration);
-        expect(find.semantics.byLabel(RegExp('Saving')), findsNothing);
-        expect(find.semantics.byLabel(RegExp('Working')), findsOne);
-      } finally {
-        semantics.dispose();
-      }
-    });
-  }
 }
 
 Widget _action(String label, FocusNode? focusNode, VoidCallback onPressed) =>

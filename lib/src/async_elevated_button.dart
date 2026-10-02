@@ -226,7 +226,7 @@ class AsyncElevatedButton extends StatefulWidget {
 
   /// The accessible label for the default loading spinner.
   ///
-  /// Defaults to null; supply a localized description of the operation.
+  /// Defaults to `null`; supply a localized description of the operation.
   /// Ignored with [loadingChild] or [TransitionAnimationType.customBuilder],
   /// whose content owns its semantics and any live announcements.
   final String? loadingSemanticsLabel;

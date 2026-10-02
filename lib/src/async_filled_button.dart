@@ -33,6 +33,7 @@ class AsyncFilledButton extends StatefulWidget {
     required this.onPressed,
     this.onError,
     this.loadingChild,
+    this.loadingSemanticsLabel,
     this.loading = false,
     this.autofocus = false,
     this.clipBehavior,
@@ -83,6 +84,7 @@ class AsyncFilledButton extends StatefulWidget {
     Widget? icon,
     IconAlignment? iconAlignment,
     Widget? loadingChild,
+    String? loadingSemanticsLabel,
     bool loading = false,
     bool autofocus = false,
     Duration animationDuration = Durations.medium1,
@@ -98,6 +100,7 @@ class AsyncFilledButton extends StatefulWidget {
         onPressed: onPressed,
         onError: onError,
         loadingChild: loadingChild,
+        loadingSemanticsLabel: loadingSemanticsLabel,
         loading: loading,
         autofocus: autofocus,
         clipBehavior: clipBehavior,
@@ -123,6 +126,7 @@ class AsyncFilledButton extends StatefulWidget {
       onError: onError,
       loading: loading,
       loadingChild: loadingChild,
+      loadingSemanticsLabel: loadingSemanticsLabel,
       key: key,
       onLongPress: onLongPress,
       onHover: onHover,
@@ -152,6 +156,7 @@ class AsyncFilledButton extends StatefulWidget {
     required this.onPressed,
     this.onError,
     this.loadingChild,
+    this.loadingSemanticsLabel,
     this.loading = false,
     this.autofocus = false,
     this.clipBehavior,
@@ -195,6 +200,7 @@ class AsyncFilledButton extends StatefulWidget {
     Widget? icon,
     IconAlignment? iconAlignment,
     Widget? loadingChild,
+    String? loadingSemanticsLabel,
     bool loading = false,
     bool autofocus = false,
     Duration animationDuration = Durations.medium1,
@@ -210,6 +216,7 @@ class AsyncFilledButton extends StatefulWidget {
         onPressed: onPressed,
         onError: onError,
         loadingChild: loadingChild,
+        loadingSemanticsLabel: loadingSemanticsLabel,
         loading: loading,
         autofocus: autofocus,
         clipBehavior: clipBehavior ?? Clip.none,
@@ -245,6 +252,7 @@ class AsyncFilledButton extends StatefulWidget {
       iconAlignment: iconAlignment,
       loading: loading,
       loadingChild: loadingChild,
+      loadingSemanticsLabel: loadingSemanticsLabel,
       animationDuration: animationDuration,
       minimumChildOpacity: minimumChildOpacity,
       transitionType: transitionType,
@@ -262,6 +270,13 @@ class AsyncFilledButton extends StatefulWidget {
   /// semantics for custom content; larger content can change the button's size.
   /// A custom builder receives this value unchanged, including null.
   final Widget? loadingChild;
+
+  /// The accessible label for the default loading spinner.
+  ///
+  /// Defaults to `null`; supply a localized description of the operation.
+  /// Ignored with [loadingChild] or [TransitionAnimationType.customBuilder],
+  /// whose content owns its semantics and any live announcements.
+  final String? loadingSemanticsLabel;
 
   /// The synchronous or asynchronous activation callback.
   ///
@@ -404,6 +419,7 @@ class _AsyncFilledButtonState extends State<AsyncFilledButton>
                   widget.loadingChild ??
                   DefaultLoadingIndicator(
                     style: widget.style,
+                    loadingSemanticsLabel: widget.loadingSemanticsLabel,
                     themeStyleOf: (context) =>
                         FilledButtonTheme.of(context).style,
                   ),

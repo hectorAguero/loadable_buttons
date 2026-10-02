@@ -58,6 +58,7 @@ class AsyncFloatingActionButton extends StatefulWidget {
     this.transitionType = TransitionAnimationType.stack,
     this.customBuilder,
     this.loadingChild,
+    this.loadingSemanticsLabel,
     this.loading = false,
     this.splashFactory,
     super.key,
@@ -103,6 +104,7 @@ class AsyncFloatingActionButton extends StatefulWidget {
     this.transitionType = TransitionAnimationType.stack,
     this.customBuilder,
     this.loadingChild,
+    this.loadingSemanticsLabel,
     this.loading = false,
     this.splashFactory,
     super.key,
@@ -153,6 +155,7 @@ class AsyncFloatingActionButton extends StatefulWidget {
     this.transitionType = TransitionAnimationType.stack,
     this.customBuilder,
     this.loadingChild,
+    this.loadingSemanticsLabel,
     this.loading = false,
     this.splashFactory,
     super.key,
@@ -203,6 +206,7 @@ class AsyncFloatingActionButton extends StatefulWidget {
     this.transitionType = TransitionAnimationType.stack,
     this.customBuilder,
     this.loadingChild,
+    this.loadingSemanticsLabel,
     this.loading = false,
     this.extendedIconLabelSpacing,
     this.extendedPadding,
@@ -235,6 +239,13 @@ class AsyncFloatingActionButton extends StatefulWidget {
   /// semantics for custom content; larger content can change the button's size.
   /// A custom builder receives this value unchanged, including null.
   final Widget? loadingChild;
+
+  /// The accessible label for the default loading spinner.
+  ///
+  /// Defaults to `null`; supply a localized description of the operation.
+  /// Ignored with [loadingChild] or [TransitionAnimationType.customBuilder],
+  /// whose content owns its semantics and any live announcements.
+  final String? loadingSemanticsLabel;
 
   /// The synchronous or asynchronous activation callback.
   ///
@@ -420,6 +431,7 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton>
           animationDuration: widget.animationDuration,
           minimumChildOpacity: widget.minimumChildOpacity,
           loadingChild: widget.loadingChild,
+          loadingSemanticsLabel: widget.loadingSemanticsLabel,
           customBuilder: widget.customBuilder,
         ),
         tooltip: widget.tooltip,
@@ -454,6 +466,7 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton>
           animationDuration: widget.animationDuration,
           minimumChildOpacity: widget.minimumChildOpacity,
           loadingChild: widget.loadingChild,
+          loadingSemanticsLabel: widget.loadingSemanticsLabel,
           customBuilder: widget.customBuilder,
         ),
         tooltip: widget.tooltip,
@@ -486,6 +499,7 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton>
           animationDuration: widget.animationDuration,
           minimumChildOpacity: widget.minimumChildOpacity,
           loadingChild: widget.loadingChild,
+          loadingSemanticsLabel: widget.loadingSemanticsLabel,
           customBuilder: widget.customBuilder,
         ),
         tooltip: widget.tooltip,
@@ -547,6 +561,7 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton>
                 animationDuration: widget.animationDuration,
                 minimumChildOpacity: widget.minimumChildOpacity,
                 loadingChild: const SizedBox.shrink(),
+                loadingSemanticsLabel: widget.loadingSemanticsLabel,
                 customBuilder: widget.customBuilder,
               ),
         label: _AsyncFloatingActionButtonChild(
@@ -565,6 +580,7 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton>
           animationDuration: widget.animationDuration,
           minimumChildOpacity: widget.minimumChildOpacity,
           loadingChild: widget.loadingChild,
+          loadingSemanticsLabel: widget.loadingSemanticsLabel,
           customBuilder: widget.customBuilder,
         ),
         enableFeedback: widget.enableFeedback,
@@ -582,6 +598,7 @@ class _AsyncFloatingActionButtonChild extends StatelessWidget {
     required this.animationDuration,
     required this.minimumChildOpacity,
     required this.loadingChild,
+    required this.loadingSemanticsLabel,
     required this.customBuilder,
     this.leadingIcon,
     this.iconLabelSpacing,
@@ -595,6 +612,7 @@ class _AsyncFloatingActionButtonChild extends StatelessWidget {
   final Widget? leadingIcon;
   final double? iconLabelSpacing;
   final Widget? loadingChild;
+  final String? loadingSemanticsLabel;
   final Color? color;
   final TransitionAnimationType transitionType;
   final bool isLoading;
@@ -632,7 +650,12 @@ class _AsyncFloatingActionButtonChild extends StatelessWidget {
                 ],
               ),
       ),
-      loadingChild: loadingChild ?? DefaultLoadingIndicator(color: color),
+      loadingChild:
+          loadingChild ??
+          DefaultLoadingIndicator(
+            color: color,
+            loadingSemanticsLabel: loadingSemanticsLabel,
+          ),
       isLoading: isLoading,
       transitionType: transitionType,
       animationDuration: animationDuration,
