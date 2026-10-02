@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import 'package:loadable_buttons/src/loading_transition.dart';
+
 /// Package-internal loading state, intentionally absent from the public barrel.
 ///
 /// Each button keeps its own State and native Material variant wiring.
@@ -31,6 +33,68 @@ mixin AsyncButtonState<ButtonWidget extends StatefulWidget>
     }
   }
 }
+
+/// Presents stack content in Material's full button layer, including padding.
+///
+/// The native button keeps control of padding, alignment, sizing, state, and
+/// inherited styles. Loading content shares its paint, hit-test, and semantics
+/// bounds instead of being translated outside the idle content's layout.
+mixin StackLoadingButton on ButtonStyleButton {
+  @override
+  Widget? get child {
+    final content = super.child;
+
+    return content is LoadingTransition &&
+            content.transitionType == TransitionAnimationType.stack
+        ? content.child
+        : content;
+  }
+
+  @override
+  ButtonStyle? get style {
+    final originalStyle = super.style;
+    final content = super.child;
+    if (content is! LoadingTransition ||
+        content.transitionType != TransitionAnimationType.stack) {
+      return originalStyle;
+    }
+
+    return (originalStyle ?? const ButtonStyle()).copyWith(
+      backgroundBuilder: (context, states, child) {
+        final backgroundBuilder =
+            originalStyle?.backgroundBuilder ??
+            themeStyleOf(context)?.backgroundBuilder ??
+            defaultStyleOf(context).backgroundBuilder;
+
+        final transition = LoadingTransition(
+          child: child ?? const SizedBox.shrink(),
+          loadingChild: content.loadingChild,
+          isLoading: content.isLoading,
+          transitionType: content.transitionType,
+          animationDuration: content.animationDuration,
+          minimumChildOpacity: content.minimumChildOpacity,
+          animateChildSize: content.animateChildSize,
+          preserveChildConstraints: true,
+        );
+
+        return backgroundBuilder?.call(context, states, transition) ??
+            transition;
+      },
+    );
+  }
+}
+
+/// Keeps Material's original clipping policy when adding the loading layer.
+Clip resolveButtonClipBehavior({
+  required Clip? clipBehavior,
+  required ButtonStyle? style,
+  required ButtonStyle? themeStyle,
+}) =>
+    clipBehavior ??
+    ((style?.backgroundBuilder ?? themeStyle?.backgroundBuilder) != null ||
+            (style?.foregroundBuilder ?? themeStyle?.foregroundBuilder) != null
+        ? Clip.antiAlias
+        : Clip.none);
 
 /// Package-internal default indicator, resolved inside the Material button.
 class DefaultLoadingIndicator extends StatelessWidget {

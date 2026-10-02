@@ -1,3 +1,14 @@
+## 1.1.1
+
+* Invoke Filled button custom builders only for custom transitions.
+* Match native Material padding in Elevated, Filled (including tonal), Outlined,
+  and Text icon-and-label buttons, including text scaling and RTL layouts.
+* Preserve explicit and inherited theme padding, including state-dependent
+  fallbacks.
+* Center stack loading indicators within the whole button, including padding,
+  for Material text buttons and extended floating action buttons. Preserve idle
+  layout and custom loading-content interaction.
+
 ## 1.1.0
 
 * Clarify the Dart requirement as >=3.7.0 <4.0.0, matching the existing Flutter 3.29.0 minimum.

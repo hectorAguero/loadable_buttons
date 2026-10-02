@@ -161,6 +161,8 @@ defaults to `0.0` for stack transitions.
 Stack retains the idle content's layout, so a smaller indicator normally fits
 within the idle size. A larger `loadingChild` can expand the button within its
 parent and Material constraints. Stack does not guarantee a fixed size.
+Stack indicators are centered within the whole button, including padding, even
+when icon-and-label variants use asymmetric padding or content alignment.
 Animated switcher keeps both sizes in the layout while outgoing content fades;
 the shared layout animates its resize, including the shrink after that content
 is removed.

@@ -222,40 +222,47 @@ class _AsyncOutlinedButtonState extends State<AsyncOutlinedButton>
   }
 
   @override
-  Widget build(BuildContext context) => OutlinedButton(
-    onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
-    onLongPress:
-        isLoading || widget.onLongPress == null ? null : _handleLongPress,
-    onHover: widget.onHover,
-    onFocusChange: widget.onFocusChange,
-    style:
-        widget.style ??
-        OutlinedButton.styleFrom(splashFactory: widget.splashFactory),
-    focusNode: widget.focusNode,
-    autofocus: widget.autofocus,
-    clipBehavior: widget.clipBehavior,
-    statesController: widget.statesController,
-    child:
-        widget.transitionType == TransitionAnimationType.customBuilder
-            ? widget.customBuilder?.call(
-                  isLoading,
-                  widget.child,
-                  widget.loadingChild,
-                ) ??
-                widget.child
-            : LoadingTransition(
-              child: widget.child,
-              loadingChild:
-                  widget.loadingChild ??
-                  DefaultLoadingIndicator(
-                    style: widget.style,
-                    themeStyleOf:
-                        (context) => OutlinedButtonTheme.of(context).style,
-                  ),
-              isLoading: isLoading,
-              transitionType: widget.transitionType,
-              animationDuration: widget.animationDuration,
-              minimumChildOpacity: widget.minimumChildOpacity,
-            ),
-  );
+  Widget build(BuildContext context) {
+    return _OutlinedButtonWithIconPadding(
+      hasIcon: widget is _AsyncOutlinedButtonWithIcon,
+      onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
+      onLongPress:
+          isLoading || widget.onLongPress == null ? null : _handleLongPress,
+      onHover: widget.onHover,
+      onFocusChange: widget.onFocusChange,
+      style:
+          widget.style ??
+          OutlinedButton.styleFrom(splashFactory: widget.splashFactory),
+      focusNode: widget.focusNode,
+      autofocus: widget.autofocus,
+      clipBehavior: resolveButtonClipBehavior(
+        clipBehavior: widget.clipBehavior,
+        style: widget.style,
+        themeStyle: OutlinedButtonTheme.of(context).style,
+      ),
+      statesController: widget.statesController,
+      child:
+          widget.transitionType == TransitionAnimationType.customBuilder
+              ? widget.customBuilder?.call(
+                    isLoading,
+                    widget.child,
+                    widget.loadingChild,
+                  ) ??
+                  widget.child
+              : LoadingTransition(
+                child: widget.child,
+                loadingChild:
+                    widget.loadingChild ??
+                    DefaultLoadingIndicator(
+                      style: widget.style,
+                      themeStyleOf:
+                          (context) => OutlinedButtonTheme.of(context).style,
+                    ),
+                isLoading: isLoading,
+                transitionType: widget.transitionType,
+                animationDuration: widget.animationDuration,
+                minimumChildOpacity: widget.minimumChildOpacity,
+              ),
+    );
+  }
 }

@@ -222,40 +222,47 @@ class _AsyncTextButtonState extends State<AsyncTextButton>
   }
 
   @override
-  Widget build(BuildContext context) => TextButton(
-    onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
-    onLongPress:
-        isLoading || widget.onLongPress == null ? null : _handleLongPress,
-    onHover: widget.onHover,
-    onFocusChange: widget.onFocusChange,
-    style:
-        widget.style ??
-        TextButton.styleFrom(splashFactory: widget.splashFactory),
-    focusNode: widget.focusNode,
-    autofocus: widget.autofocus,
-    clipBehavior: widget.clipBehavior,
-    statesController: widget.statesController,
-    child:
-        widget.transitionType == TransitionAnimationType.customBuilder
-            ? widget.customBuilder?.call(
-                  isLoading,
-                  widget.child,
-                  widget.loadingChild,
-                ) ??
-                widget.child
-            : LoadingTransition(
-              child: widget.child,
-              loadingChild:
-                  widget.loadingChild ??
-                  DefaultLoadingIndicator(
-                    style: widget.style,
-                    themeStyleOf:
-                        (context) => TextButtonTheme.of(context).style,
-                  ),
-              isLoading: isLoading,
-              transitionType: widget.transitionType,
-              animationDuration: widget.animationDuration,
-              minimumChildOpacity: widget.minimumChildOpacity,
-            ),
-  );
+  Widget build(BuildContext context) {
+    return _TextButtonWithIconPadding(
+      hasIcon: widget is _AsyncTextButtonWithIcon,
+      onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
+      onLongPress:
+          isLoading || widget.onLongPress == null ? null : _handleLongPress,
+      onHover: widget.onHover,
+      onFocusChange: widget.onFocusChange,
+      style:
+          widget.style ??
+          TextButton.styleFrom(splashFactory: widget.splashFactory),
+      focusNode: widget.focusNode,
+      autofocus: widget.autofocus,
+      clipBehavior: resolveButtonClipBehavior(
+        clipBehavior: widget.clipBehavior,
+        style: widget.style,
+        themeStyle: TextButtonTheme.of(context).style,
+      ),
+      statesController: widget.statesController,
+      child:
+          widget.transitionType == TransitionAnimationType.customBuilder
+              ? widget.customBuilder?.call(
+                    isLoading,
+                    widget.child,
+                    widget.loadingChild,
+                  ) ??
+                  widget.child
+              : LoadingTransition(
+                child: widget.child,
+                loadingChild:
+                    widget.loadingChild ??
+                    DefaultLoadingIndicator(
+                      style: widget.style,
+                      themeStyleOf:
+                          (context) => TextButtonTheme.of(context).style,
+                    ),
+                isLoading: isLoading,
+                transitionType: widget.transitionType,
+                animationDuration: widget.animationDuration,
+                minimumChildOpacity: widget.minimumChildOpacity,
+              ),
+    );
+  }
 }

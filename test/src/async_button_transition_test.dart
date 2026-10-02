@@ -412,9 +412,23 @@ void main() {
             const label = Text('Send');
             final padding =
                 paddingSource == 'widget'
-                    ? const EdgeInsetsDirectional.only(start: 12, end: 18)
+                    ? const EdgeInsetsDirectional.fromSTEB(12, 2, 18, 10)
                     : null;
             final spacing = paddingSource == 'widget' ? 12.0 : null;
+            const loadingKey = ValueKey('extended-loading-control');
+            var loadingCalls = 0;
+            final loadingChild =
+                paddingSource == 'widget'
+                    ? GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () => loadingCalls++,
+                      child: const SizedBox(
+                        key: loadingKey,
+                        width: 24,
+                        height: 20,
+                      ),
+                    )
+                    : null;
             const textStyle = TextStyle(fontSize: 16);
             Widget host(Widget button) => MaterialApp(
               theme: ThemeData(
@@ -422,9 +436,11 @@ void main() {
                     paddingSource == 'default'
                         ? const FloatingActionButtonThemeData()
                         : const FloatingActionButtonThemeData(
-                          extendedPadding: EdgeInsetsDirectional.only(
-                            start: 10,
-                            end: 26,
+                          extendedPadding: EdgeInsetsDirectional.fromSTEB(
+                            10,
+                            4,
+                            26,
+                            12,
                           ),
                           extendedIconLabelSpacing: 20,
                         ),
@@ -464,6 +480,7 @@ void main() {
               label: label,
               icon: icon,
               loading: loading,
+              loadingChild: loadingChild,
               extendedPadding: padding,
               extendedIconLabelSpacing: spacing,
               extendedTextStyle: textStyle,
@@ -471,12 +488,6 @@ void main() {
             await tester.pumpWidget(host(button(false)));
             expect(tester.getSize(find.byKey(_buttonKey)), materialSize);
             final labelRect = tester.getRect(find.text('Send'));
-            final contentRect =
-                withIcon
-                    ? labelRect.expandToInclude(
-                      tester.getRect(find.byKey(iconKey)),
-                    )
-                    : labelRect;
             if (withIcon) {
               final labelX = labelRect.center.dx;
               final iconX = tester.getCenter(find.byKey(iconKey)).dx;
@@ -488,13 +499,27 @@ void main() {
               );
             }
             await tester.pumpWidget(host(button(true)));
-            await tester.pump(_duration);
-            expect(tester.takeException(), isNull);
-            expect(tester.getSize(find.byKey(_buttonKey)), materialSize);
-            expect(
-              tester.getCenter(find.byType(CircularProgressIndicator)).dx,
-              closeTo(contentRect.center.dx, 0.01),
-            );
+            final loader =
+                loadingChild == null
+                    ? find.byType(CircularProgressIndicator)
+                    : find.byKey(loadingKey);
+            for (final elapsed in [Duration.zero, _halfDuration, _duration]) {
+              await tester.pump(elapsed);
+              expect(tester.takeException(), isNull);
+              expect(tester.getSize(find.byKey(_buttonKey)), materialSize);
+              expect(
+                tester.getCenter(loader).dx,
+                closeTo(tester.getCenter(find.byKey(_buttonKey)).dx, 0.01),
+              );
+              expect(
+                tester.getCenter(loader).dy,
+                closeTo(tester.getCenter(find.byKey(_buttonKey)).dy, 0.01),
+              );
+            }
+            if (loadingChild != null) {
+              await tester.tapAt(tester.getCenter(loader));
+              expect(loadingCalls, 1);
+            }
             await tester.pumpWidget(host(button(false)));
             await tester.pump(_duration);
             expect(tester.getSize(find.byKey(_buttonKey)), materialSize);

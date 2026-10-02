@@ -39,6 +39,7 @@ class LoadingTransition extends StatelessWidget {
     required this.animationDuration,
     required this.minimumChildOpacity,
     this.animateChildSize = true,
+    this.preserveChildConstraints = false,
     super.key,
   }) : assert(transitionType != TransitionAnimationType.customBuilder);
 
@@ -63,6 +64,9 @@ class LoadingTransition extends StatelessWidget {
   /// Whether stack content uses animated sizing, as on Material text buttons.
   final bool animateChildSize;
 
+  /// Keeps native full-button constraints when wrapping its background layer.
+  final bool preserveChildConstraints;
+
   @override
   Widget build(BuildContext context) {
     if (transitionType == TransitionAnimationType.stack) {
@@ -70,6 +74,7 @@ class LoadingTransition extends StatelessWidget {
 
       return Stack(
         alignment: Alignment.center,
+        fit: preserveChildConstraints ? StackFit.passthrough : StackFit.loose,
         children: [
           AnimatedOpacity(
             opacity: isLoading ? minimumChildOpacity : 1.0,
@@ -87,7 +92,11 @@ class LoadingTransition extends StatelessWidget {
             duration: animationDuration,
             child: Visibility(
               visible: isLoading,
-              child: _InactiveContent(active: isLoading, child: loadingChild),
+              child: Center(
+                widthFactor: 1,
+                heightFactor: 1,
+                child: _InactiveContent(active: isLoading, child: loadingChild),
+              ),
             ),
           ),
         ],
@@ -110,20 +119,20 @@ class LoadingTransition extends StatelessWidget {
         // Re-evaluate outgoing content here instead of retaining an idle guard
         // captured by transitionBuilder. Preserve each switcher entry's key.
         layoutBuilder:
-            (currentChild, previousChildren) => Stack(
+            (current, previous) => Stack(
               alignment: Alignment.center,
               children: [
-                for (final previousChild in previousChildren)
+                for (final previousChild in previous)
                   _InactiveContent(
                     key: previousChild.key,
                     active: false,
                     child: previousChild,
                   ),
-                if (currentChild != null)
+                if (current != null)
                   _InactiveContent(
-                    key: currentChild.key,
+                    key: current.key,
                     active: true,
-                    child: currentChild,
+                    child: current,
                   ),
               ],
             ),

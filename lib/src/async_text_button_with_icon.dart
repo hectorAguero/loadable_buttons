@@ -33,6 +33,37 @@ class _AsyncTextButtonWithIcon extends AsyncTextButton {
        );
 }
 
+// Keep the complete async content as the child while using native icon
+// defaults. Material still owns widget/theme/default style precedence.
+class _TextButtonWithIconPadding extends TextButton with StackLoadingButton {
+  const _TextButtonWithIconPadding({
+    required bool hasIcon,
+    required super.onPressed,
+    required super.child,
+    super.onLongPress,
+    super.onHover,
+    super.onFocusChange,
+    super.style,
+    super.focusNode,
+    super.autofocus,
+    super.clipBehavior,
+    super.statesController,
+  }) : _hasIcon = hasIcon;
+
+  final bool _hasIcon;
+
+  @override
+  ButtonStyle defaultStyleOf(BuildContext context) {
+    if (!_hasIcon) return super.defaultStyleOf(context);
+
+    return TextButton.icon(
+      onPressed: null,
+      icon: const SizedBox.shrink(),
+      label: const SizedBox.shrink(),
+    ).defaultStyleOf(context);
+  }
+}
+
 /// Copy of TextButton.icon with the loading animation.
 class _TextButtonWithIconChild extends StatelessWidget {
   const _TextButtonWithIconChild({
