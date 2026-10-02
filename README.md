@@ -9,21 +9,22 @@ and customizable indicators and transitions.
 
 ```sh
 flutter pub add loadable_buttons
+flutter pub add material_ui
 ```
 
-Requires Flutter **3.29.0+** and Dart **3.7.0+ (below 4.0.0)**.
-Version 1.x uses Flutter's Material library.
-The planned SDK and Material UI migrations are described in the
-[compatibility roadmap](doc/compatibility-roadmap.md); they are future release
-targets, not features of 1.1.
+Version 2 requires Flutter **3.44.0+**, Dart **3.12.0+ (below 4.0.0)**,
+and **material_ui >=1.0.0 <2.0.0**. Pub selects a compatible Material UI
+release for your SDK; Material UI 1.4.0 and newer require Flutter 3.47 / Dart 3.13.
+Version 1.x remains the compatibility line for Flutter 3.29 and the built-in
+Material library. See the [compatibility roadmap](doc/compatibility-roadmap.md).
 
 ## Quick start
 
 Paste this example into `lib/main.dart` in a Flutter application:
 
 ```dart
-import 'package:flutter/material.dart';
 import 'package:loadable_buttons/loadable_buttons.dart';
+import 'package:material_ui/material_ui.dart';
 
 void main() {
   runApp(
@@ -50,6 +51,34 @@ Future<void> saveChanges() async {
 
 The button shows a spinner and prevents repeated activation until the returned
 Future completes. The following examples reuse `saveChanges`.
+
+## Migrating from 1.x
+
+Add `material_ui` as a direct dependency and replace
+`package:flutter/material.dart` imports with `package:material_ui/material_ui.dart`.
+Create `MaterialApp`, themes, styles, and ink factories from that package too.
+Material types such as `ButtonStyle`, `ThemeData`, `IconAlignment`, and
+`InteractiveInkFeatureFactory` are distinct from their legacy Flutter types;
+legacy values cannot be passed to the v2 constructors. Widget state types
+continue to come from Flutter's widgets library.
+
+If your app uses Material localizations, use the standalone
+`GlobalMaterialLocalizations.delegates`. Applications with dependencies that
+still use Flutter's built-in Material widgets can wrap those subtrees in
+`MaterialUiCompatibilityBridge` under a standalone `MaterialApp`:
+
+```dart
+MaterialApp(
+  builder: (context, child) => MaterialUiCompatibilityBridge(
+    child: child ?? const SizedBox.shrink(),
+  ),
+  home: const HomeScreen(), // Your application's screen.
+);
+```
+
+The bridge supplies legacy themes and localizations; it does not convert legacy
+style arguments to standalone types. See the
+[official Material UI migration guide](https://pub.dev/packages/material_ui#migrating-existing-code-to-this-package).
 
 ## Button families
 
@@ -122,7 +151,7 @@ early. The button cannot track that work or handle its later errors.
 Set `onPressed: null` to disable a button. Elevated, Filled, Outlined, and Text
 buttons remain enabled if `onLongPress` is provided; loading blocks both
 callbacks. `onLongPress` is synchronous and does not start a loading state.
-IconButton forwards its long-press callback to Flutter's native IconButton;
+IconButton forwards its long-press callback to Material UI's native IconButton;
 floating action buttons have no long-press parameter. Native Material styling,
 focus, and semantics determine the disabled appearance for each family.
 

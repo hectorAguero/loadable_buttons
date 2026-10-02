@@ -38,7 +38,7 @@ class _AsyncOutlinedButtonWithIcon extends AsyncOutlinedButton {
 class _OutlinedButtonWithIconPadding extends OutlinedButton
     with StackLoadingButton {
   const _OutlinedButtonWithIconPadding({
-    required bool hasIcon,
+    required this._hasIcon,
     required super.onPressed,
     required super.child,
     super.onLongPress,
@@ -49,7 +49,7 @@ class _OutlinedButtonWithIconPadding extends OutlinedButton
     super.autofocus,
     super.clipBehavior,
     super.statesController,
-  }) : _hasIcon = hasIcon;
+  });
 
   final bool _hasIcon;
 
@@ -109,10 +109,9 @@ class _OutlinedButtonWithIconChild extends StatelessWidget {
 
     return Row(
       mainAxisSize: MainAxisSize.min,
-      children:
-          effectiveIconAlignment == IconAlignment.start
-              ? <Widget>[icon, SizedBox(width: gap), Flexible(child: label)]
-              : <Widget>[Flexible(child: label), SizedBox(width: gap), icon],
+      children: effectiveIconAlignment == IconAlignment.start
+          ? <Widget>[icon, SizedBox(width: gap), Flexible(child: label)]
+          : <Widget>[Flexible(child: label), SizedBox(width: gap), icon],
     );
   }
 }

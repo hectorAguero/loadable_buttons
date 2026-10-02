@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:ui' show SemanticsAction, SemanticsFlag;
 
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:loadable_buttons/loadable_buttons.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../support/async_button_fixture.dart';
 
@@ -67,10 +67,9 @@ void main() {
 
                     return Semantics(
                       label: loading ? 'Custom busy' : 'Custom idle',
-                      child:
-                          loading
-                              ? loadingChild ?? const Text('Missing loader')
-                              : child,
+                      child: loading
+                          ? loadingChild ?? const Text('Missing loader')
+                          : child,
                     );
                   },
                 ),
@@ -131,11 +130,8 @@ void main() {
                 child: const Text('Run'),
                 onPressed: () => pending.future,
                 transitionType: TransitionAnimationType.customBuilder,
-                customBuilder:
-                    (loading, child, loadingChild) =>
-                        loading
-                            ? loadingChild ?? const Text('Fallback')
-                            : child,
+                customBuilder: (loading, child, loadingChild) =>
+                    loading ? loadingChild ?? const Text('Fallback') : child,
               ),
             ),
           );
@@ -153,8 +149,9 @@ void main() {
       );
 
       for (final asynchronous in [false, true]) {
-        final failureName =
-            asynchronous ? 'failed Future' : 'synchronous throw';
+        final failureName = asynchronous
+            ? 'failed Future'
+            : 'synchronous throw';
         testWidgets('$failureName propagates and permits retry', (
           tester,
         ) async {

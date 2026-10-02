@@ -1,10 +1,9 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:flutter/material.dart';
-
 import 'package:loadable_buttons/src/async_button_helpers.dart';
 import 'package:loadable_buttons/src/loading_transition.dart';
+import 'package:material_ui/material_ui.dart';
 
 part 'async_elevated_button_with_icon.dart';
 
@@ -237,8 +236,9 @@ class _AsyncElevatedButtonState extends State<AsyncElevatedButton>
     return _ElevatedButtonWithIconPadding(
       hasIcon: widget is _AsyncElevatedButtonWithIcon,
       onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
-      onLongPress:
-          isLoading || widget.onLongPress == null ? null : _handleLongPress,
+      onLongPress: isLoading || widget.onLongPress == null
+          ? null
+          : _handleLongPress,
       onHover: widget.onHover,
       onFocusChange: widget.onFocusChange,
       style:
@@ -252,29 +252,28 @@ class _AsyncElevatedButtonState extends State<AsyncElevatedButton>
         themeStyle: ElevatedButtonTheme.of(context).style,
       ),
       statesController: widget.statesController,
-      child:
-          widget.transitionType == TransitionAnimationType.customBuilder
-              ? widget.customBuilder?.call(
-                    isLoading,
-                    widget.child,
-                    widget.loadingChild,
-                  ) ??
-                  widget.child
-              : LoadingTransition(
-                child: widget.child,
-                loadingChild:
-                    widget.loadingChild ??
-                    DefaultLoadingIndicator(
-                      style: widget.style,
-                      themeStyleOf:
-                          (context) => ElevatedButtonTheme.of(context).style,
-                      loadingSemanticsLabel: widget.loadingSemanticsLabel,
-                    ),
-                isLoading: isLoading,
-                transitionType: widget.transitionType,
-                animationDuration: widget.animationDuration,
-                minimumChildOpacity: widget.minimumChildOpacity,
-              ),
+      child: widget.transitionType == TransitionAnimationType.customBuilder
+          ? widget.customBuilder?.call(
+                  isLoading,
+                  widget.child,
+                  widget.loadingChild,
+                ) ??
+                widget.child
+          : LoadingTransition(
+              child: widget.child,
+              loadingChild:
+                  widget.loadingChild ??
+                  DefaultLoadingIndicator(
+                    style: widget.style,
+                    themeStyleOf: (context) =>
+                        ElevatedButtonTheme.of(context).style,
+                    loadingSemanticsLabel: widget.loadingSemanticsLabel,
+                  ),
+              isLoading: isLoading,
+              transitionType: widget.transitionType,
+              animationDuration: widget.animationDuration,
+              minimumChildOpacity: widget.minimumChildOpacity,
+            ),
     );
   }
 }

@@ -39,7 +39,7 @@ class _AsyncElevatedButtonWithIcon extends AsyncElevatedButton {
 class _ElevatedButtonWithIconPadding extends ElevatedButton
     with StackLoadingButton {
   const _ElevatedButtonWithIconPadding({
-    required bool hasIcon,
+    required this._hasIcon,
     required super.onPressed,
     required super.child,
     super.onLongPress,
@@ -50,7 +50,7 @@ class _ElevatedButtonWithIconPadding extends ElevatedButton
     super.autofocus,
     super.clipBehavior,
     super.statesController,
-  }) : _hasIcon = hasIcon;
+  });
 
   final bool _hasIcon;
 
@@ -110,10 +110,9 @@ class _ElevatedButtonWithIconChild extends StatelessWidget {
 
     return Row(
       mainAxisSize: MainAxisSize.min,
-      children:
-          effectiveIconAlignment == IconAlignment.start
-              ? <Widget>[icon, SizedBox(width: gap), Flexible(child: label)]
-              : <Widget>[Flexible(child: label), SizedBox(width: gap), icon],
+      children: effectiveIconAlignment == IconAlignment.start
+          ? <Widget>[icon, SizedBox(width: gap), Flexible(child: label)]
+          : <Widget>[Flexible(child: label), SizedBox(width: gap), icon],
     );
   }
 }

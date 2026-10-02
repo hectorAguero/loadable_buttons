@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:loadable_buttons/loadable_buttons.dart';
+import 'package:material_ui/material_ui.dart';
 
 typedef _ButtonBuilder =
     Widget Function({
@@ -65,18 +65,16 @@ void main() {
     for (final direction in TextDirection.values) {
       final themeStyle = ButtonStyle(
         padding: WidgetStateProperty.resolveWith(
-          (states) =>
-              states.contains(WidgetState.disabled)
-                  ? const EdgeInsetsDirectional.fromSTEB(28, 6, 40, 6)
-                  : const EdgeInsetsDirectional.fromSTEB(20, 4, 32, 4),
+          (states) => states.contains(WidgetState.disabled)
+              ? const EdgeInsetsDirectional.fromSTEB(28, 6, 40, 6)
+              : const EdgeInsetsDirectional.fromSTEB(20, 4, 32, 4),
         ),
       );
       final widgetStyle = ButtonStyle(
         padding: WidgetStateProperty.resolveWith(
-          (states) =>
-              states.contains(WidgetState.disabled)
-                  ? null
-                  : const EdgeInsetsDirectional.fromSTEB(36, 8, 48, 8),
+          (states) => states.contains(WidgetState.disabled)
+              ? null
+              : const EdgeInsetsDirectional.fromSTEB(36, 8, 48, 8),
         ),
       );
       for (final paddingCase in [
@@ -190,11 +188,10 @@ Future<({_Layout nativeLayout, _Layout asyncLayout})> _measureLayouts(
       labelInset:
           tester.getTopLeft(within(key, find.text('Save changes'))) -
           rect.topLeft,
-      iconInset:
-          hasIcon
-              ? tester.getTopLeft(within(key, find.byIcon(Icons.save))) -
-                  rect.topLeft
-              : null,
+      iconInset: hasIcon
+          ? tester.getTopLeft(within(key, find.byIcon(Icons.save))) -
+                rect.topLeft
+          : null,
     );
   }
 

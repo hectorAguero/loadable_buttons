@@ -1,98 +1,81 @@
 import 'dart:async';
 import 'dart:ui' show SemanticsAction, SemanticsFlag;
 
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:loadable_buttons/loadable_buttons.dart';
+import 'package:material_ui/material_ui.dart';
 
 typedef _ButtonBuilder =
     Widget Function({required FutureOr<void> Function()? onPressed});
 
 void main() {
   final builders = <String, _ButtonBuilder>{
-    'Elevated':
-        ({required onPressed}) =>
-            AsyncElevatedButton(onPressed: onPressed, child: const Text('Run')),
-    'Elevated.icon':
-        ({required onPressed}) => AsyncElevatedButton.icon(
-          onPressed: onPressed,
-          icon: const Icon(Icons.add),
-          label: const Text('Run'),
-        ),
-    'Filled':
-        ({required onPressed}) =>
-            AsyncFilledButton(onPressed: onPressed, child: const Text('Run')),
-    'Filled.icon':
-        ({required onPressed}) => AsyncFilledButton.icon(
-          onPressed: onPressed,
-          icon: const Icon(Icons.add),
-          label: const Text('Run'),
-        ),
-    'Filled.tonal':
-        ({required onPressed}) => AsyncFilledButton.tonal(
-          onPressed: onPressed,
-          child: const Text('Run'),
-        ),
-    'Filled.tonalIcon':
-        ({required onPressed}) => AsyncFilledButton.tonalIcon(
-          onPressed: onPressed,
-          icon: const Icon(Icons.add),
-          label: const Text('Run'),
-        ),
-    'Outlined':
-        ({required onPressed}) =>
-            AsyncOutlinedButton(onPressed: onPressed, child: const Text('Run')),
-    'Outlined.icon':
-        ({required onPressed}) => AsyncOutlinedButton.icon(
-          onPressed: onPressed,
-          icon: const Icon(Icons.add),
-          label: const Text('Run'),
-        ),
-    'Text':
-        ({required onPressed}) =>
-            AsyncTextButton(onPressed: onPressed, child: const Text('Run')),
-    'Text.icon':
-        ({required onPressed}) => AsyncTextButton.icon(
-          onPressed: onPressed,
-          icon: const Icon(Icons.add),
-          label: const Text('Run'),
-        ),
-    'Icon':
-        ({required onPressed}) =>
-            AsyncIconButton(onPressed: onPressed, icon: const Icon(Icons.add)),
-    'Icon.filled':
-        ({required onPressed}) => AsyncIconButton.filled(
-          onPressed: onPressed,
-          icon: const Icon(Icons.add),
-        ),
-    'Icon.filledTonal':
-        ({required onPressed}) => AsyncIconButton.filledTonal(
-          onPressed: onPressed,
-          icon: const Icon(Icons.add),
-        ),
-    'Icon.outlined':
-        ({required onPressed}) => AsyncIconButton.outlined(
-          onPressed: onPressed,
-          icon: const Icon(Icons.add),
-        ),
-    'Floating action':
-        ({required onPressed}) => AsyncFloatingActionButton(
+    'Elevated': ({required onPressed}) =>
+        AsyncElevatedButton(onPressed: onPressed, child: const Text('Run')),
+    'Elevated.icon': ({required onPressed}) => AsyncElevatedButton.icon(
+      onPressed: onPressed,
+      icon: const Icon(Icons.add),
+      label: const Text('Run'),
+    ),
+    'Filled': ({required onPressed}) =>
+        AsyncFilledButton(onPressed: onPressed, child: const Text('Run')),
+    'Filled.icon': ({required onPressed}) => AsyncFilledButton.icon(
+      onPressed: onPressed,
+      icon: const Icon(Icons.add),
+      label: const Text('Run'),
+    ),
+    'Filled.tonal': ({required onPressed}) =>
+        AsyncFilledButton.tonal(onPressed: onPressed, child: const Text('Run')),
+    'Filled.tonalIcon': ({required onPressed}) => AsyncFilledButton.tonalIcon(
+      onPressed: onPressed,
+      icon: const Icon(Icons.add),
+      label: const Text('Run'),
+    ),
+    'Outlined': ({required onPressed}) =>
+        AsyncOutlinedButton(onPressed: onPressed, child: const Text('Run')),
+    'Outlined.icon': ({required onPressed}) => AsyncOutlinedButton.icon(
+      onPressed: onPressed,
+      icon: const Icon(Icons.add),
+      label: const Text('Run'),
+    ),
+    'Text': ({required onPressed}) =>
+        AsyncTextButton(onPressed: onPressed, child: const Text('Run')),
+    'Text.icon': ({required onPressed}) => AsyncTextButton.icon(
+      onPressed: onPressed,
+      icon: const Icon(Icons.add),
+      label: const Text('Run'),
+    ),
+    'Icon': ({required onPressed}) =>
+        AsyncIconButton(onPressed: onPressed, icon: const Icon(Icons.add)),
+    'Icon.filled': ({required onPressed}) => AsyncIconButton.filled(
+      onPressed: onPressed,
+      icon: const Icon(Icons.add),
+    ),
+    'Icon.filledTonal': ({required onPressed}) => AsyncIconButton.filledTonal(
+      onPressed: onPressed,
+      icon: const Icon(Icons.add),
+    ),
+    'Icon.outlined': ({required onPressed}) => AsyncIconButton.outlined(
+      onPressed: onPressed,
+      icon: const Icon(Icons.add),
+    ),
+    'Floating action': ({required onPressed}) => AsyncFloatingActionButton(
+      onPressed: onPressed,
+      child: const Icon(Icons.add),
+    ),
+    'Floating action.small': ({required onPressed}) =>
+        AsyncFloatingActionButton.small(
           onPressed: onPressed,
           child: const Icon(Icons.add),
         ),
-    'Floating action.small':
-        ({required onPressed}) => AsyncFloatingActionButton.small(
+    'Floating action.large': ({required onPressed}) =>
+        AsyncFloatingActionButton.large(
           onPressed: onPressed,
           child: const Icon(Icons.add),
         ),
-    'Floating action.large':
-        ({required onPressed}) => AsyncFloatingActionButton.large(
-          onPressed: onPressed,
-          child: const Icon(Icons.add),
-        ),
-    'Floating action.extended':
-        ({required onPressed}) => AsyncFloatingActionButton.extended(
+    'Floating action.extended': ({required onPressed}) =>
+        AsyncFloatingActionButton.extended(
           onPressed: onPressed,
           icon: const Icon(Icons.add),
           label: const Text('Run'),
@@ -108,25 +91,23 @@ void main() {
         home: Scaffold(
           body: Center(
             child: entry.value(
-              onPressed:
-                  enabled
-                      ? () {
-                        calls++;
-                      }
-                      : null,
+              onPressed: enabled
+                  ? () {
+                      calls++;
+                    }
+                  : null,
             ),
           ),
         ),
       );
-      final button =
-          find
-              .byWidgetPredicate(
-                (widget) =>
-                    widget is ButtonStyleButton ||
-                    widget is IconButton ||
-                    widget is FloatingActionButton,
-              )
-              .first;
+      final button = find
+          .byWidgetPredicate(
+            (widget) =>
+                widget is ButtonStyleButton ||
+                widget is IconButton ||
+                widget is FloatingActionButton,
+          )
+          .first;
       void expectDisabled() {
         final node = tester.getSemantics(button);
         expect(

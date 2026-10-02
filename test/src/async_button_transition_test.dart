@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:ui' show SemanticsAction;
 
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:loadable_buttons/loadable_buttons.dart';
+import 'package:material_ui/material_ui.dart';
 
 typedef _Builder =
     Widget Function({
@@ -402,7 +402,13 @@ void main() {
 
   for (final withIcon in [false, true]) {
     for (final direction in TextDirection.values) {
-      for (final paddingSource in ['default', 'theme', 'widget']) {
+      for (final paddingSource in [
+        'default',
+        'theme',
+        'inherited',
+        'empty inherited',
+        'widget',
+      ]) {
         testWidgets(
           'extended FAB preserves Material layout and centers its loader: '
           '$withIcon $direction $paddingSource',
@@ -410,40 +416,40 @@ void main() {
             final iconKey = GlobalKey();
             final icon = withIcon ? Icon(Icons.send, key: iconKey) : null;
             const label = Text('Send');
-            final padding =
-                paddingSource == 'widget'
-                    ? const EdgeInsetsDirectional.fromSTEB(12, 2, 18, 10)
-                    : null;
+            final padding = paddingSource == 'widget'
+                ? const EdgeInsetsDirectional.fromSTEB(12, 2, 18, 10)
+                : null;
             final spacing = paddingSource == 'widget' ? 12.0 : null;
             const loadingKey = ValueKey('extended-loading-control');
             var loadingCalls = 0;
-            final loadingChild =
-                paddingSource == 'widget'
-                    ? GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () => loadingCalls++,
-                      child: const SizedBox(
-                        key: loadingKey,
-                        width: 24,
-                        height: 20,
-                      ),
-                    )
-                    : null;
-            const textStyle = TextStyle(fontSize: 16);
+            final loadingChild = paddingSource == 'widget'
+                ? GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => loadingCalls++,
+                    child: const SizedBox(
+                      key: loadingKey,
+                      width: 24,
+                      height: 20,
+                    ),
+                  )
+                : null;
+            final textStyle = paddingSource == 'widget'
+                ? const TextStyle(fontSize: 16)
+                : null;
             Widget host(Widget button) => MaterialApp(
               theme: ThemeData(
-                floatingActionButtonTheme:
-                    paddingSource == 'default'
-                        ? const FloatingActionButtonThemeData()
-                        : const FloatingActionButtonThemeData(
-                          extendedPadding: EdgeInsetsDirectional.fromSTEB(
-                            10,
-                            4,
-                            26,
-                            12,
-                          ),
-                          extendedIconLabelSpacing: 20,
+                floatingActionButtonTheme: paddingSource == 'default'
+                    ? const FloatingActionButtonThemeData()
+                    : const FloatingActionButtonThemeData(
+                        extendedPadding: EdgeInsetsDirectional.fromSTEB(
+                          10,
+                          4,
+                          26,
+                          12,
                         ),
+                        extendedIconLabelSpacing: 20,
+                        extendedTextStyle: TextStyle(fontSize: 18),
+                      ),
               ),
               home: Scaffold(
                 body: Center(
@@ -455,7 +461,31 @@ void main() {
                       textDirection: direction,
                       child: ConstrainedBox(
                         constraints: const BoxConstraints(maxWidth: 180),
-                        child: KeyedSubtree(key: _buttonKey, child: button),
+                        child: KeyedSubtree(
+                          key: _buttonKey,
+                          child:
+                              paddingSource == 'default' ||
+                                  paddingSource == 'theme'
+                              ? button
+                              : FloatingActionButtonTheme(
+                                  data: paddingSource == 'empty inherited'
+                                      ? const FloatingActionButtonThemeData()
+                                      : const FloatingActionButtonThemeData(
+                                          extendedPadding:
+                                              EdgeInsetsDirectional.fromSTEB(
+                                                6,
+                                                8,
+                                                30,
+                                                14,
+                                              ),
+                                          extendedIconLabelSpacing: 28,
+                                          extendedTextStyle: TextStyle(
+                                            fontSize: 20,
+                                          ),
+                                        ),
+                                  child: button,
+                                ),
+                        ),
                       ),
                     ),
                   ),
@@ -475,6 +505,10 @@ void main() {
               ),
             );
             final materialSize = tester.getSize(find.byKey(_buttonKey));
+            final materialLabelRect = tester.getRect(find.text('Send'));
+            final materialIconRect = withIcon
+                ? tester.getRect(find.byKey(iconKey))
+                : null;
             Widget button(bool loading) => AsyncFloatingActionButton.extended(
               onPressed: () {},
               label: label,
@@ -488,7 +522,9 @@ void main() {
             await tester.pumpWidget(host(button(false)));
             expect(tester.getSize(find.byKey(_buttonKey)), materialSize);
             final labelRect = tester.getRect(find.text('Send'));
+            expect(labelRect, materialLabelRect);
             if (withIcon) {
+              expect(tester.getRect(find.byKey(iconKey)), materialIconRect);
               final labelX = labelRect.center.dx;
               final iconX = tester.getCenter(find.byKey(iconKey)).dx;
               expect(
@@ -499,10 +535,9 @@ void main() {
               );
             }
             await tester.pumpWidget(host(button(true)));
-            final loader =
-                loadingChild == null
-                    ? find.byType(CircularProgressIndicator)
-                    : find.byKey(loadingKey);
+            final loader = loadingChild == null
+                ? find.byType(CircularProgressIndicator)
+                : find.byKey(loadingKey);
             for (final elapsed in [Duration.zero, _halfDuration, _duration]) {
               await tester.pump(elapsed);
               expect(tester.takeException(), isNull);
@@ -598,10 +633,9 @@ void main() {
                 loading: true,
                 style: ButtonStyle(
                   foregroundColor: WidgetStateProperty.resolveWith(
-                    (states) =>
-                        states.contains(WidgetState.disabled)
-                            ? Colors.purple
-                            : foreground,
+                    (states) => states.contains(WidgetState.disabled)
+                        ? Colors.purple
+                        : foreground,
                   ),
                 ),
               ),
@@ -733,6 +767,8 @@ void _startOperation(WidgetTester tester) {
 
 Widget _host(Widget button) => MaterialApp(
   home: Scaffold(
-    body: Center(child: KeyedSubtree(key: _buttonKey, child: button)),
+    body: Center(
+      child: KeyedSubtree(key: _buttonKey, child: button),
+    ),
   ),
 );

@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:ui' show PointerDeviceKind, SemanticsFlag;
 
-import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:loadable_buttons/loadable_buttons.dart';
+import 'package:material_ui/material_ui.dart';
 
 typedef _IconButtonBuilder =
     AsyncIconButton Function({
@@ -150,10 +150,9 @@ void main() {
                     onPressed: () => setState(() => selected = !selected),
                     style: ButtonStyle(
                       foregroundColor: WidgetStateProperty.resolveWith(
-                        (states) =>
-                            states.contains(WidgetState.selected)
-                                ? Colors.green
-                                : Colors.red,
+                        (states) => states.contains(WidgetState.selected)
+                            ? Colors.green
+                            : Colors.red,
                       ),
                     ),
                   );
@@ -200,8 +199,9 @@ void main() {
               variant.value(
                 icon: const Icon(Icons.add),
                 selectedIcon: selectedIcon,
-                isSelected:
-                    selected == null ? null : WidgetStatePropertyAll(selected),
+                isSelected: selected == null
+                    ? null
+                    : WidgetStatePropertyAll(selected),
                 onPressed: () {},
               ),
             );
@@ -297,9 +297,8 @@ void main() {
                       loading: loading,
                       transitionType: transition,
                       loadingChild: const Text('Loading'),
-                      customBuilder:
-                          (loading, icon, loadingChild) =>
-                              loading ? loadingChild ?? icon : icon,
+                      customBuilder: (loading, icon, loadingChild) =>
+                          loading ? loadingChild ?? icon : icon,
                     ),
                   );
               void expectLoading() {

@@ -1,3 +1,20 @@
+## 2.0.0 (unreleased)
+
+* **Breaking:** use standalone `material_ui >=1.0.0 <2.0.0` for all Material
+  widgets and public types. Applications must import
+  `package:material_ui/material_ui.dart` for themes and `ButtonStyle` values.
+* **Breaking:** require Flutter >=3.44.0 and Dart >=3.12.0 <4.0.0.
+* Honor inherited `FloatingActionButtonTheme` padding and icon spacing for
+  extended FAB stack transitions, matching the native standalone button.
+* Preserve native icon padding, loading ownership, selection, keyboard,
+  semantics, and custom loading-content behavior across the migration.
+* Validate exact Material UI 1.0.0 and the newest compatible resolution on
+  both the minimum Flutter SDK and current stable. Run Solid Lints 1.0.0 and
+  DCL 4.4.0 plugin checks on both SDKs, with an isolated DCL CLI graph that
+  also supports Dart 3.12.
+* Raise the Very Good Analysis development dependency minimum to 10.3.0 and
+  use its Dart 3.12-compatible preset on both SDKs; allow 11.x on stable.
+
 ## 1.1.1
 
 * Invoke Filled button custom builders only for custom transitions.
