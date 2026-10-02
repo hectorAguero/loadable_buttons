@@ -2,6 +2,31 @@
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) for development and validation commands.
 
+## Editing and tooling
+
+- Prefer direct/patch edits for small, localized changes. Choose mechanisms for
+  safety and efficiency; do not force a CLI tool merely because it is installed.
+- For terminal search, prefer `rg` for text and `fd` for file discovery;
+  `rg --files` is also useful for repository file lists.
+- Reuse repository scripts and codemods before inventing transformations.
+  Use `sd` or scripts for safe, repetitive mechanical changes when more efficient.
+  Avoid ad-hoc Python for simple edits; keep it available for complex bulk work.
+- When Dart changes depend on syntax, symbols, imports, types, or semantics,
+  use Dart-aware tooling or targeted patches instead of naive text replacement.
+- Prefer direct YAML/pubspec edits for small changes. Use `yq` when structured
+  updates are safer, without rewriting unrelated content, comments, formatting,
+  quoting, or ordering.
+- Use established generation workflows for generated files; do not edit them
+  manually. Inspect the resulting diff and run `git diff --check`.
+
+Format changed Dart files with `dart format <files>`; only format the whole
+repository when intentionally requested. After relevant Dart/Flutter changes,
+run `flutter analyze`, appropriate tests, and the required CONTRIBUTING checks,
+including `bash tool/analyze.sh` for plugin diagnostics. After dependency changes,
+use the repository's normal resolution workflow (Material UI uses
+`bash tool/resolve_material_ui.sh` with the appropriate mode); otherwise run
+`flutter pub get` in the affected package roots.
+
 ## File organization and copyability
 
 This package supports copying button implementations into application projects.
