@@ -70,24 +70,21 @@ ButtonStyle? applyButtonStyleShortcuts(
   Color? disabledForegroundColor,
   MouseCursor? mouseCursor,
 }) {
-  if (padding == null &&
-      minimumSize == null &&
-      alignment == null &&
-      backgroundColor == null &&
-      foregroundColor == null &&
-      disabledBackgroundColor == null &&
-      disabledForegroundColor == null &&
-      mouseCursor == null) {
-    return style;
-  }
+  final shortcuts = <Object?>[
+    padding,
+    minimumSize,
+    alignment,
+    backgroundColor,
+    foregroundColor,
+    disabledBackgroundColor,
+    disabledForegroundColor,
+    mouseCursor,
+  ];
+  if (shortcuts.every((shortcut) => shortcut == null)) return style;
 
   return (style ?? const ButtonStyle()).copyWith(
-    padding: padding == null
-        ? null
-        : WidgetStatePropertyAll<EdgeInsetsGeometry?>(padding),
-    minimumSize: minimumSize == null
-        ? null
-        : WidgetStatePropertyAll<Size?>(minimumSize),
+    padding: ButtonStyleButton.allOrNull<EdgeInsetsGeometry>(padding),
+    minimumSize: ButtonStyleButton.allOrNull<Size>(minimumSize),
     alignment: alignment,
     backgroundColor: _composeStateColor(
       enabled: backgroundColor,
@@ -99,12 +96,16 @@ ButtonStyle? applyButtonStyleShortcuts(
       disabled: disabledForegroundColor,
       fallback: style?.foregroundColor,
     ),
-    mouseCursor: mouseCursor == null
-        ? null
-        : WidgetStateProperty.resolveWith<MouseCursor?>(
-            (states) =>
-                WidgetStateProperty.resolveAs<MouseCursor>(mouseCursor, states),
-          ),
+    mouseCursor: _composeMouseCursor(mouseCursor),
+  );
+}
+
+/// Applies a plain cursor in every state or resolves a state-aware cursor.
+WidgetStateProperty<MouseCursor?>? _composeMouseCursor(MouseCursor? cursor) {
+  if (cursor == null) return null;
+
+  return WidgetStateProperty.resolveWith<MouseCursor?>(
+    (states) => WidgetStateProperty.resolveAs<MouseCursor>(cursor, states),
   );
 }
 
