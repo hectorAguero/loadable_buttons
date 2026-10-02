@@ -1,5 +1,11 @@
 ## 2.0.0 (unreleased)
 
+* Add nullable Material style shortcuts for padding, minimum size, alignment,
+  enabled/disabled colors, and mouse cursors to Elevated, Filled, Outlined, and
+  Text buttons, including icon, tonal, and null-icon variants. Preserve supplied
+  style resolvers per state, inherited themes, native layout/feedback, and
+  loading-indicator foreground resolution.
+
 * Ship a `loadable-buttons-usage` agent skill, installable with
   `dart run skills@ get --package loadable_buttons`, covering imports,
   constructors, loading ownership, errors, accessibility, theming, sizing, and

@@ -155,6 +155,46 @@ AsyncFilledButton.icon(
 );
 ```
 
+## Material style shortcuts
+
+`AsyncElevatedButton`, `AsyncFilledButton`, `AsyncOutlinedButton`, and
+`AsyncTextButton` accept these optional shortcuts, including their icon, tonal,
+and null-icon variants:
+
+| Parameter | Native mapping |
+| --- | --- |
+| `padding` | `ButtonStyle.padding` |
+| `minimumSize` | `ButtonStyle.minimumSize`; native density, constraints, and tap targets still apply |
+| `alignment` | `ButtonStyle.alignment` |
+| `backgroundColor`, `foregroundColor` | Enabled-state colors |
+| `disabledBackgroundColor`, `disabledForegroundColor` | Disabled-state colors; loading disables the outer button |
+| `mouseCursor` | `ButtonStyle.mouseCursor`; plain or state-dependent `MouseCursor` |
+
+All default to `null`. For each property and state, precedence is **non-null
+shortcut → supplied `style` → family theme → native defaults**. A cursor that
+resolves to null still checks that state's supplied style before the theme.
+Enabled color shortcuts preserve disabled colors; disabled shortcuts preserve
+enabled colors. Unrelated style properties and native interaction feedback are
+retained, including Material's separate `iconColor` precedence.
+
+```dart
+AsyncFilledButton.icon(
+  onPressed: saveChanges,
+  padding: const EdgeInsetsDirectional.fromSTEB(20, 12, 24, 12),
+  minimumSize: const Size(160, 48),
+  disabledBackgroundColor: Colors.blueGrey,
+  style: FilledButton.styleFrom(shape: const StadiumBorder()),
+  icon: const Icon(Icons.save_outlined),
+  label: const Text('Save changes'),
+);
+```
+
+Here only the disabled/loading background changes; enabled colors still come
+from the style, Filled theme, or native defaults. `foregroundColor` also colors
+the default loading spinner using its enabled value. `minimumSize` is a lower
+bound, so larger content can still grow the button. Use `style` for other native
+options. IconButton and FAB retain their own native styling and sizing APIs.
+
 ## Loading behavior
 
 `onPressed` accepts synchronous or asynchronous callbacks. Return or await your
@@ -440,9 +480,10 @@ Keep the copyright and MIT license notice with the copied code.
 
 Include any companion `part` files, `async_button_helpers.dart` for shared loading
 state and error handling, and `loading_transition.dart` for the enum and widgets.
-Material buttons also need `async_material_button_helpers.dart` for native layers
-and indicators; Cupertino buttons keep their indicator and semantics adapter in
-`async_cupertino_button.dart`. Update package imports to match your project.
+Material buttons also need `async_material_button_helpers.dart` for style
+shortcuts, native layers, and indicators; Cupertino buttons keep their indicator
+and semantics adapter in `async_cupertino_button.dart`. Update package imports
+to match your project.
 
 For a single-file copy, inline the shared loading helper declarations, move the
 enum into your button file, and inline the transition bodies. This outline shows the ternary and switch structure:

@@ -11,8 +11,8 @@ work is pending, and blocks repeated activation. Only use the APIs listed here
 or in the package API reference; do not invent controllers, adaptive buttons,
 or retry/cancel parameters.
 
-For custom loading content, transitions, custom builders, IconButton selection,
-and detailed sizing, read
+For Material style shortcuts, custom loading content, transitions, custom
+builders, IconButton selection, and detailed sizing, read
 [references/customization.md](references/customization.md).
 
 ## Setup and imports
@@ -204,9 +204,17 @@ spinner. It defaults to `null`; the package provides no English fallback.
 - Material buttons accept native `style`, and the matching theme (for example
   `ElevatedButtonThemeData`) applies as usual. Use the native `styleFrom`
   helpers, such as `FilledButton.styleFrom`, from `material_ui`.
-- The default Material spinner uses the style's enabled `foregroundColor`,
-  then the family theme, then the ambient icon or text color. Set the
-  foreground color in `style` to change it; FABs use `foregroundColor`.
+- Elevated, Filled, Outlined, and Text buttons also accept nullable `padding`,
+  `minimumSize`, `alignment`, `backgroundColor`, `foregroundColor`,
+  `disabledBackgroundColor`, `disabledForegroundColor`, and `mouseCursor`,
+  including icon, tonal, and null-icon variants. For each property and state,
+  precedence is non-null shortcut, supplied `style`, family theme, then native
+  defaults. Omit them to preserve native resolution. Enabled and disabled
+  color overrides preserve the other state; loading uses disabled styling.
+- The default Material spinner uses the effective style's enabled
+  `foregroundColor`, then the family theme, then the ambient icon or text color.
+  Set the shortcut or foreground color in `style` to change it; FABs use
+  `foregroundColor`. Disabled-only shortcuts do not change the spinner color.
 - Cupertino buttons accept native `sizeStyle`, `padding`, `color`,
   `foregroundColor`, `disabledColor`, `minimumSize`, `pressedOpacity`,
   `borderRadius`, `alignment`, and focus options. Use `minimumSize`; `minSize`

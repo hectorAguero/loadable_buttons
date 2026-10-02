@@ -1,7 +1,8 @@
 # Customizing loading content
 
 Read this when replacing the default spinner, choosing a transition, writing a
-`customBuilder`, using IconButton selection, or controlling button size. The
+`customBuilder`, using Material style shortcuts or IconButton selection, or
+controlling button size. The
 core loading, error, and disabled rules in [SKILL.md](../SKILL.md) still apply.
 
 ## Transitions
@@ -153,6 +154,40 @@ customBuilder: (loading, child, loadingChild) => Stack(
 The outer button still owns activation, the loading lock, and disabled
 semantics. `AsyncFloatingActionButton.extended` can call the builder
 separately for its icon and label slots, so make the builder correct for both.
+
+## Material style shortcuts
+
+Elevated, Filled, Outlined, and Text buttons support nullable `padding`,
+`minimumSize`, `alignment`, `backgroundColor`, `foregroundColor`,
+`disabledBackgroundColor`, `disabledForegroundColor`, and `mouseCursor` on all
+constructors. Combine them with `style`:
+
+```dart
+AsyncFilledButton.tonalIcon(
+  onPressed: saveChanges,
+  padding: const EdgeInsetsDirectional.fromSTEB(20, 12, 24, 12),
+  minimumSize: const Size(160, 48),
+  disabledBackgroundColor: Colors.blueGrey,
+  style: FilledButton.styleFrom(shape: const StadiumBorder()),
+  icon: const Icon(Icons.save_outlined),
+  label: Text(l10n.save),
+);
+```
+
+Only non-null shortcuts override the corresponding property and state in the
+supplied style. Null then falls back through that state's supplied resolver,
+the matching family theme, and native defaults. A disabled-only color override
+leaves enabled colors and the default spinner unchanged; enabled colors leave
+disabled/loading styling unchanged. Native text/icon color resolution,
+outline, shape, elevation, overlays, splash, and layer builders remain intact.
+Use `style.iconColor` when you need an icon color separate from the foreground.
+
+`mouseCursor` accepts a plain cursor such as `SystemMouseCursors.text` or a
+state-dependent `WidgetStateMouseCursor`. A custom cursor that implements
+`WidgetStateProperty<MouseCursor?>` and resolves to null for a state falls back
+to that state's supplied-style cursor before the theme.
+These conveniences do not add new options to IconButton or FAB; use those
+families' existing native parameters.
 
 ## Sizing details
 
