@@ -508,6 +508,7 @@ void _mouseCursorTests(_Variant variant) {
               .debugDeviceActiveCursor(1);
           await gesture.moveTo(Offset.zero);
           await tester.pump();
+
           return cursor;
         }
 
