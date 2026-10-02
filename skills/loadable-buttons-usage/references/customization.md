@@ -14,9 +14,11 @@ core loading, error, and disabled rules in [SKILL.md](../SKILL.md) still apply.
 
 - `animationDuration` defaults to 200 milliseconds (`Durations.medium1` on
   Material buttons).
-- `minimumChildOpacity` (default `0.0`) keeps stack idle content partially
-  visible while loading. Partially visible idle content still cannot receive
-  pointer input, focus, or accessibility actions.
+- `minimumChildOpacity` sets the idle content's opacity while a `stack`
+  transition is loading. The default `0.0` hides idle content completely;
+  a value above zero, such as `0.3`, keeps it partially visible behind the
+  loading content. Either way, idle content cannot receive pointer input,
+  focus, or accessibility actions while loading. Other transitions ignore it.
 - Selecting `customBuilder` without a `customBuilder` fails an assertion.
   A `customBuilder` is ignored by the other transition types.
 
