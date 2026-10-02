@@ -346,45 +346,17 @@ class _AsyncFilledButtonState extends State<AsyncFilledButton>
   @override
   Widget build(BuildContext context) {
     final buttonBuilder =
-        widget is _AsyncFilledButtonWithIcon
-            ? _FilledButtonWithIconPadding.new
-            : FilledButton.new;
-    final tonalButtonBuilder =
-        widget is _AsyncFilledButtonWithIcon
+        widget._variant == _AsyncFilledButtonVariant.tonal
             ? _FilledButtonWithIconPadding.tonal
-            : FilledButton.tonal;
-    if (widget._variant == _AsyncFilledButtonVariant.tonal) {
-      return tonalButtonBuilder(
-        onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
-        onLongPress:
-            isLoading || widget.onLongPress == null ? null : _handleLongPress,
-        onHover: widget.onHover,
-        onFocusChange: widget.onFocusChange,
-        style:
-            widget.style ??
-            FilledButton.styleFrom(splashFactory: widget.splashFactory),
-        focusNode: widget.focusNode,
-        autofocus: widget.autofocus,
-        clipBehavior: widget.clipBehavior,
-        statesController: widget.statesController,
-        child: _ChildContent(
-          customBuilder: widget.customBuilder?.call(
-            isLoading,
-            widget.child,
-            widget.loadingChild,
-          ),
-          child: widget.child,
-          loadingChild: widget.loadingChild,
-          isLoading: isLoading,
-          transitionType: widget.transitionType,
-          animationDuration: widget.animationDuration,
-          minimumChildOpacity: widget.minimumChildOpacity,
-          style: widget.style,
-        ),
-      );
-    }
+            : _FilledButtonWithIconPadding.new;
+    final customChild = widget.customBuilder?.call(
+      isLoading,
+      widget.child,
+      widget.loadingChild,
+    );
 
     return buttonBuilder(
+      hasIcon: widget is _AsyncFilledButtonWithIcon,
       onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
       onLongPress:
           isLoading || widget.onLongPress == null ? null : _handleLongPress,
@@ -395,65 +367,29 @@ class _AsyncFilledButtonState extends State<AsyncFilledButton>
           FilledButton.styleFrom(splashFactory: widget.splashFactory),
       focusNode: widget.focusNode,
       autofocus: widget.autofocus,
-      clipBehavior: widget.clipBehavior,
-      statesController: widget.statesController,
-      child: _ChildContent(
-        customBuilder: widget.customBuilder?.call(
-          isLoading,
-          widget.child,
-          widget.loadingChild,
-        ),
-        child: widget.child,
-        loadingChild: widget.loadingChild,
-        isLoading: isLoading,
-        transitionType: widget.transitionType,
-        animationDuration: widget.animationDuration,
-        minimumChildOpacity: widget.minimumChildOpacity,
+      clipBehavior: resolveButtonClipBehavior(
+        clipBehavior: widget.clipBehavior,
         style: widget.style,
+        themeStyle: FilledButtonTheme.of(context).style,
       ),
-    );
-  }
-}
-
-class _ChildContent extends StatelessWidget {
-  final Widget? customBuilder;
-  final Widget child;
-  final Widget? loadingChild;
-  final bool isLoading;
-  final TransitionAnimationType transitionType;
-  final Duration animationDuration;
-  final double minimumChildOpacity;
-  final ButtonStyle? style;
-
-  const _ChildContent({
-    required this.customBuilder,
-    required this.child,
-    required this.loadingChild,
-    required this.isLoading,
-    required this.transitionType,
-    required this.animationDuration,
-    required this.minimumChildOpacity,
-    required this.style,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    if (transitionType == TransitionAnimationType.customBuilder) {
-      return customBuilder ?? child;
-    }
-
-    return LoadingTransition(
-      child: child,
-      loadingChild:
-          loadingChild ??
-          DefaultLoadingIndicator(
-            style: style,
-            themeStyleOf: (context) => FilledButtonTheme.of(context).style,
-          ),
-      isLoading: isLoading,
-      transitionType: transitionType,
-      animationDuration: animationDuration,
-      minimumChildOpacity: minimumChildOpacity,
+      statesController: widget.statesController,
+      child:
+          widget.transitionType == TransitionAnimationType.customBuilder
+              ? customChild ?? widget.child
+              : LoadingTransition(
+                child: widget.child,
+                loadingChild:
+                    widget.loadingChild ??
+                    DefaultLoadingIndicator(
+                      style: widget.style,
+                      themeStyleOf:
+                          (context) => FilledButtonTheme.of(context).style,
+                    ),
+                isLoading: isLoading,
+                transitionType: widget.transitionType,
+                animationDuration: widget.animationDuration,
+                minimumChildOpacity: widget.minimumChildOpacity,
+              ),
     );
   }
 }

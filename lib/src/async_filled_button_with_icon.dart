@@ -66,8 +66,10 @@ class _AsyncFilledButtonWithIcon extends AsyncFilledButton {
 
 // Keep the complete async content as the child while using native icon
 // defaults. Material still owns widget/theme/default style precedence.
-class _FilledButtonWithIconPadding extends FilledButton {
+class _FilledButtonWithIconPadding extends FilledButton
+    with StackLoadingButton {
   const _FilledButtonWithIconPadding({
+    required bool hasIcon,
     required super.onPressed,
     required super.child,
     super.onLongPress,
@@ -78,9 +80,11 @@ class _FilledButtonWithIconPadding extends FilledButton {
     super.autofocus,
     super.clipBehavior,
     super.statesController,
-  }) : _tonal = false;
+  }) : _tonal = false,
+       _hasIcon = hasIcon;
 
   const _FilledButtonWithIconPadding.tonal({
+    required bool hasIcon,
     required super.onPressed,
     required super.child,
     super.onLongPress,
@@ -92,12 +96,15 @@ class _FilledButtonWithIconPadding extends FilledButton {
     super.clipBehavior,
     super.statesController,
   }) : _tonal = true,
+       _hasIcon = hasIcon,
        super.tonal();
 
   final bool _tonal;
+  final bool _hasIcon;
 
   @override
   ButtonStyle defaultStyleOf(BuildContext context) {
+    if (!_hasIcon) return super.defaultStyleOf(context);
     final nativeButton =
         _tonal
             ? FilledButton.tonalIcon(

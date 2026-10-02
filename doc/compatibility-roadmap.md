@@ -24,8 +24,9 @@ The v2 migration must preserve native icon-and-label button padding for Elevated
 Filled (including tonal), Outlined, and Text buttons. Keep widget padding ahead
 of inherited family theme padding, then native defaults, resolving fallbacks per
 widget state. Retain native-reference regression coverage for text scaling,
-LTR/RTL, and null icons, and keep loading content centered over the full idle
-content.
+LTR/RTL, and null icons, and keep stack loading content centered within the full
+button, including asymmetric padding. Cover both axes during the transition and
+retain interaction with custom loading content.
 
 ## Flutter 3.22 compatibility check
 

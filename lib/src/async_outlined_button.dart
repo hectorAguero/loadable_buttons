@@ -223,12 +223,8 @@ class _AsyncOutlinedButtonState extends State<AsyncOutlinedButton>
 
   @override
   Widget build(BuildContext context) {
-    final buttonBuilder =
-        widget is _AsyncOutlinedButtonWithIcon
-            ? _OutlinedButtonWithIconPadding.new
-            : OutlinedButton.new;
-
-    return buttonBuilder(
+    return _OutlinedButtonWithIconPadding(
+      hasIcon: widget is _AsyncOutlinedButtonWithIcon,
       onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
       onLongPress:
           isLoading || widget.onLongPress == null ? null : _handleLongPress,
@@ -239,7 +235,11 @@ class _AsyncOutlinedButtonState extends State<AsyncOutlinedButton>
           OutlinedButton.styleFrom(splashFactory: widget.splashFactory),
       focusNode: widget.focusNode,
       autofocus: widget.autofocus,
-      clipBehavior: widget.clipBehavior,
+      clipBehavior: resolveButtonClipBehavior(
+        clipBehavior: widget.clipBehavior,
+        style: widget.style,
+        themeStyle: OutlinedButtonTheme.of(context).style,
+      ),
       statesController: widget.statesController,
       child:
           widget.transitionType == TransitionAnimationType.customBuilder

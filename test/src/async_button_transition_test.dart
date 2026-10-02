@@ -220,11 +220,7 @@ void main() {
             expect(idleCalls, 1);
 
             await tester.pumpWidget(host(true));
-            for (final elapsed in [
-              const Duration(milliseconds: 1),
-              _halfDuration,
-              _duration,
-            ]) {
+            for (final elapsed in [Duration.zero, _halfDuration, _duration]) {
               await tester.pump(elapsed);
               idleFocus.requestFocus();
               await tester.pump();
@@ -247,11 +243,7 @@ void main() {
             expect(loadingFocus.hasFocus, isTrue);
 
             await tester.pumpWidget(host(false));
-            for (final elapsed in [
-              const Duration(milliseconds: 1),
-              _halfDuration,
-              _duration,
-            ]) {
+            for (final elapsed in [Duration.zero, _halfDuration, _duration]) {
               await tester.pump(elapsed);
               loadingFocus.requestFocus();
               await tester.pump();
@@ -423,6 +415,20 @@ void main() {
                     ? const EdgeInsetsDirectional.fromSTEB(12, 2, 18, 10)
                     : null;
             final spacing = paddingSource == 'widget' ? 12.0 : null;
+            const loadingKey = ValueKey('extended-loading-control');
+            var loadingCalls = 0;
+            final loadingChild =
+                paddingSource == 'widget'
+                    ? GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () => loadingCalls++,
+                      child: const SizedBox(
+                        key: loadingKey,
+                        width: 24,
+                        height: 20,
+                      ),
+                    )
+                    : null;
             const textStyle = TextStyle(fontSize: 16);
             Widget host(Widget button) => MaterialApp(
               theme: ThemeData(
@@ -474,6 +480,7 @@ void main() {
               label: label,
               icon: icon,
               loading: loading,
+              loadingChild: loadingChild,
               extendedPadding: padding,
               extendedIconLabelSpacing: spacing,
               extendedTextStyle: textStyle,
@@ -492,22 +499,26 @@ void main() {
               );
             }
             await tester.pumpWidget(host(button(true)));
-            for (final elapsed in [
-              const Duration(milliseconds: 1),
-              _halfDuration,
-              _duration,
-            ]) {
+            final loader =
+                loadingChild == null
+                    ? find.byType(CircularProgressIndicator)
+                    : find.byKey(loadingKey);
+            for (final elapsed in [Duration.zero, _halfDuration, _duration]) {
               await tester.pump(elapsed);
               expect(tester.takeException(), isNull);
               expect(tester.getSize(find.byKey(_buttonKey)), materialSize);
               expect(
-                tester.getCenter(find.byType(CircularProgressIndicator)).dx,
+                tester.getCenter(loader).dx,
                 closeTo(tester.getCenter(find.byKey(_buttonKey)).dx, 0.01),
               );
               expect(
-                tester.getCenter(find.byType(CircularProgressIndicator)).dy,
+                tester.getCenter(loader).dy,
                 closeTo(tester.getCenter(find.byKey(_buttonKey)).dy, 0.01),
               );
+            }
+            if (loadingChild != null) {
+              await tester.tapAt(tester.getCenter(loader));
+              expect(loadingCalls, 1);
             }
             await tester.pumpWidget(host(button(false)));
             await tester.pump(_duration);

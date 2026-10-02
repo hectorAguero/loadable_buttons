@@ -234,12 +234,8 @@ class _AsyncElevatedButtonState extends State<AsyncElevatedButton>
 
   @override
   Widget build(BuildContext context) {
-    final buttonBuilder =
-        widget is _AsyncElevatedButtonWithIcon
-            ? _ElevatedButtonWithIconPadding.new
-            : ElevatedButton.new;
-
-    return buttonBuilder(
+    return _ElevatedButtonWithIconPadding(
+      hasIcon: widget is _AsyncElevatedButtonWithIcon,
       onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
       onLongPress:
           isLoading || widget.onLongPress == null ? null : _handleLongPress,
@@ -250,7 +246,11 @@ class _AsyncElevatedButtonState extends State<AsyncElevatedButton>
           ElevatedButton.styleFrom(splashFactory: widget.splashFactory),
       focusNode: widget.focusNode,
       autofocus: widget.autofocus,
-      clipBehavior: widget.clipBehavior,
+      clipBehavior: resolveButtonClipBehavior(
+        clipBehavior: widget.clipBehavior,
+        style: widget.style,
+        themeStyle: ElevatedButtonTheme.of(context).style,
+      ),
       statesController: widget.statesController,
       child:
           widget.transitionType == TransitionAnimationType.customBuilder

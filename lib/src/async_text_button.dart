@@ -223,12 +223,8 @@ class _AsyncTextButtonState extends State<AsyncTextButton>
 
   @override
   Widget build(BuildContext context) {
-    final buttonBuilder =
-        widget is _AsyncTextButtonWithIcon
-            ? _TextButtonWithIconPadding.new
-            : TextButton.new;
-
-    return buttonBuilder(
+    return _TextButtonWithIconPadding(
+      hasIcon: widget is _AsyncTextButtonWithIcon,
       onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
       onLongPress:
           isLoading || widget.onLongPress == null ? null : _handleLongPress,
@@ -239,7 +235,11 @@ class _AsyncTextButtonState extends State<AsyncTextButton>
           TextButton.styleFrom(splashFactory: widget.splashFactory),
       focusNode: widget.focusNode,
       autofocus: widget.autofocus,
-      clipBehavior: widget.clipBehavior,
+      clipBehavior: resolveButtonClipBehavior(
+        clipBehavior: widget.clipBehavior,
+        style: widget.style,
+        themeStyle: TextButtonTheme.of(context).style,
+      ),
       statesController: widget.statesController,
       child:
           widget.transitionType == TransitionAnimationType.customBuilder

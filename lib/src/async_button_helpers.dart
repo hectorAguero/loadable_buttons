@@ -66,11 +66,8 @@ mixin StackLoadingButton on ButtonStyleButton {
             themeStyleOf(context)?.backgroundBuilder ??
             defaultStyleOf(context).backgroundBuilder;
 
-        return LoadingTransition(
-          child:
-              backgroundBuilder?.call(context, states, child) ??
-              child ??
-              const SizedBox.shrink(),
+        final transition = LoadingTransition(
+          child: child ?? const SizedBox.shrink(),
           loadingChild: content.loadingChild,
           isLoading: content.isLoading,
           transitionType: content.transitionType,
@@ -79,6 +76,9 @@ mixin StackLoadingButton on ButtonStyleButton {
           animateChildSize: content.animateChildSize,
           preserveChildConstraints: true,
         );
+
+        return backgroundBuilder?.call(context, states, transition) ??
+            transition;
       },
     );
   }

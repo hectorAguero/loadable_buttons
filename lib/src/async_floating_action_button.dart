@@ -365,16 +365,29 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton>
     end: 20,
   );
 
+  static const _extendedPaddingWithoutIcon = EdgeInsets.symmetric(
+    horizontal: 20,
+  );
+
   @override
   bool get externalLoading => widget.loading;
 
   @override
   FutureOr<void> Function()? get asyncOnPressed => widget.onPressed;
 
-  bool get _useCombinedExtendedContent =>
+  bool get _useFullExtendedStack =>
       widget.transitionType == TransitionAnimationType.stack &&
-      widget.isExtended &&
-      widget.child != null;
+      widget.isExtended;
+
+  bool get _useCombinedExtendedContent =>
+      _useFullExtendedStack && widget.child != null;
+
+  EdgeInsetsGeometry _extendedPaddingOf(BuildContext context) =>
+      widget.extendedPadding ??
+      Theme.of(context).floatingActionButtonTheme.extendedPadding ??
+      (widget.child == null
+          ? _extendedPaddingWithoutIcon
+          : _extendedPaddingWithIcon);
 
   @override
   Widget build(BuildContext context) => Theme(
@@ -500,14 +513,10 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton>
         focusNode: widget.focusNode,
         autofocus: widget.autofocus,
         extendedIconLabelSpacing: widget.extendedIconLabelSpacing,
-        // The combined row occupies the label slot; retain the native
-        // padding that Material would choose with an icon present.
+        // Keep padding in the retained idle layout so the stack's center
+        // includes it without changing the native idle dimensions.
         extendedPadding:
-            widget.extendedPadding ??
-            (_useCombinedExtendedContent
-                ? Theme.of(context).floatingActionButtonTheme.extendedPadding ??
-                    _extendedPaddingWithIcon
-                : null),
+            _useFullExtendedStack ? EdgeInsets.zero : widget.extendedPadding,
         extendedTextStyle: widget.extendedTextStyle,
         icon:
             widget.child == null || _useCombinedExtendedContent
@@ -523,6 +532,10 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton>
                   customBuilder: widget.customBuilder,
                 ),
         label: _AsyncFloatingActionButtonChild(
+          contentPadding:
+              _useFullExtendedStack
+                  ? _extendedPaddingOf(context)
+                  : EdgeInsets.zero,
           leadingIcon: _useCombinedExtendedContent ? widget.child : null,
           iconLabelSpacing: widget.extendedIconLabelSpacing,
           child: AnimatedSize(
@@ -555,11 +568,13 @@ class _AsyncFloatingActionButtonChild extends StatelessWidget {
     required this.customBuilder,
     this.leadingIcon,
     this.iconLabelSpacing,
+    this.contentPadding = EdgeInsets.zero,
   });
 
   static const double _defaultIconLabelSpacing = 8.0;
 
   final Widget child;
+  final EdgeInsetsGeometry contentPadding;
   final Widget? leadingIcon;
   final double? iconLabelSpacing;
   final Widget? loadingChild;
@@ -580,24 +595,27 @@ class _AsyncFloatingActionButtonChild extends StatelessWidget {
     final icon = leadingIcon;
 
     return LoadingTransition(
-      child:
-          icon == null
-              ? child
-              : Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  icon,
-                  SizedBox(
-                    width:
-                        iconLabelSpacing ??
-                        Theme.of(
-                          context,
-                        ).floatingActionButtonTheme.extendedIconLabelSpacing ??
-                        _defaultIconLabelSpacing,
-                  ),
-                  child,
-                ],
-              ),
+      child: Padding(
+        padding: contentPadding,
+        child:
+            icon == null
+                ? child
+                : Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    icon,
+                    SizedBox(
+                      width:
+                          iconLabelSpacing ??
+                          Theme.of(context)
+                              .floatingActionButtonTheme
+                              .extendedIconLabelSpacing ??
+                          _defaultIconLabelSpacing,
+                    ),
+                    child,
+                  ],
+                ),
+      ),
       loadingChild: loadingChild ?? DefaultLoadingIndicator(color: color),
       isLoading: isLoading,
       transitionType: transitionType,

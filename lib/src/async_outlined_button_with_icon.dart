@@ -35,8 +35,10 @@ class _AsyncOutlinedButtonWithIcon extends AsyncOutlinedButton {
 
 // Keep the complete async content as the child while using native icon
 // defaults. Material still owns widget/theme/default style precedence.
-class _OutlinedButtonWithIconPadding extends OutlinedButton {
+class _OutlinedButtonWithIconPadding extends OutlinedButton
+    with StackLoadingButton {
   const _OutlinedButtonWithIconPadding({
+    required bool hasIcon,
     required super.onPressed,
     required super.child,
     super.onLongPress,
@@ -47,14 +49,20 @@ class _OutlinedButtonWithIconPadding extends OutlinedButton {
     super.autofocus,
     super.clipBehavior,
     super.statesController,
-  });
+  }) : _hasIcon = hasIcon;
+
+  final bool _hasIcon;
 
   @override
-  ButtonStyle defaultStyleOf(BuildContext context) => OutlinedButton.icon(
-    onPressed: null,
-    icon: const SizedBox.shrink(),
-    label: const SizedBox.shrink(),
-  ).defaultStyleOf(context);
+  ButtonStyle defaultStyleOf(BuildContext context) {
+    if (!_hasIcon) return super.defaultStyleOf(context);
+
+    return OutlinedButton.icon(
+      onPressed: null,
+      icon: const SizedBox.shrink(),
+      label: const SizedBox.shrink(),
+    ).defaultStyleOf(context);
+  }
 }
 
 /// Copy of OutlinedButton.icon with the loading animation.

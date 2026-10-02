@@ -70,7 +70,7 @@ void main() {
             await tester.tap(find.text('Run this operation'));
             await tester.pump();
             for (final elapsed in [
-              const Duration(milliseconds: 1),
+              Duration.zero,
               Durations.medium1 ~/ 2,
               Durations.medium1,
             ]) {
@@ -93,42 +93,55 @@ void main() {
       }
     }
 
-    testWidgets('${entry.key} keeps centered custom loading controls usable', (
-      tester,
-    ) async {
-      const loadingKey = ValueKey('loading-control');
-      var calls = 0;
-      await tester.pumpWidget(
-        _host(
-          entry.value(
-            onPressed: () {},
-            loading: true,
-            icon: const Icon(Icons.add),
-            label: const Text('Run'),
-            style: const ButtonStyle(
-              fixedSize: WidgetStatePropertyAll(Size(280, 96)),
-              alignment: AlignmentDirectional.bottomStart,
-              padding: WidgetStatePropertyAll(
-                EdgeInsetsDirectional.fromSTEB(60, 2, 10, 14),
+    for (final styleSource in ['widget', 'theme']) {
+      testWidgets('${entry.key} keeps centered custom loading controls and '
+          '$styleSource background content usable', (tester) async {
+        const loadingKey = ValueKey('loading-control');
+        var calls = 0;
+        final semantics = tester.ensureSemantics();
+        try {
+          final style = ButtonStyle(
+            fixedSize: const WidgetStatePropertyAll(Size(280, 96)),
+            alignment: AlignmentDirectional.bottomStart,
+            padding: const WidgetStatePropertyAll(
+              EdgeInsetsDirectional.fromSTEB(60, 2, 10, 14),
+            ),
+            backgroundBuilder:
+                (_, _, child) =>
+                    Semantics(label: 'Button decoration', child: child),
+          );
+          await tester.pumpWidget(
+            _host(
+              entry.value(
+                onPressed: () {},
+                loading: true,
+                icon: const Icon(Icons.add),
+                label: const Text('Run'),
+                style: styleSource == 'widget' ? style : null,
+                loadingChild: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => calls++,
+                  child: const SizedBox(key: loadingKey, width: 24, height: 24),
+                ),
               ),
+              themeStyle: styleSource == 'theme' ? style : null,
             ),
-            loadingChild: GestureDetector(
-              onTap: () => calls++,
-              child: const SizedBox(key: loadingKey, width: 24, height: 24),
-            ),
-          ),
-        ),
-      );
-      final button = find.byWidgetPredicate(
-        (widget) => widget is ButtonStyleButton,
-      );
-      final buttonCenter = tester.getCenter(button);
-      final loaderCenter = tester.getCenter(find.byKey(loadingKey));
-      expect(loaderCenter.dx, closeTo(buttonCenter.dx, 0.01));
-      expect(loaderCenter.dy, closeTo(buttonCenter.dy, 0.01));
-      await tester.tap(find.byKey(loadingKey));
-      expect(calls, 1);
-    });
+          );
+          final button = find.byWidgetPredicate(
+            (widget) => widget is ButtonStyleButton,
+          );
+          final buttonCenter = tester.getCenter(button);
+          final loaderCenter = tester.getCenter(find.byKey(loadingKey));
+          expect(loaderCenter.dx, closeTo(buttonCenter.dx, 0.01));
+          expect(loaderCenter.dy, closeTo(buttonCenter.dy, 0.01));
+          expect(find.semantics.byLabel(RegExp('Button decoration')), findsOne);
+          await tester.tapAt(loaderCenter);
+          expect(calls, 1);
+        } finally {
+          semantics.dispose();
+        }
+      });
+    }
 
     for (final hasIcon in [true, false]) {
       final icon = hasIcon ? const Icon(Icons.add) : null;
