@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:loadable_buttons/src/async_button_error_handler.dart';
 import 'package:loadable_buttons/src/async_button_helpers.dart';
 import 'package:loadable_buttons/src/loading_transition.dart';
 import 'package:material_ui/material_ui.dart';

@@ -4,7 +4,7 @@
 /// and types such as `ButtonStyle`. Version 2 requires Flutter 3.44 or newer.
 library;
 
-export 'src/async_button_error_handler.dart';
+export 'src/async_button_helpers.dart' show AsyncButtonErrorHandler;
 export 'src/async_elevated_button.dart';
 export 'src/async_filled_button.dart';
 export 'src/async_floating_action_button.dart';

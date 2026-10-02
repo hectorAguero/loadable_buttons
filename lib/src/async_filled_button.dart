@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:loadable_buttons/src/async_button_error_handler.dart';
 import 'package:loadable_buttons/src/async_button_helpers.dart';
 import 'package:loadable_buttons/src/async_outlined_button.dart'
     show AsyncOutlinedButton;

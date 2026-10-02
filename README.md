@@ -310,7 +310,7 @@ copy a button into your project, and adapt it, including for commercial use.
 Keep the copyright and MIT license notice with the copied code.
 
 Include any companion `part` files, `async_button_helpers.dart` for shared loading
-state and indicators, and `loading_transition.dart` for the transition enum
+state, error handling, and indicators, and `loading_transition.dart` for the enum
 and widgets. Update package imports to match your project.
 
 For a single-file copy, inline the shared loading helper declarations, move the
