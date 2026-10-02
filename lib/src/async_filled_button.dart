@@ -349,11 +349,6 @@ class _AsyncFilledButtonState extends State<AsyncFilledButton>
         widget._variant == _AsyncFilledButtonVariant.tonal
             ? _FilledButtonWithIconPadding.tonal
             : _FilledButtonWithIconPadding.new;
-    final customChild = widget.customBuilder?.call(
-      isLoading,
-      widget.child,
-      widget.loadingChild,
-    );
 
     return buttonBuilder(
       hasIcon: widget is _AsyncFilledButtonWithIcon,
@@ -375,7 +370,12 @@ class _AsyncFilledButtonState extends State<AsyncFilledButton>
       statesController: widget.statesController,
       child:
           widget.transitionType == TransitionAnimationType.customBuilder
-              ? customChild ?? widget.child
+              ? widget.customBuilder?.call(
+                    isLoading,
+                    widget.child,
+                    widget.loadingChild,
+                  ) ??
+                  widget.child
               : LoadingTransition(
                 child: widget.child,
                 loadingChild:

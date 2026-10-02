@@ -53,6 +53,7 @@ void main() {
           '${transition.name} presents custom loading and idle content',
           (tester) async {
             final pending = Completer<void>();
+            var customBuilds = 0;
             await tester.pumpWidget(
               buttonHost(
                 entry.value(
@@ -61,14 +62,17 @@ void main() {
                   onPressed: () => pending.future,
                   transitionType: transition,
                   animationDuration: _duration,
-                  customBuilder:
-                      (loading, child, loadingChild) => Semantics(
-                        label: loading ? 'Custom busy' : 'Custom idle',
-                        child:
-                            loading
-                                ? loadingChild ?? const Text('Missing loader')
-                                : child,
-                      ),
+                  customBuilder: (loading, child, loadingChild) {
+                    customBuilds++;
+
+                    return Semantics(
+                      label: loading ? 'Custom busy' : 'Custom idle',
+                      child:
+                          loading
+                              ? loadingChild ?? const Text('Missing loader')
+                              : child,
+                    );
+                  },
                 ),
               ),
             );
@@ -79,6 +83,8 @@ void main() {
                 tester.getSemantics(materialButton).getSemanticsData().label,
                 contains('Custom idle'),
               );
+            } else {
+              expect(customBuilds, 0);
             }
             await tester.tap(materialButton);
             // Text loading content has no indefinite animation. Settling also
@@ -91,6 +97,8 @@ void main() {
                 tester.getSemantics(materialButton).getSemanticsData().label,
                 contains('Custom busy'),
               );
+            } else {
+              expect(customBuilds, 0);
             }
             expect(find.text('Missing loader'), findsNothing);
             expect(find.byType(CircularProgressIndicator), findsNothing);
@@ -106,6 +114,8 @@ void main() {
                 tester.getSemantics(materialButton).getSemanticsData().label,
                 contains('Custom idle'),
               );
+            } else {
+              expect(customBuilds, 0);
             }
           },
         );

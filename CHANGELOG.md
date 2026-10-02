@@ -1,5 +1,6 @@
 ## 1.1.1
 
+* Invoke Filled button custom builders only for custom transitions.
 * Match native Material padding in Elevated, Filled (including tonal), Outlined,
   and Text icon-and-label buttons, including text scaling and RTL layouts.
 * Preserve explicit and inherited theme padding, including state-dependent
