@@ -3,7 +3,7 @@ description: CLI checks for the loadable_buttons repository.
 publish_to: none
 
 environment:
-  sdk: ^3.13.0
+  sdk: ^3.12.0
 
 dependencies:
   dart_code_linter: ^4.4.0

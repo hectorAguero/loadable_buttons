@@ -66,17 +66,17 @@ jobs:
         run: dart format --output=none --set-exit-if-changed lib test example/lib
 
       - name: Analyze Package, Tests, and Example
-        run: bash tool/analyze.sh ${{ matrix.sdk == 'minimum' && '--minimum' || '' }}
+        run: bash tool/analyze.sh
 
-      # Modern plugins and their CLI require a newer Dart SDK than Flutter 3.44.
-      # Built-in analysis still runs on minimum, with the same strict baseline.
-      - name: Resolve Stable Lint Tools
-        if: matrix.sdk == 'stable' && matrix.material == 'latest'
+      # Keep lint-tool dependencies separate from Flutter's SDK-pinned graph.
+      # Validate the CLI once per SDK; plugin checks run in every matrix job.
+      - name: Resolve Lint Tools
+        if: matrix.material == 'latest'
         working-directory: tool/dcl
         run: dart pub get
 
       - name: Check Dart Code Linter Rules
-        if: matrix.sdk == 'stable' && matrix.material == 'latest'
+        if: matrix.material == 'latest'
         run: bash tool/check_dcl.sh
 
       - name: Run Tests

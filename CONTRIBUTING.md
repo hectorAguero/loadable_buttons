@@ -6,20 +6,18 @@ Version 2 supports Flutter **3.44.0+**, Dart **3.12.0+**, and standalone
 and the newest compatible Material UI release. See
 [the compatibility roadmap](doc/compatibility-roadmap.md).
 
-Use current Flutter stable with Dart **3.13 or newer** for the full plugin checks.
-Flutter 3.44 ships Dart 3.12, which can run the built-in analyzer baseline but
-cannot run the modern analyzer plugins. The minimum job deliberately omits only
-the plugin activation block; it still analyzes package, test, and example sources
-with strict casts, inference, and raw types, and treats infos and warnings as
-failures. The script restores the original configuration even if analysis fails.
+Both the minimum Flutter 3.44 / Dart 3.12 SDK and current stable run the full
+analyzer-plugin checks with strict casts, inference, and raw types. Infos and
+warnings fail validation. CI also runs the isolated DCL CLI on both SDKs in
+the latest-compatible Material UI jobs; plugin checks run in all four jobs.
 
 ## Why these three lint packages
 
 | Tool | Role in this package |
 | --- | --- |
 | [Very Good Analysis](https://pub.dev/packages/very_good_analysis) | The versioned 10.3.0 preset provides the same built-in rules on both SDKs, including public API documentation and strict types. |
-| [Solid Lints 1.0.0](https://pub.dev/packages/solid_lints) | Stable-only custom checks for null safety, context usage, code complexity, and widget/lifecycle conventions. |
-| [Dart Code Linter 4.4.0](https://pub.dev/packages/dart_code_linter) | Stable-only complementary checks for listener cleanup, redundant `async`, `async`/`await` style, test assertions, and test filenames. |
+| [Solid Lints 1.0.0](https://pub.dev/packages/solid_lints) | Custom checks for null safety, context usage, code complexity, and widget/lifecycle conventions. |
+| [Dart Code Linter 4.4.0](https://pub.dev/packages/dart_code_linter) | Complementary checks for listener cleanup, redundant `async`, `async`/`await` style, test assertions, and test filenames. |
 
 The package and example allow VGA >=10.3.0 <12.0.0 so Pub can select a release
 compatible with each SDK, while the included preset stays fixed at 10.3.0.
@@ -115,7 +113,7 @@ disabled by the package policy. It also permits widget-producing fixtures,
 empty stub callbacks, literal expected values, diagnostic printing, and explicit
 default arguments. Public API documentation is unnecessary for test helpers.
 Strict types and built-in async/lifecycle checks remain active on both SDKs.
-Plugin test-assertion and filename checks run on stable. Named callback typedefs
+Plugin test-assertion and filename checks run on both SDKs. Named callback typedefs
 remain allowed to keep parameterized fixtures readable. Lints can detect missing
 assertions, but reviewing the behavior a test protects is still necessary.
 
@@ -124,7 +122,7 @@ for `_HomePageState.build`, which showcases all button variants.
 
 ## Local checks
 
-Run the stable checks with one SDK selected on `PATH`:
+Run these checks with either supported SDK selected on `PATH`:
 
 ```sh
 flutter --version
@@ -137,9 +135,9 @@ flutter test --no-pub
 git diff --check
 ```
 
-For Flutter 3.44.0, use `bash tool/analyze.sh --minimum` and omit the two DCL CLI
-steps. This mode requires Python 3 to select the supported analyzer configuration.
-Do not claim minimum compatibility from a stable-only run.
+Flutter 3.44.0 runs the same plugin and CLI checks as stable; no minimum-SDK
+plugin bypass is needed. Do not claim minimum compatibility from a stable-only
+run.
 
 Run `bash tool/resolve_material_ui.sh oldest` in an isolated checkout to pin
 exact Material UI 1.0.0 for both the package and example. The script refuses to

@@ -22,8 +22,9 @@ SDK: [1.3.0 is retracted](https://pub.dev/packages/material_ui/versions/1.3.0),
 and releases 1.4.0 and newer require Flutter 3.47 / Dart 3.13.
 The inclusive lower bound preserves
 the first stable release, and the implementation uses no newer expressive APIs.
-Modern analyzer plugins and the isolated DCL tool continue to require Dart 3.13
-for development; they do not raise the consumer or test SDK floor.
+Solid Lints 1.0.0 and DCL 4.4.0 plugins and the isolated DCL CLI are validated
+on Dart 3.12 and stable. Their independent dependency graphs keep analyzer
+requirements separate from Flutter's SDK-pinned consumer and test dependencies.
 
 CI runs four SDK/dependency combinations: exact Flutter 3.44.0 and current
 stable, each with exact Material UI 1.0.0 and the latest compatible resolution.
@@ -36,7 +37,7 @@ changes and the compatibility bridge for legacy dependencies.
 Development dependencies use Very Good Analysis >=10.3.0 <12.0.0, resolving
 10.3.0 on the minimum SDK and 11.0.0 on stable. Both use the versioned 10.3.0
 preset so lint rules remain compatible with Dart 3.12. Solid Lints 1.0.0 and
-DCL 4.4.0 remain enabled only with the newer development SDK.
+DCL 4.4.0 remain at their current versions and run on both SDKs.
 
 Version 2 preserves native icon-and-label button padding for Elevated,
 Filled (including tonal), Outlined, and Text buttons. Keep widget padding ahead
@@ -58,7 +59,9 @@ Validated locally on October 2, 2026 in isolated dependency graphs:
 | 3.47.5 (stable) | 3.13.4 | 1.5.0 (latest) | 642 passed |
 
 Package, test, and example analysis and formatting passed in all four graphs.
-Stable also passed the full analyzer-plugin and DCL CLI checks. The running
+Both SDKs also passed the full analyzer-plugin and DCL CLI checks. Temporary
+negative probes confirmed that Solid and DCL emit their configured diagnostics
+on Dart 3.12. The running
 macOS example restarted with the migrated package and reported no runtime errors.
 The inherited-FAB native-reference matrix failed eight cases before the lookup
 fix and passed afterward. It checks inherited and empty inherited themes,
