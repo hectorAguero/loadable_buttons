@@ -29,8 +29,8 @@ YAML
   flutter pub get --no-example
   (cd example && flutter pub get)
 else
-  flutter pub upgrade material_ui --no-example
-  (cd example && flutter pub upgrade material_ui)
+  flutter pub upgrade --unlock-transitive material_ui --no-example
+  (cd example && flutter pub upgrade --unlock-transitive material_ui)
 fi
 
 # Verify the actual resolved version, including the example's independent graph.

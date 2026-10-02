@@ -144,9 +144,9 @@ exact Material UI 1.0.0 for both the package and example. The script refuses to
 replace existing overrides, removes its temporary overrides on exit, and checks
 the resolved versions. Then run the same analysis and `flutter test --no-pub`
 checks; keep `--no-pub` so the verified resolution stays in use. Run this on the
-exact minimum and stable SDKs. The latest mode upgrades only Material UI and its
-required dependencies to the newest compatible resolution. Finish the primary
-checkout with latest resolution on stable.
+exact minimum and stable SDKs. The latest mode unlocks Material UI and all its
+transitive dependencies to resolve their newest compatible versions. Finish the
+primary checkout with latest resolution on stable.
 
 After changing SDKs or moving a checkout, run the dependency-resolution script
 again. Do not reuse `.dart_tool/package_config.json` from a different SDK: it
