@@ -160,3 +160,33 @@ tracked lockfile; different Flutter SDKs may resolve different SDK-pinned packag
 versions. CI permits those expected resolutions without overwriting the committed
 lockfile. Review any local lockfile diff before committing it, and finish with the
 stable example resolution when updating its baseline.
+
+## Optional structural audits
+
+For a maintainability review, run the pinned
+[Analytica cognitive complexity CLI](https://github.com/kevmoo/analytica.dart/tree/main/packages/cognitive_complexity)
+from the repository root:
+
+```sh
+dart run cognitive_complexity@0.2.5 --git-diff=origin/main --format=json lib/
+```
+
+This reports function complexity changes against `origin/main`. It is an optional
+review aid, with no failure threshold or CI gate. Dart resolves the tool in its
+own dependency graph; the command does not add package dependencies or install
+agent skills. Version 0.2.5 was verified on Dart 3.12.0 and 3.13.4. Fetch the PR's
+actual base branch and use that ref instead of `origin/main` when appropriate.
+
+Review findings in context. Keep cohesive loading/error logic together and
+preserve native Material constructor forwarding. A score increase alone does not
+justify splitting helpers or changing public APIs. Declarative widget builds and
+parameterized contract tests need different treatment from callback logic.
+
+The remaining tools were evaluated on October 2, 2026:
+
+| Tool | Adoption notes |
+| --- | --- |
+| [dedupe](https://github.com/kevmoo/analytica.dart/tree/main/packages/dedupe) | Revisit for targeted audits. Repeated button wiring is intentional, so a package-wide duplication percentage should not become a release gate. |
+| [undead](https://github.com/kevmoo/analytica.dart/tree/main/packages/undead) | Revisit after the published CLI compiles cleanly. Version 0.1.1 failed to compile with resolved `analytica 0.1.2` because both libraries define `ElementReferenceExtractor`. Use library mode for future audits so exported APIs remain roots. |
+| [lower_bound](https://github.com/kevmoo/analytica.dart/tree/main/packages/lower_bound) | Currently in development. Evaluate separately; retain the existing exact Flutter minimum and Material UI dependency matrix with full tests. |
+| [scripts.dart](https://github.com/kevmoo/scripts.dart) | Evaluate as developer tooling with its own SDK. Its current constraint is `^3.13.0-100`, above this package's Dart 3.12 floor. Adapt personal repository/skill conventions before applying them to this repository. |

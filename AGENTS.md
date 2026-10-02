@@ -19,3 +19,11 @@ need to copy and adapt.
   merely to put each declaration in its own file.
 - Keep the README's copy instructions accurate when changing source files,
   imports, or companion `part` files.
+
+## Structural audits
+
+Use the optional commands in [CONTRIBUTING.md](CONTRIBUTING.md#optional-structural-audits)
+when a maintainability review would benefit from them. Treat findings as review
+leads: preserve intentional Material constructor wiring, exported package APIs,
+and cohesive helpers. Evaluate external skill rules against this repository's
+copyability and SDK requirements before adopting them.
