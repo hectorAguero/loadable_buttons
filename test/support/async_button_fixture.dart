@@ -161,7 +161,9 @@ AsyncButtonBuilder _withIcon(_IconBuilder builder, {bool selected = false}) =>
     }) => builder(
       icon: child,
       isSelected: selected ? const WidgetStatePropertyAll(true) : null,
-      selectedIcon: selected ? child : null,
+      selectedIcon: selected
+          ? const Icon(Icons.check, semanticLabel: 'Selected')
+          : null,
       onPressed: onPressed,
       onError: onError,
       loading: loading,

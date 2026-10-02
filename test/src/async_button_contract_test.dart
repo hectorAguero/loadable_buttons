@@ -208,6 +208,7 @@ void main() {
   // selected icons. Check actual accessibility output during both loading
   // sources and fades, without depending on the transition's widget structure.
   for (final entry in asyncButtonSemanticsBuilders.entries) {
+    final idleLabel = entry.key.endsWith(' selected') ? 'Selected' : 'Run';
     for (final transition in [
       TransitionAnimationType.stack,
       TransitionAnimationType.animatedSwitcher,
@@ -236,6 +237,13 @@ void main() {
                     minimumChildOpacity: 0.5,
                   ),
                 );
+            void expectIdleLabel() {
+              expect(find.semantics.byLabel(idleLabel), findsOne);
+              if (idleLabel == 'Selected') {
+                expect(find.semantics.byLabel('Run'), findsNothing);
+              }
+            }
+
             void expectLoadingLabel(String label) {
               final labels = find.semantics.byLabel(RegExp(label));
               expect(labels, findsOne);
@@ -248,6 +256,7 @@ void main() {
               expect(data.flagsCollection.isLiveRegion, isFalse);
               expect(data.hasAction(SemanticsAction.tap), isFalse);
               expect(find.semantics.byLabel('Run'), findsNothing);
+              expect(find.semantics.byLabel('Selected'), findsNothing);
               final outer = tester
                   .getSemantics(materialButton)
                   .getSemanticsData();
@@ -257,7 +266,7 @@ void main() {
             }
 
             await tester.pumpWidget(host(false));
-            expect(find.semantics.byLabel('Run'), findsOne);
+            expectIdleLabel();
             expect(find.semantics.byLabel('Guardando cambios'), findsNothing);
 
             // Null leaves progress unlabeled, with no English default.
@@ -272,9 +281,10 @@ void main() {
             );
             await tester.pumpWidget(host(false));
             await tester.pumpAndSettle();
+            expectIdleLabel();
 
             tester.semantics.performAction(
-              find.semantics.byLabel('Run'),
+              find.semantics.byLabel(idleLabel),
               SemanticsAction.tap,
             );
             await tester.pump();
@@ -297,15 +307,16 @@ void main() {
             // Outgoing loading content is inaccessible during its fade.
             expect(find.semantics.byLabel('Enregistrement'), findsNothing);
             await tester.pump(_duration ~/ 2);
-            expect(find.semantics.byLabel('Run'), findsOne);
+            expectIdleLabel();
             await tester.pumpAndSettle();
             expect(find.byType(CircularProgressIndicator), findsNothing);
             tester.semantics.performAction(
-              find.semantics.byLabel('Run'),
+              find.semantics.byLabel(idleLabel),
               SemanticsAction.tap,
             );
             await tester.pumpAndSettle();
             expect(calls, 2);
+            expectIdleLabel();
           } finally {
             semantics.dispose();
           }
