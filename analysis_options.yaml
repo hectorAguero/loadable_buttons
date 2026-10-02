@@ -1,5 +1,5 @@
-# Use the same Dart 3.7-compatible baseline on minimum and stable.
-include: package:very_good_analysis/analysis_options.8.0.0.yaml
+# Use the same versioned baseline on minimum and stable.
+include: package:very_good_analysis/analysis_options.10.3.0.yaml
 
 analyzer:
   exclude:
@@ -15,7 +15,7 @@ analyzer:
     strict-raw-types: true
 
 # Very Good Analysis owns built-in rules; these plugins add custom checks.
-# Modern plugins run on stable; Flutter 3.29 uses the built-in lint baseline.
+# Modern plugins run on stable; Flutter 3.44 uses the built-in lint baseline.
 # tool/analyze.sh --minimum temporarily omits the unsupported plugin entries.
 plugins:
   solid_lints: ^1.0.0

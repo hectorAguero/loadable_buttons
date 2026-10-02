@@ -1,8 +1,7 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
-
 import 'package:loadable_buttons/src/loading_transition.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Package-internal loading state, intentionally absent from the public barrel.
 ///

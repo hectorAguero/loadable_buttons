@@ -1,11 +1,13 @@
 # Development and linting
 
-The 1.1.x compatibility line supports Flutter **3.29.0+** and Dart
-**3.7.0+**. CI tests the exact Flutter minimum declared in `pubspec.yaml` and the
-moving stable channel. See [the compatibility roadmap](doc/compatibility-roadmap.md).
+Version 2 supports Flutter **3.44.0+**, Dart **3.12.0+**, and standalone
+**material_ui >=1.0.0 <2.0.0**. CI tests the exact Flutter minimum declared in
+`pubspec.yaml` and the moving stable channel, each with exact Material UI 1.0.0
+and the newest compatible Material UI release. See
+[the compatibility roadmap](doc/compatibility-roadmap.md).
 
 Use current Flutter stable with Dart **3.13 or newer** for the full plugin checks.
-Flutter 3.29 ships Dart 3.7, which can run the built-in analyzer baseline but
+Flutter 3.44 ships Dart 3.12, which can run the built-in analyzer baseline but
 cannot run the modern analyzer plugins. The minimum job deliberately omits only
 the plugin activation block; it still analyzes package, test, and example sources
 with strict casts, inference, and raw types, and treats infos and warnings as
@@ -15,12 +17,14 @@ failures. The script restores the original configuration even if analysis fails.
 
 | Tool | Role in this package |
 | --- | --- |
-| [Very Good Analysis](https://pub.dev/packages/very_good_analysis) | The versioned 8.0.0 preset provides the same Dart 3.7-compatible built-in rules on both SDKs, including public API documentation and strict types. |
+| [Very Good Analysis](https://pub.dev/packages/very_good_analysis) | The versioned 10.3.0 preset provides the same built-in rules on both SDKs, including public API documentation and strict types. |
 | [Solid Lints 1.0.0](https://pub.dev/packages/solid_lints) | Stable-only custom checks for null safety, context usage, code complexity, and widget/lifecycle conventions. |
 | [Dart Code Linter 4.4.0](https://pub.dev/packages/dart_code_linter) | Stable-only complementary checks for listener cleanup, redundant `async`, `async`/`await` style, test assertions, and test filenames. |
 
-The package and example allow VGA >=8.0.0 <12.0.0 so Pub can select a release
-compatible with each SDK, while the included preset stays fixed at 8.0.0.
+The package and example allow VGA >=10.3.0 <12.0.0 so Pub can select a release
+compatible with each SDK, while the included preset stays fixed at 10.3.0.
+VGA 10.3.0 supports the consumer Dart 3.12 floor; VGA 11.0.0 requires Dart
+3.13 and resolves on stable. Solid Lints 1.0.0 and DCL 4.4.0 are already current.
 The root analyzer configuration enables the modern plugins directly by version;
 they resolve their own dependencies and do not need root development dependencies.
 The DCL CLI has a separate dependency graph in `tool/dcl/pubspec.yaml` so it cannot
@@ -38,7 +42,7 @@ instead of the default `test/**` pattern.
 
 ## Package rules
 
-`analysis_options.yaml` includes VGA's versioned 8.0.0 preset and enables strict
+`analysis_options.yaml` includes VGA's versioned 10.3.0 preset and enables strict
 casts, strict inference, and strict raw types. Public API documentation and public type
 annotations remain enabled because this is a reusable package.
 
@@ -81,11 +85,11 @@ The package overrides policies that conflict with its API or structure:
 - Redundant `async` and preferences for uninitialized `late` fields: DCL owns
   the async check, while Solid discourages `late` outside test fixtures.
 - Newer syntax lints: the versioned baseline avoids requiring language features
-  above the package's consumer Dart 3.7 floor. Unsupported newer lint overrides
+  above the package's consumer Dart 3.12 floor. Unsupported newer lint overrides
   are omitted rather than suppressing analyzer warnings.
 
-The shared preset avoids formatter options unsupported by Dart 3.7. Both CI
-jobs check formatting using the package's declared Dart language version.
+All CI jobs check formatting using the package's declared Dart 3.12 language
+version, so the minimum and stable formatters share the same baseline.
 
 DCL enables `always-remove-listener`, `avoid-redundant-async`,
 `prefer-async-await`, `missing-test-assertion`, and
@@ -124,8 +128,7 @@ Run the stable checks with one SDK selected on `PATH`:
 
 ```sh
 flutter --version
-flutter pub get --no-example
-(cd example && flutter pub get)
+bash tool/resolve_material_ui.sh latest
 dart format --output=none --set-exit-if-changed lib test example/lib
 bash tool/analyze.sh
 (cd tool/dcl && dart pub get)
@@ -134,11 +137,20 @@ flutter test --no-pub
 git diff --check
 ```
 
-For Flutter 3.29.0, use `bash tool/analyze.sh --minimum` and omit the two DCL CLI
+For Flutter 3.44.0, use `bash tool/analyze.sh --minimum` and omit the two DCL CLI
 steps. This mode requires Python 3 to select the supported analyzer configuration.
 Do not claim minimum compatibility from a stable-only run.
 
-After changing SDKs or moving a checkout, run both dependency-resolution steps
+Run `bash tool/resolve_material_ui.sh oldest` in an isolated checkout to pin
+exact Material UI 1.0.0 for both the package and example. The script refuses to
+replace existing overrides, removes its temporary overrides on exit, and checks
+the resolved versions. Then run the same analysis and `flutter test --no-pub`
+checks; keep `--no-pub` so the verified resolution stays in use. Run this on the
+exact minimum and stable SDKs. The latest mode upgrades only Material UI and its
+required dependencies to the newest compatible resolution. Finish the primary
+checkout with latest resolution on stable.
+
+After changing SDKs or moving a checkout, run the dependency-resolution script
 again. Do not reuse `.dart_tool/package_config.json` from a different SDK: it
 contains absolute paths. The analysis script checks package-wide diagnostics,
 then explicitly targets every Dart source file in `lib/`, `test/`, and

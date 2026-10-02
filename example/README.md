@@ -4,6 +4,9 @@ A Flutter application demonstrating the async button families, icon variants,
 loading transitions, and theme colors. It uses the package from the parent
 directory through a path dependency.
 
+Requires Flutter 3.44.0 / Dart 3.12.0 or newer and imports standalone
+`package:material_ui/material_ui.dart`, matching the package's v2 API.
+
 From this directory, run:
 
 ```sh

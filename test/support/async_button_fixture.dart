@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:loadable_buttons/loadable_buttons.dart';
+import 'package:material_ui/material_ui.dart';
 
 typedef LoadingBuilder =
     Widget Function(bool loading, Widget child, Widget? loadingChild);
@@ -122,15 +122,15 @@ AsyncButtonBuilder _withIcon(_IconBuilder builder) =>
       focusNode: focusNode,
     );
 
-Widget buttonHost(Widget button) =>
-    MaterialApp(home: Scaffold(body: Center(child: button)));
+Widget buttonHost(Widget button) => MaterialApp(
+  home: Scaffold(body: Center(child: button)),
+);
 
-Finder get materialButton =>
-    find
-        .byWidgetPredicate(
-          (widget) =>
-              widget is ButtonStyleButton ||
-              widget is IconButton ||
-              widget is FloatingActionButton,
-        )
-        .first;
+Finder get materialButton => find
+    .byWidgetPredicate(
+      (widget) =>
+          widget is ButtonStyleButton ||
+          widget is IconButton ||
+          widget is FloatingActionButton,
+    )
+    .first;

@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:loadable_buttons/loadable_buttons.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Interactive examples of loading ownership and consumer responsibilities.
 class LoadingContractDemo extends StatefulWidget {
@@ -79,26 +79,24 @@ class _LoadingContractDemoState extends State<LoadingContractDemo> {
     final loadingContent = Semantics(
       label: 'Saving changes',
       excludeSemantics: true,
-      child:
-          _largerContent
-              ? const Padding(
-                padding: EdgeInsets.symmetric(vertical: 16),
-                child: Text('Saving changes, please wait…'),
-              )
-              : const SizedBox.square(
-                dimension: 20,
-                child: CircularProgressIndicator(),
-              ),
+      child: _largerContent
+          ? const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: Text('Saving changes, please wait…'),
+            )
+          : const SizedBox.square(
+              dimension: 20,
+              child: CircularProgressIndicator(),
+            ),
     );
 
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 760),
       child: MediaQuery(
         data: MediaQuery.of(context).copyWith(
-          textScaler:
-              _largeText
-                  ? const TextScaler.linear(2)
-                  : MediaQuery.textScalerOf(context),
+          textScaler: _largeText
+              ? const TextScaler.linear(2)
+              : MediaQuery.textScalerOf(context),
         ),
         child: Card(
           margin: EdgeInsets.zero,
@@ -121,8 +119,8 @@ class _LoadingContractDemoState extends State<LoadingContractDemo> {
                   contentPadding: EdgeInsets.zero,
                   title: const Text('External loading'),
                   value: _externalLoading,
-                  onChanged:
-                      (value) => setState(() => _externalLoading = value),
+                  onChanged: (value) =>
+                      setState(() => _externalLoading = value),
                 ),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
@@ -152,10 +150,9 @@ class _LoadingContractDemoState extends State<LoadingContractDemo> {
                       transitionType: widget.transitionType,
                       loadingChild: loadingContent,
                       onPressed: _disabled ? null : _startOperation,
-                      onLongPress:
-                          _disabled
-                              ? null
-                              : () => setState(() => _longPressCount++),
+                      onLongPress: _disabled
+                          ? null
+                          : () => setState(() => _longPressCount++),
                       child: const Text('Start operation'),
                     ),
                     OutlinedButton(
@@ -163,10 +160,9 @@ class _LoadingContractDemoState extends State<LoadingContractDemo> {
                       child: const Text('Finish operation'),
                     ),
                     TextButton(
-                      onPressed:
-                          _operation == null
-                              ? null
-                              : () => _finishOperation(fail: true),
+                      onPressed: _operation == null
+                          ? null
+                          : () => _finishOperation(fail: true),
                       child: const Text('Fail operation'),
                     ),
                   ],
@@ -196,8 +192,9 @@ class _LoadingContractDemoState extends State<LoadingContractDemo> {
                       isSelected: WidgetStatePropertyAll(_selected),
                       icon: const Icon(Icons.favorite_border),
                       selectedIcon: const Icon(Icons.favorite),
-                      onPressed:
-                          timedOperation == null ? null : _toggleSelected,
+                      onPressed: timedOperation == null
+                          ? null
+                          : _toggleSelected,
                     ),
                     Text(
                       _selected ? 'Favorite selected' : 'Favorite unselected',
@@ -208,12 +205,9 @@ class _LoadingContractDemoState extends State<LoadingContractDemo> {
                       transitionType: TransitionAnimationType.customBuilder,
                       // Immediate replacement retains no inactive subtree.
                       // Animated builders must guard any outgoing content.
-                      customBuilder:
-                          (loading, child, loadingChild) =>
-                              loading
-                                  ? loadingChild ??
-                                      const Text('Saving changes…')
-                                  : child,
+                      customBuilder: (loading, child, loadingChild) => loading
+                          ? loadingChild ?? const Text('Saving changes…')
+                          : child,
                       loadingChild: loadingContent,
                       child: const Text('Custom builder'),
                     ),

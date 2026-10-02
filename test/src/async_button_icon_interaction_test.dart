@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:loadable_buttons/loadable_buttons.dart';
+import 'package:material_ui/material_ui.dart';
 
 typedef _IconButtonBuilder =
     Widget Function({
@@ -49,14 +49,9 @@ void main() {
                   icon: const Icon(Icons.add),
                   label: const Text('Run this operation'),
                   style: paddingSource == 'widget' ? paddingStyle : null,
-                  loadingChild:
-                      scale == 2.0
-                          ? const SizedBox(
-                            key: loadingKey,
-                            width: 24,
-                            height: 20,
-                          )
-                          : null,
+                  loadingChild: scale == 2.0
+                      ? const SizedBox(key: loadingKey, width: 24, height: 20)
+                      : null,
                 ),
                 direction: direction,
                 scale: scale,
@@ -75,10 +70,9 @@ void main() {
               Durations.medium1,
             ]) {
               await tester.pump(elapsed);
-              final loader =
-                  scale == 2.0
-                      ? find.byKey(loadingKey)
-                      : find.byType(CircularProgressIndicator);
+              final loader = scale == 2.0
+                  ? find.byKey(loadingKey)
+                  : find.byType(CircularProgressIndicator);
               final buttonCenter = tester.getCenter(button);
               final loaderCenter = tester.getCenter(loader);
               expect(loaderCenter.dx, closeTo(buttonCenter.dx, 0.01));
@@ -106,9 +100,8 @@ void main() {
             padding: const WidgetStatePropertyAll(
               EdgeInsetsDirectional.fromSTEB(60, 2, 10, 14),
             ),
-            backgroundBuilder:
-                (_, _, child) =>
-                    Semantics(label: 'Button decoration', child: child),
+            backgroundBuilder: (_, _, child) =>
+                Semantics(label: 'Button decoration', child: child),
           );
           await tester.pumpWidget(
             _host(

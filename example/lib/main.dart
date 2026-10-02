@@ -1,7 +1,7 @@
 import 'package:example/loading_contract_demo.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:loadable_buttons/loadable_buttons.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// main is the entry point of the application.
 void main() {
@@ -81,8 +81,8 @@ class _HomePageState extends State<_HomePage> {
 
   String get _buttonLabel =>
       transitionType == TransitionAnimationType.animatedSwitcher && _isLongText
-          ? longClickMeText
-          : clickMeText;
+      ? longClickMeText
+      : clickMeText;
 
   Future<void> _runDemo() async {
     final duration = _loadingDuration;
@@ -101,13 +101,11 @@ class _HomePageState extends State<_HomePage> {
         seconds >= 0 &&
         seconds <= _maximumSeconds;
     setState(() {
-      _loadingDuration =
-          valid
-              ? Duration(
-                milliseconds:
-                    (seconds * Duration.millisecondsPerSecond).round(),
-              )
-              : null;
+      _loadingDuration = valid
+          ? Duration(
+              milliseconds: (seconds * Duration.millisecondsPerSecond).round(),
+            )
+          : null;
       _durationError = valid ? null : 'Enter 0–60 seconds';
     });
   }
@@ -358,10 +356,9 @@ class _ExampleControls extends StatelessWidget {
   @override
   Widget build(BuildContext context) => LayoutBuilder(
     builder: (_, constraints) {
-      final width =
-          constraints.maxWidth < _controlWidth
-              ? constraints.maxWidth
-              : _controlWidth;
+      final width = constraints.maxWidth < _controlWidth
+          ? constraints.maxWidth
+          : _controlWidth;
 
       return Wrap(
         alignment: WrapAlignment.center,

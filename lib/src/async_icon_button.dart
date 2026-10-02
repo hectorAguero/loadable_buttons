@@ -1,9 +1,8 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
-
 import 'package:loadable_buttons/src/async_button_helpers.dart';
 import 'package:loadable_buttons/src/loading_transition.dart';
+import 'package:material_ui/material_ui.dart';
 
 enum _IconButtonVariant { standard, filled, filledTonal, outlined }
 
@@ -362,19 +361,18 @@ class _AsyncIconButtonState extends State<AsyncIconButton>
       customBuilder: widget.customBuilder,
     );
     final selectedIcon = widget.selectedIcon;
-    final selectedChild =
-        selectedIcon == null
-            ? null
-            : _AsyncIconButtonChild(
-              icon: selectedIcon,
-              isLoading: isLoading,
-              transitionType: widget.transitionType,
-              animationDuration: widget.animationDuration,
-              minimumChildOpacity: widget.minimumChildOpacity,
-              loadingChild: widget.loadingChild,
-              style: widget.style,
-              customBuilder: widget.customBuilder,
-            );
+    final selectedChild = selectedIcon == null
+        ? null
+        : _AsyncIconButtonChild(
+            icon: selectedIcon,
+            isLoading: isLoading,
+            transitionType: widget.transitionType,
+            animationDuration: widget.animationDuration,
+            minimumChildOpacity: widget.minimumChildOpacity,
+            loadingChild: widget.loadingChild,
+            style: widget.style,
+            customBuilder: widget.customBuilder,
+          );
 
     // Flutter 3.29 styleFrom supplies a default cursor that would otherwise
     // override IconButton's forwarded mouseCursor when these styles merge.

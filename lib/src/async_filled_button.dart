@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:flutter/material.dart';
-
 import 'package:loadable_buttons/src/async_button_helpers.dart';
 import 'package:loadable_buttons/src/async_outlined_button.dart'
     show AsyncOutlinedButton;
 import 'package:loadable_buttons/src/loading_transition.dart';
+import 'package:material_ui/material_ui.dart';
 
 part 'async_filled_button_with_icon.dart';
 
@@ -345,16 +344,16 @@ class _AsyncFilledButtonState extends State<AsyncFilledButton>
 
   @override
   Widget build(BuildContext context) {
-    final buttonBuilder =
-        widget._variant == _AsyncFilledButtonVariant.tonal
-            ? _FilledButtonWithIconPadding.tonal
-            : _FilledButtonWithIconPadding.new;
+    final buttonBuilder = widget._variant == _AsyncFilledButtonVariant.tonal
+        ? _FilledButtonWithIconPadding.tonal
+        : _FilledButtonWithIconPadding.new;
 
     return buttonBuilder(
       hasIcon: widget is _AsyncFilledButtonWithIcon,
       onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
-      onLongPress:
-          isLoading || widget.onLongPress == null ? null : _handleLongPress,
+      onLongPress: isLoading || widget.onLongPress == null
+          ? null
+          : _handleLongPress,
       onHover: widget.onHover,
       onFocusChange: widget.onFocusChange,
       style:
@@ -368,28 +367,27 @@ class _AsyncFilledButtonState extends State<AsyncFilledButton>
         themeStyle: FilledButtonTheme.of(context).style,
       ),
       statesController: widget.statesController,
-      child:
-          widget.transitionType == TransitionAnimationType.customBuilder
-              ? widget.customBuilder?.call(
-                    isLoading,
-                    widget.child,
-                    widget.loadingChild,
-                  ) ??
-                  widget.child
-              : LoadingTransition(
-                child: widget.child,
-                loadingChild:
-                    widget.loadingChild ??
-                    DefaultLoadingIndicator(
-                      style: widget.style,
-                      themeStyleOf:
-                          (context) => FilledButtonTheme.of(context).style,
-                    ),
-                isLoading: isLoading,
-                transitionType: widget.transitionType,
-                animationDuration: widget.animationDuration,
-                minimumChildOpacity: widget.minimumChildOpacity,
-              ),
+      child: widget.transitionType == TransitionAnimationType.customBuilder
+          ? widget.customBuilder?.call(
+                  isLoading,
+                  widget.child,
+                  widget.loadingChild,
+                ) ??
+                widget.child
+          : LoadingTransition(
+              child: widget.child,
+              loadingChild:
+                  widget.loadingChild ??
+                  DefaultLoadingIndicator(
+                    style: widget.style,
+                    themeStyleOf: (context) =>
+                        FilledButtonTheme.of(context).style,
+                  ),
+              isLoading: isLoading,
+              transitionType: widget.transitionType,
+              animationDuration: widget.animationDuration,
+              minimumChildOpacity: widget.minimumChildOpacity,
+            ),
     );
   }
 }

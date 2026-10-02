@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:loadable_buttons/loadable_buttons.dart';
+import 'package:material_ui/material_ui.dart';
 
 typedef _Builder =
     Widget Function({
@@ -23,15 +23,14 @@ void main() {
               autofocus: true,
               child: const Text('Run'),
             ),
-    'Filled':
-        ({required loading, required onPressed, required onLongPress}) =>
-            AsyncFilledButton(
-              loading: loading,
-              onPressed: onPressed,
-              onLongPress: onLongPress,
-              autofocus: true,
-              child: const Text('Run'),
-            ),
+    'Filled': ({required loading, required onPressed, required onLongPress}) =>
+        AsyncFilledButton(
+          loading: loading,
+          onPressed: onPressed,
+          onLongPress: onLongPress,
+          autofocus: true,
+          child: const Text('Run'),
+        ),
     'Filled tonal':
         ({required loading, required onPressed, required onLongPress}) =>
             AsyncFilledButton.tonal(
@@ -50,15 +49,14 @@ void main() {
               autofocus: true,
               child: const Text('Run'),
             ),
-    'Text':
-        ({required loading, required onPressed, required onLongPress}) =>
-            AsyncTextButton(
-              loading: loading,
-              onPressed: onPressed,
-              onLongPress: onLongPress,
-              autofocus: true,
-              child: const Text('Run'),
-            ),
+    'Text': ({required loading, required onPressed, required onLongPress}) =>
+        AsyncTextButton(
+          loading: loading,
+          onPressed: onPressed,
+          onLongPress: onLongPress,
+          autofocus: true,
+          child: const Text('Run'),
+        ),
   };
 
   for (final entry in builders.entries) {
@@ -89,8 +87,9 @@ void main() {
       );
       final position = tester.getCenter(button);
       // Capture a callback already exposed to Material before the next frame.
-      final idleLongPress =
-          tester.widget<ButtonStyleButton>(button).onLongPress;
+      final idleLongPress = tester
+          .widget<ButtonStyleButton>(button)
+          .onLongPress;
       if (idleLongPress == null) {
         fail('An idle button must expose its configured long-press callback.');
       }
@@ -155,5 +154,6 @@ void main() {
   }
 }
 
-Widget _host(Widget child) =>
-    MaterialApp(home: Scaffold(body: Center(child: child)));
+Widget _host(Widget child) => MaterialApp(
+  home: Scaffold(body: Center(child: child)),
+);

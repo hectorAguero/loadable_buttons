@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:loadable_buttons/loadable_buttons.dart';
+import 'package:material_ui/material_ui.dart';
 
 typedef _ButtonBuilder =
     StatefulWidget Function({
@@ -12,108 +12,102 @@ typedef _ButtonBuilder =
 
 void main() {
   final builders = <String, _ButtonBuilder>{
-    'Filled':
-        ({required key, required onPressed}) => AsyncFilledButton(
-          key: key,
-          onPressed: onPressed,
-          child: const Text('Run'),
-        ),
-    'Filled.icon':
-        ({required key, required onPressed}) => AsyncFilledButton.icon(
-          key: key,
-          onPressed: onPressed,
-          icon: const Icon(Icons.add),
-          label: const Text('Run'),
-        ),
-    'Filled.tonal':
-        ({required key, required onPressed}) => AsyncFilledButton.tonal(
-          key: key,
-          onPressed: onPressed,
-          child: const Text('Run'),
-        ),
-    'Filled.tonalIcon':
-        ({required key, required onPressed}) => AsyncFilledButton.tonalIcon(
+    'Filled': ({required key, required onPressed}) => AsyncFilledButton(
+      key: key,
+      onPressed: onPressed,
+      child: const Text('Run'),
+    ),
+    'Filled.icon': ({required key, required onPressed}) =>
+        AsyncFilledButton.icon(
           key: key,
           onPressed: onPressed,
           icon: const Icon(Icons.add),
           label: const Text('Run'),
         ),
-    'Outlined':
-        ({required key, required onPressed}) => AsyncOutlinedButton(
+    'Filled.tonal': ({required key, required onPressed}) =>
+        AsyncFilledButton.tonal(
           key: key,
           onPressed: onPressed,
           child: const Text('Run'),
         ),
-    'Outlined.icon':
-        ({required key, required onPressed}) => AsyncOutlinedButton.icon(
+    'Filled.tonalIcon': ({required key, required onPressed}) =>
+        AsyncFilledButton.tonalIcon(
           key: key,
           onPressed: onPressed,
           icon: const Icon(Icons.add),
           label: const Text('Run'),
         ),
-    'Text':
-        ({required key, required onPressed}) => AsyncTextButton(
-          key: key,
-          onPressed: onPressed,
-          child: const Text('Run'),
-        ),
-    'Text.icon':
-        ({required key, required onPressed}) => AsyncTextButton.icon(
+    'Outlined': ({required key, required onPressed}) => AsyncOutlinedButton(
+      key: key,
+      onPressed: onPressed,
+      child: const Text('Run'),
+    ),
+    'Outlined.icon': ({required key, required onPressed}) =>
+        AsyncOutlinedButton.icon(
           key: key,
           onPressed: onPressed,
           icon: const Icon(Icons.add),
           label: const Text('Run'),
         ),
-    'Icon':
-        ({required key, required onPressed}) => AsyncIconButton(
+    'Text': ({required key, required onPressed}) => AsyncTextButton(
+      key: key,
+      onPressed: onPressed,
+      child: const Text('Run'),
+    ),
+    'Text.icon': ({required key, required onPressed}) => AsyncTextButton.icon(
+      key: key,
+      onPressed: onPressed,
+      icon: const Icon(Icons.add),
+      label: const Text('Run'),
+    ),
+    'Icon': ({required key, required onPressed}) => AsyncIconButton(
+      key: key,
+      onPressed: onPressed,
+      icon: const Icon(Icons.add),
+    ),
+    'Icon.filled': ({required key, required onPressed}) =>
+        AsyncIconButton.filled(
           key: key,
           onPressed: onPressed,
           icon: const Icon(Icons.add),
         ),
-    'Icon.filled':
-        ({required key, required onPressed}) => AsyncIconButton.filled(
+    'Icon.filledTonal': ({required key, required onPressed}) =>
+        AsyncIconButton.filledTonal(
           key: key,
           onPressed: onPressed,
           icon: const Icon(Icons.add),
         ),
-    'Icon.filledTonal':
-        ({required key, required onPressed}) => AsyncIconButton.filledTonal(
+    'Icon.outlined': ({required key, required onPressed}) =>
+        AsyncIconButton.outlined(
           key: key,
           onPressed: onPressed,
           icon: const Icon(Icons.add),
         ),
-    'Icon.outlined':
-        ({required key, required onPressed}) => AsyncIconButton.outlined(
-          key: key,
-          onPressed: onPressed,
-          icon: const Icon(Icons.add),
-        ),
-    'Floating action':
-        ({required key, required onPressed}) => AsyncFloatingActionButton(
+    'Floating action': ({required key, required onPressed}) =>
+        AsyncFloatingActionButton(
           key: key,
           onPressed: onPressed,
           child: const Icon(Icons.add),
         ),
-    'Floating action.small':
-        ({required key, required onPressed}) => AsyncFloatingActionButton.small(
+    'Floating action.small': ({required key, required onPressed}) =>
+        AsyncFloatingActionButton.small(
           key: key,
           onPressed: onPressed,
           child: const Icon(Icons.add),
         ),
-    'Floating action.large':
-        ({required key, required onPressed}) => AsyncFloatingActionButton.large(
+    'Floating action.large': ({required key, required onPressed}) =>
+        AsyncFloatingActionButton.large(
           key: key,
           onPressed: onPressed,
           child: const Icon(Icons.add),
         ),
-    'Floating action.extended':
-        ({required key, required onPressed}) =>
-            AsyncFloatingActionButton.extended(
-              key: key,
-              onPressed: onPressed,
-              icon: const Icon(Icons.add),
-              label: const Text('Run'),
-            ),
+    'Floating action.extended': ({required key, required onPressed}) =>
+        AsyncFloatingActionButton.extended(
+          key: key,
+          onPressed: onPressed,
+          icon: const Icon(Icons.add),
+          label: const Text('Run'),
+        ),
   };
 
   for (final entry in builders.entries) {
@@ -161,5 +155,6 @@ void main() {
   }
 }
 
-Widget _host(Widget button) =>
-    MaterialApp(home: Scaffold(body: Center(child: button)));
+Widget _host(Widget button) => MaterialApp(
+  home: Scaffold(body: Center(child: button)),
+);

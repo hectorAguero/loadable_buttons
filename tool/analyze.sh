@@ -4,7 +4,7 @@ set -euo pipefail
 project_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$project_dir"
 
-# Modern plugins are unsupported on Flutter 3.29 / Dart 3.7.
+# Modern plugins require Dart 3.13, above the consumer Dart 3.12 floor.
 # Keep built-in rules active, and restore the IDE configuration on exit.
 case "${1:-}" in
   --minimum)

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// The type of animation between idle and loading content.
 enum TransitionAnimationType {
@@ -79,13 +79,9 @@ class LoadingTransition extends StatelessWidget {
           AnimatedOpacity(
             opacity: isLoading ? minimumChildOpacity : 1.0,
             duration: animationDuration,
-            child:
-                animateChildSize
-                    ? AnimatedSize(
-                      duration: animationDuration,
-                      child: idleContent,
-                    )
-                    : idleContent,
+            child: animateChildSize
+                ? AnimatedSize(duration: animationDuration, child: idleContent)
+                : idleContent,
           ),
           AnimatedOpacity(
             opacity: isLoading ? 1.0 : 0.0,
@@ -113,29 +109,23 @@ class LoadingTransition extends StatelessWidget {
           key: ValueKey(isLoading),
           child: isLoading ? loadingChild : child,
         ),
-        transitionBuilder:
-            (child, animation) =>
-                FadeTransition(opacity: animation, child: child),
+        transitionBuilder: (child, animation) =>
+            FadeTransition(opacity: animation, child: child),
         // Re-evaluate outgoing content here instead of retaining an idle guard
         // captured by transitionBuilder. Preserve each switcher entry's key.
-        layoutBuilder:
-            (current, previous) => Stack(
-              alignment: Alignment.center,
-              children: [
-                for (final previousChild in previous)
-                  _InactiveContent(
-                    key: previousChild.key,
-                    active: false,
-                    child: previousChild,
-                  ),
-                if (current != null)
-                  _InactiveContent(
-                    key: current.key,
-                    active: true,
-                    child: current,
-                  ),
-              ],
-            ),
+        layoutBuilder: (current, previous) => Stack(
+          alignment: Alignment.center,
+          children: [
+            for (final previousChild in previous)
+              _InactiveContent(
+                key: previousChild.key,
+                active: false,
+                child: previousChild,
+              ),
+            if (current != null)
+              _InactiveContent(key: current.key, active: true, child: current),
+          ],
+        ),
       ),
     );
   }

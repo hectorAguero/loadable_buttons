@@ -69,7 +69,7 @@ class _AsyncFilledButtonWithIcon extends AsyncFilledButton {
 class _FilledButtonWithIconPadding extends FilledButton
     with StackLoadingButton {
   const _FilledButtonWithIconPadding({
-    required bool hasIcon,
+    required this._hasIcon,
     required super.onPressed,
     required super.child,
     super.onLongPress,
@@ -80,11 +80,10 @@ class _FilledButtonWithIconPadding extends FilledButton
     super.autofocus,
     super.clipBehavior,
     super.statesController,
-  }) : _tonal = false,
-       _hasIcon = hasIcon;
+  }) : _tonal = false;
 
   const _FilledButtonWithIconPadding.tonal({
-    required bool hasIcon,
+    required this._hasIcon,
     required super.onPressed,
     required super.child,
     super.onLongPress,
@@ -96,7 +95,6 @@ class _FilledButtonWithIconPadding extends FilledButton
     super.clipBehavior,
     super.statesController,
   }) : _tonal = true,
-       _hasIcon = hasIcon,
        super.tonal();
 
   final bool _tonal;
@@ -105,18 +103,17 @@ class _FilledButtonWithIconPadding extends FilledButton
   @override
   ButtonStyle defaultStyleOf(BuildContext context) {
     if (!_hasIcon) return super.defaultStyleOf(context);
-    final nativeButton =
-        _tonal
-            ? FilledButton.tonalIcon(
-              onPressed: null,
-              icon: const SizedBox.shrink(),
-              label: const SizedBox.shrink(),
-            )
-            : FilledButton.icon(
-              onPressed: null,
-              icon: const SizedBox.shrink(),
-              label: const SizedBox.shrink(),
-            );
+    final nativeButton = _tonal
+        ? FilledButton.tonalIcon(
+            onPressed: null,
+            icon: const SizedBox.shrink(),
+            label: const SizedBox.shrink(),
+          )
+        : FilledButton.icon(
+            onPressed: null,
+            icon: const SizedBox.shrink(),
+            label: const SizedBox.shrink(),
+          );
 
     return nativeButton.defaultStyleOf(context);
   }
@@ -166,10 +163,9 @@ class _FilledButtonWithIconChild extends StatelessWidget {
 
     return Row(
       mainAxisSize: MainAxisSize.min,
-      children:
-          effectiveIconAlignment == IconAlignment.start
-              ? <Widget>[icon, SizedBox(width: gap), Flexible(child: label)]
-              : <Widget>[Flexible(child: label), SizedBox(width: gap), icon],
+      children: effectiveIconAlignment == IconAlignment.start
+          ? <Widget>[icon, SizedBox(width: gap), Flexible(child: label)]
+          : <Widget>[Flexible(child: label), SizedBox(width: gap), icon],
     );
   }
 }

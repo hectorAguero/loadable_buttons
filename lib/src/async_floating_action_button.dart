@@ -1,9 +1,8 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
-
 import 'package:loadable_buttons/src/async_button_helpers.dart';
 import 'package:loadable_buttons/src/loading_transition.dart';
+import 'package:material_ui/material_ui.dart';
 
 enum _FloatingActionButtonType { regular, small, large, extended }
 
@@ -65,10 +64,9 @@ class AsyncFloatingActionButton extends StatefulWidget {
              customBuilder != null,
          'customBuilder must be provided when transitionType is customBuilder',
        ),
-       _floatingActionButtonType =
-           mini
-               ? _FloatingActionButtonType.small
-               : _FloatingActionButtonType.regular,
+       _floatingActionButtonType = mini
+           ? _FloatingActionButtonType.small
+           : _FloatingActionButtonType.regular,
        _extendedLabel = null,
        extendedIconLabelSpacing = null,
        extendedPadding = null,
@@ -384,7 +382,7 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton>
 
   EdgeInsetsGeometry _extendedPaddingOf(BuildContext context) =>
       widget.extendedPadding ??
-      Theme.of(context).floatingActionButtonTheme.extendedPadding ??
+      FloatingActionButtonTheme.of(context).extendedPadding ??
       (widget.child == null
           ? _extendedPaddingWithoutIcon
           : _extendedPaddingWithIcon);
@@ -515,27 +513,26 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton>
         extendedIconLabelSpacing: widget.extendedIconLabelSpacing,
         // Keep padding in the retained idle layout so the stack's center
         // includes it without changing the native idle dimensions.
-        extendedPadding:
-            _useFullExtendedStack ? EdgeInsets.zero : widget.extendedPadding,
+        extendedPadding: _useFullExtendedStack
+            ? EdgeInsets.zero
+            : widget.extendedPadding,
         extendedTextStyle: widget.extendedTextStyle,
-        icon:
-            widget.child == null || _useCombinedExtendedContent
-                ? null
-                : _AsyncFloatingActionButtonChild(
-                  child: widget.child ?? const SizedBox.shrink(),
-                  color: widget.foregroundColor,
-                  isLoading: isLoading,
-                  transitionType: widget.transitionType,
-                  animationDuration: widget.animationDuration,
-                  minimumChildOpacity: widget.minimumChildOpacity,
-                  loadingChild: const SizedBox.shrink(),
-                  customBuilder: widget.customBuilder,
-                ),
+        icon: widget.child == null || _useCombinedExtendedContent
+            ? null
+            : _AsyncFloatingActionButtonChild(
+                child: widget.child ?? const SizedBox.shrink(),
+                color: widget.foregroundColor,
+                isLoading: isLoading,
+                transitionType: widget.transitionType,
+                animationDuration: widget.animationDuration,
+                minimumChildOpacity: widget.minimumChildOpacity,
+                loadingChild: const SizedBox.shrink(),
+                customBuilder: widget.customBuilder,
+              ),
         label: _AsyncFloatingActionButtonChild(
-          contentPadding:
-              _useFullExtendedStack
-                  ? _extendedPaddingOf(context)
-                  : EdgeInsets.zero,
+          contentPadding: _useFullExtendedStack
+              ? _extendedPaddingOf(context)
+              : EdgeInsets.zero,
           leadingIcon: _useCombinedExtendedContent ? widget.child : null,
           iconLabelSpacing: widget.extendedIconLabelSpacing,
           child: AnimatedSize(
@@ -597,24 +594,23 @@ class _AsyncFloatingActionButtonChild extends StatelessWidget {
     return LoadingTransition(
       child: Padding(
         padding: contentPadding,
-        child:
-            icon == null
-                ? child
-                : Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    icon,
-                    SizedBox(
-                      width:
-                          iconLabelSpacing ??
-                          Theme.of(context)
-                              .floatingActionButtonTheme
-                              .extendedIconLabelSpacing ??
-                          _defaultIconLabelSpacing,
-                    ),
-                    child,
-                  ],
-                ),
+        child: icon == null
+            ? child
+            : Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  icon,
+                  SizedBox(
+                    width:
+                        iconLabelSpacing ??
+                        FloatingActionButtonTheme.of(
+                          context,
+                        ).extendedIconLabelSpacing ??
+                        _defaultIconLabelSpacing,
+                  ),
+                  child,
+                ],
+              ),
       ),
       loadingChild: loadingChild ?? DefaultLoadingIndicator(color: color),
       isLoading: isLoading,

@@ -11,13 +11,14 @@ permissions:
 
 jobs:
   validate:
-    name: Flutter ${{ matrix.sdk }}
+    name: Flutter ${{ matrix.sdk }} / Material ${{ matrix.material }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
         sdk: [minimum, stable]
+        material: [oldest, latest]
 
     steps:
       - uses: actions/checkout@v4
@@ -58,12 +59,8 @@ jobs:
 
       # Resolve anew after selecting the SDK, including the example's own graph.
       # Do not cache .dart_tool: it contains SDK and checkout-specific paths.
-      - name: Resolve Package Dependencies
-        run: flutter pub get --no-example
-
-      - name: Resolve Example Dependencies
-        working-directory: example
-        run: flutter pub get
+      - name: Resolve and Verify Material UI Dependencies
+        run: bash tool/resolve_material_ui.sh ${{ matrix.material }}
 
       - name: Check Formatting
         run: dart format --output=none --set-exit-if-changed lib test example/lib
@@ -71,15 +68,15 @@ jobs:
       - name: Analyze Package, Tests, and Example
         run: bash tool/analyze.sh ${{ matrix.sdk == 'minimum' && '--minimum' || '' }}
 
-      # Modern plugins and their CLI require a newer Dart SDK than Flutter 3.29.
+      # Modern plugins and their CLI require a newer Dart SDK than Flutter 3.44.
       # Built-in analysis still runs on minimum, with the same strict baseline.
       - name: Resolve Stable Lint Tools
-        if: matrix.sdk == 'stable'
+        if: matrix.sdk == 'stable' && matrix.material == 'latest'
         working-directory: tool/dcl
         run: dart pub get
 
       - name: Check Dart Code Linter Rules
-        if: matrix.sdk == 'stable'
+        if: matrix.sdk == 'stable' && matrix.material == 'latest'
         run: bash tool/check_dcl.sh
 
       - name: Run Tests
