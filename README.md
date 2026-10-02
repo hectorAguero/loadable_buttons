@@ -432,7 +432,7 @@ enum into your button file, and inline the transition bodies. This outline shows
 ```dart
 child: widget.transitionType == TransitionAnimationType.customBuilder
     ? widget.customBuilder
-            ?.call(_isLoading, widget.child, widget.loadingChild) ??
+            ?.call(isLoading, widget.child, widget.loadingChild) ??
         widget.child
     : switch (widget.transitionType) {
         TransitionAnimationType.stack => Stack(

@@ -35,38 +35,6 @@ class _AsyncElevatedButtonWithIcon extends AsyncElevatedButton {
        );
 }
 
-// Keep the complete async content as the child while using native icon
-// defaults. Material still owns widget/theme/default style precedence.
-class _ElevatedButtonWithIconPadding extends ElevatedButton
-    with StackLoadingButton {
-  const _ElevatedButtonWithIconPadding({
-    required this._hasIcon,
-    required super.onPressed,
-    required super.child,
-    super.onLongPress,
-    super.onHover,
-    super.onFocusChange,
-    super.style,
-    super.focusNode,
-    super.autofocus,
-    super.clipBehavior,
-    super.statesController,
-  });
-
-  final bool _hasIcon;
-
-  @override
-  ButtonStyle defaultStyleOf(BuildContext context) {
-    if (!_hasIcon) return super.defaultStyleOf(context);
-
-    return ElevatedButton.icon(
-      onPressed: null,
-      icon: const SizedBox.shrink(),
-      label: const SizedBox.shrink(),
-    ).defaultStyleOf(context);
-  }
-}
-
 /// Copy of ElevatedButton.icon with the loading animation.
 class _ElevatedButtonWithIconChild extends StatelessWidget {
   const _ElevatedButtonWithIconChild({
