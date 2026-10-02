@@ -183,8 +183,9 @@ outline, shape, elevation, overlays, splash, and layer builders remain intact.
 Use `style.iconColor` when you need an icon color separate from the foreground.
 
 `mouseCursor` accepts a plain cursor such as `SystemMouseCursors.text` or a
-state-dependent `WidgetStateMouseCursor`. If its resolver returns null for a
-state, that state's supplied-style cursor still has precedence over the theme.
+state-dependent `WidgetStateMouseCursor`. A custom cursor that implements
+`WidgetStateProperty<MouseCursor?>` and resolves to null for a state falls back
+to that state's supplied-style cursor before the theme.
 These conveniences do not add new options to IconButton or FAB; use those
 families' existing native parameters.
 

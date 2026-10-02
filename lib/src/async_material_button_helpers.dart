@@ -19,12 +19,20 @@ ButtonStyle resolveMaterialButtonStyle({
   InteractiveInkFeatureFactory? splashFactory,
 }) {
   final base = style ?? ButtonStyle(splashFactory: splashFactory);
+  if (padding == null &&
+      minimumSize == null &&
+      alignment == null &&
+      backgroundColor == null &&
+      foregroundColor == null &&
+      disabledBackgroundColor == null &&
+      disabledForegroundColor == null &&
+      mouseCursor == null) {
+    return base;
+  }
 
   return base.copyWith(
-    padding: padding == null ? null : WidgetStatePropertyAll(padding),
-    minimumSize: minimumSize == null
-        ? null
-        : WidgetStatePropertyAll(minimumSize),
+    padding: ButtonStyleButton.allOrNull(padding),
+    minimumSize: ButtonStyleButton.allOrNull(minimumSize),
     alignment: alignment,
     backgroundColor: _overrideButtonColors(
       base.backgroundColor,
@@ -36,16 +44,7 @@ ButtonStyle resolveMaterialButtonStyle({
       foregroundColor,
       disabledForegroundColor,
     ),
-    mouseCursor: mouseCursor == null
-        ? null
-        : WidgetStateProperty.resolveWith(
-            (states) =>
-                WidgetStateProperty.resolveAs<MouseCursor?>(
-                  mouseCursor,
-                  states,
-                ) ??
-                base.mouseCursor?.resolve(states),
-          ),
+    mouseCursor: _overrideButtonCursor(base.mouseCursor, mouseCursor),
   );
 }
 
@@ -59,6 +58,19 @@ WidgetStateProperty<Color?>? _overrideButtonColors(
   return WidgetStateProperty.resolveWith(
     (states) =>
         (states.contains(WidgetState.disabled) ? disabled : enabled) ??
+        original?.resolve(states),
+  );
+}
+
+WidgetStateProperty<MouseCursor?>? _overrideButtonCursor(
+  WidgetStateProperty<MouseCursor?>? original,
+  MouseCursor? cursor,
+) {
+  if (cursor == null) return original;
+
+  return WidgetStateProperty.resolveWith(
+    (states) =>
+        WidgetStateProperty.resolveAs<MouseCursor?>(cursor, states) ??
         original?.resolve(states),
   );
 }
