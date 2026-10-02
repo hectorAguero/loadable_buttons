@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cupertino_ui/cupertino_ui.dart' as cupertino;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:loadable_buttons/loadable_buttons.dart';
 import 'package:material_ui/material_ui.dart';
@@ -56,6 +57,9 @@ typedef _IconBuilder =
     });
 
 final asyncButtonBuilders = <String, AsyncButtonBuilder>{
+  'Cupertino': AsyncCupertinoButton.new,
+  'Cupertino.filled': AsyncCupertinoButton.filled,
+  'Cupertino.tinted': AsyncCupertinoButton.tinted,
   'Elevated': AsyncElevatedButton.new,
   'Elevated.icon': _withLabel(AsyncElevatedButton.icon),
   'Filled': AsyncFilledButton.new,
@@ -176,15 +180,26 @@ AsyncButtonBuilder _withIcon(_IconBuilder builder, {bool selected = false}) =>
       focusNode: focusNode,
     );
 
-Widget buttonHost(Widget button) => MaterialApp(
-  home: Scaffold(body: Center(child: button)),
-);
+Widget buttonHost(Widget button) => button is AsyncCupertinoButton
+    ? cupertino.CupertinoApp(
+        home: cupertino.CupertinoPageScaffold(child: Center(child: button)),
+      )
+    : MaterialApp(
+        home: Scaffold(body: Center(child: button)),
+      );
 
-Finder get materialButton => find
+Finder get nativeButton => find
     .byWidgetPredicate(
       (widget) =>
+          widget is cupertino.CupertinoButton ||
           widget is ButtonStyleButton ||
           widget is IconButton ||
           widget is FloatingActionButton,
     )
     .first;
+
+Finder get defaultLoadingIndicator => find.byWidgetPredicate(
+  (widget) =>
+      widget is CircularProgressIndicator ||
+      widget is cupertino.CupertinoActivityIndicator,
+);

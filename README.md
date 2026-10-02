@@ -1,7 +1,7 @@
 # loadable_buttons
 
-Flutter Material buttons with automatic loading states, external loading control,
-and customizable indicators and transitions.
+Flutter Material and Cupertino buttons with automatic loading states,
+external loading control, and customizable indicators and transitions.
 
 ![Async Material button examples](https://raw.githubusercontent.com/hectorAguero/loadable_buttons/main/screenshots/preview.gif)
 
@@ -10,11 +10,15 @@ and customizable indicators and transitions.
 ```sh
 flutter pub add loadable_buttons
 flutter pub add material_ui
+# For Cupertino applications:
+flutter pub add cupertino_ui
 ```
 
 Version 2 requires Flutter **3.44.0+**, Dart **3.12.0+ (below 4.0.0)**,
-and **material_ui >=1.0.0 <2.0.0**. Pub selects a compatible Material UI
-release for your SDK; Material UI 1.4.0 and newer require Flutter 3.47 / Dart 3.13.
+and standalone **material_ui >=1.0.0 <2.0.0** and
+**cupertino_ui >=1.0.0 <2.0.0**. Pub selects compatible design-library
+releases for your SDK; Material UI 1.4.0 and newer require Flutter 3.47 / Dart 3.13.
+Cupertino UI 1.1.1 also requires Flutter 3.47 / Dart 3.13.
 Version 1.x remains the compatibility line for Flutter 3.29 and the built-in
 Material library. See the [compatibility roadmap](doc/compatibility-roadmap.md).
 
@@ -52,6 +56,47 @@ Future<void> saveChanges() async {
 The button shows a spinner and prevents repeated activation until the returned
 Future completes. The following examples reuse `saveChanges`.
 
+## Cupertino quick start
+
+Use `package:loadable_buttons/cupertino.dart` with the standalone Cupertino
+library. `material.dart` is available for Material-only imports, and the original
+`loadable_buttons.dart` exports both families. Design-specific entry points export
+only their buttons plus `AsyncButtonErrorHandler` and `TransitionAnimationType`.
+
+```dart
+import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:loadable_buttons/cupertino.dart';
+
+void main() => runApp(
+  CupertinoApp(
+    home: CupertinoPageScaffold(
+      child: Center(
+        child: AsyncCupertinoButton.filled(
+          onPressed: saveChanges,
+          loadingSemanticsLabel: 'Saving changes',
+          child: const Text('Save'),
+        ),
+      ),
+    ),
+  ),
+);
+
+Future<void> saveChanges() async {
+  await Future<void>.delayed(const Duration(seconds: 2));
+}
+```
+
+The default, filled, and tinted constructors preserve native Cupertino sizes,
+padding, colors, press feedback, focus, and disabled behavior. They use
+`CupertinoActivityIndicator` with the theme's primary color (contrasting color
+for filled buttons), or your explicit `foregroundColor`. No Material ancestor
+is needed. The same loading, error, transition, and accessibility contracts
+below apply. Use `minimumSize`; the deprecated native `minSize` is omitted.
+
+Run the [Cupertino example](example/lib/cupertino_main.dart) with
+`cd example && flutter run -t lib/cupertino_main.dart` for all three variants,
+external loading, long presses, custom loading content, and handled errors.
+
 ## Migrating from 1.x
 
 Add `material_ui` as a direct dependency and replace
@@ -84,6 +129,7 @@ style arguments to standalone types. See the
 
 | Widget | Constructors |
 | --- | --- |
+| `AsyncCupertinoButton` | Default, `.filled`, `.tinted` |
 | `AsyncElevatedButton` | Default, `.icon` |
 | `AsyncFilledButton` | Default, `.icon`, `.tonal`, `.tonalIcon` |
 | `AsyncOutlinedButton` | Default, `.icon` |
@@ -91,7 +137,9 @@ style arguments to standalone types. See the
 | `AsyncIconButton` | Default, `.filled`, `.filledTonal`, `.outlined` |
 | `AsyncFloatingActionButton` | Default, `.small`, `.large`, `.extended` |
 
-Use the corresponding Material options, such as `style` and `focusNode`.
+Use native Material options such as `style`, or Cupertino options such as
+`sizeStyle`, `minimumSize`, `padding`, and `foregroundColor`. Both support
+`focusNode`.
 For each widget's supported properties, see the
 [API reference](https://pub.dev/documentation/loadable_buttons/latest/).
 
@@ -132,7 +180,7 @@ All constructors accept an optional `onError` callback using the exported
 `FutureOr<void> Function(Object error, StackTrace stackTrace)`.
 
 Without `onError`, a synchronous throw or failed callback Future propagates
-with its original stack trace. Material activation accepts a synchronous
+with its original stack trace. Native button activation accepts a synchronous
 callback, so unhandled errors reach the caller's zone through the package's
 handler Future.
 
@@ -166,15 +214,15 @@ including in `onError`.
 
 Launching work without returning or awaiting its Future ends the tracked callback
 early. The button cannot track that work or handle its later errors. See the
-[shared callback error policy](doc/callback-error-policy.md) for future controller
-and Cupertino/adaptive implementations.
+[shared callback error policy](doc/callback-error-policy.md) across both design
+families and future controller/adaptive implementations.
 
-Set `onPressed: null` to disable a button. Elevated, Filled, Outlined, and Text
-buttons remain enabled if `onLongPress` is provided; loading blocks both
+Set `onPressed: null` to disable a button. Elevated, Filled, Outlined, Text, and
+Cupertino buttons remain enabled if `onLongPress` is provided; loading blocks both
 callbacks. `onLongPress` is synchronous and does not start a loading state.
 IconButton forwards its long-press callback to Material UI's native IconButton;
-floating action buttons have no long-press parameter. Native Material styling,
-focus, and semantics determine the disabled appearance for each family.
+floating action buttons have no long-press parameter. Native design-library
+styling, focus, and semantics determine the disabled appearance for each family.
 
 Enabled buttons retain native keyboard activation. Loading disables the outer
 button's activation and reports it as disabled to accessibility services. For
@@ -203,16 +251,18 @@ AsyncElevatedButton(
 | `animatedSwitcher` | Fades between content; outgoing content stays in the layout until its fade ends. |
 | `customBuilder` | Uses your required `customBuilder(loading, child, loadingChild)`. |
 
-`animationDuration` defaults to `Durations.medium1`; `minimumChildOpacity`
-defaults to `0.0` for stack transitions.
+`animationDuration` defaults to 200 milliseconds (`Durations.medium1` in
+Material); `minimumChildOpacity` defaults to `0.0` for stack transitions.
 
 ### Sizing and text scaling
 
 Stack retains the idle content's layout, so a smaller indicator normally fits
 within the idle size. A larger `loadingChild` can expand the button within its
-parent and Material constraints. Stack does not guarantee a fixed size.
-Stack indicators are centered within the whole button, including padding, even
-when icon-and-label variants use asymmetric padding or content alignment.
+parent and native constraints. Stack does not guarantee a fixed size.
+Material stack indicators are centered within the whole button, including
+padding, even when icon-and-label variants use asymmetric padding or content
+alignment.
+Cupertino transitions remain inside native content padding and alignment.
 Animated switcher keeps both sizes in the layout while outgoing content fades;
 the shared layout animates its resize, including the shrink after that content
 is removed.
@@ -228,8 +278,8 @@ constrain both idle and loading content when a stable size is required.
 ### Accessible loading content
 
 Every constructor accepts `loadingSemanticsLabel` for its default spinner,
-including icon, tonal, selected IconButton, and extended FAB variants. The
-default is `null`; the package supplies no English text. Use your application's
+including Cupertino, icon, tonal, selected IconButton, and extended FAB variants.
+The default is `null`; the package supplies no English text. Use your application's
 localized strings for both the idle action and the loading operation:
 
 ```dart
@@ -278,7 +328,7 @@ them, opt in separately, such as a `Semantics(liveRegion: true)` status message
 whose text changes when an operation starts or finishes. Trigger explicit
 announcements from operation state changes, never from `build` or animation
 frames. See the [shared loading semantics policy](doc/loading-semantics-policy.md)
-for the contract future Cupertino/adaptive constructors must follow.
+for the contract across both design families and future adaptive constructors.
 
 An intentional Cancel action may remain accessible inside current loading
 content, while the outer button stays disabled:
@@ -371,8 +421,10 @@ copy a button into your project, and adapt it, including for commercial use.
 Keep the copyright and MIT license notice with the copied code.
 
 Include any companion `part` files, `async_button_helpers.dart` for shared loading
-state, error handling, and indicators, and `loading_transition.dart` for the enum
-and widgets. Update package imports to match your project.
+state and error handling, and `loading_transition.dart` for the enum and widgets.
+Material buttons also need `async_material_button_helpers.dart` for native layers
+and indicators; Cupertino buttons keep their indicator and semantics adapter in
+`async_cupertino_button.dart`. Update package imports to match your project.
 
 For a single-file copy, inline the shared loading helper declarations, move the
 enum into your button file, and inline the transition bodies. This outline shows the ternary and switch structure:
