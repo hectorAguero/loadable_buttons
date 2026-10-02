@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui' show SemanticsAction, Tristate;
 
 import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:flutter/semantics.dart' show SemanticsData;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:loadable_buttons/cupertino.dart';
 
@@ -312,6 +313,82 @@ void main() {
         expect(find.semantics.byLabel('Idle action'), findsOne);
       });
     }
+
+    testWidgets(
+      '${entry.key} merges ancestor labels like the native button',
+      (tester) async {
+        var presses = 0;
+        Future<SemanticsData> labeled({
+          required bool native,
+          bool loading = false,
+        }) async {
+          const icon = Icon(CupertinoIcons.add);
+          await tester.pumpWidget(
+            _host(
+              Semantics(
+                label: 'Add',
+                child: native
+                    ? entry.value.$1(child: icon, onPressed: () => presses++)
+                    : entry.value.$2(
+                        child: icon,
+                        onPressed: () => presses++,
+                        loading: loading,
+                      ),
+              ),
+            ),
+          );
+          await tester.pump(const Duration(milliseconds: 300));
+
+          return find.semantics
+              .byLabel('Add')
+              .evaluate()
+              .single
+              .getSemanticsData();
+        }
+
+        final native = await labeled(native: true);
+        final idle = await labeled(native: false);
+        expect(idle.flagsCollection.isButton, native.flagsCollection.isButton);
+        expect(idle.flagsCollection.isButton, isTrue);
+        expect(idle.flagsCollection.isEnabled, Tristate.isTrue);
+        expect(idle.hasAction(SemanticsAction.tap), isTrue);
+        tester.semantics.performAction(
+          find.semantics.byLabel('Add'),
+          SemanticsAction.tap,
+        );
+        expect(presses, 1);
+        final loading = await labeled(native: false, loading: true);
+        expect(loading.flagsCollection.isButton, isTrue);
+        expect(loading.flagsCollection.isEnabled, Tristate.isFalse);
+        expect(loading.hasAction(SemanticsAction.tap), isFalse);
+      },
+    );
+
+    testWidgets('${entry.key} keeps a valid spinner at zero text scale', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        MediaQuery(
+          data: const MediaQueryData(textScaler: TextScaler.linear(0)),
+          child: _host(
+            entry.value.$2(
+              loading: true,
+              onPressed: () {},
+              child: const Icon(CupertinoIcons.add),
+            ),
+          ),
+        ),
+      );
+      expect(tester.takeException(), isNull);
+      expect(
+        tester
+            .widget<CupertinoActivityIndicator>(
+              find.byType(CupertinoActivityIndicator),
+            )
+            .radius,
+        greaterThan(0),
+      );
+    });
 
     testWidgets('${entry.key} forwards native focus and cursor options', (
       tester,

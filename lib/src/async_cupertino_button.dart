@@ -299,6 +299,11 @@ class _AsyncCupertinoButtonState extends State<AsyncCupertinoButton>
       enabled:
           !isLoading &&
           (widget.onPressed != null || widget.onLongPress != null),
+      // Custom loading content may keep an intentional action, such as Cancel.
+      isolateContentActions:
+          isLoading &&
+          (widget.loadingChild != null ||
+              widget.transitionType == TransitionAnimationType.customBuilder),
       child: buttonBuilder(
         onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
         onLongPress: isLoading || widget.onLongPress == null
@@ -354,7 +359,7 @@ class _CupertinoLoadingIndicator extends StatelessWidget {
     required this.loadingSemanticsLabel,
   });
 
-  // CupertinoActivityIndicator's default, used only without a text size.
+  // CupertinoActivityIndicator's default, used without a positive text size.
   static const double _defaultRadius = 10.0;
 
   final Color? foregroundColor;
@@ -366,48 +371,63 @@ class _CupertinoLoadingIndicator extends StatelessWidget {
     // disabledColor. The contrasting color can disappear on that light fill.
     final color = foregroundColor ?? CupertinoTheme.of(context).primaryColor;
     // Match the native text size so stack loading keeps the idle text layout.
+    // The indicator requires a positive radius, which zero scaling would break.
     final fontSize = DefaultTextStyle.of(context).style.fontSize;
+    final diameter = fontSize == null
+        ? 0.0
+        : MediaQuery.textScalerOf(context).scale(fontSize);
 
     return Semantics(
       label: loadingSemanticsLabel,
       child: CupertinoActivityIndicator(
         color: CupertinoDynamicColor.resolve(color, context),
-        radius: fontSize == null
-            ? _defaultRadius
-            : MediaQuery.textScalerOf(context).scale(fontSize) / 2,
+        radius: diameter > 0 ? diameter / 2 : _defaultRadius,
       ),
     );
   }
 }
 
 // CupertinoButton's gesture recognizer advertises a tap even when disabled.
-// Block only the assembled outer node; setting blockUserActions during describe
-// would propagate to child nodes and disable intentional loading actions too.
+// Like the native button, stay mergeable so ancestor labels and hints describe
+// it, and block disabled actions through the subtree. Blocking propagates to
+// every descendant, so current custom loading content instead gets an outer
+// boundary that blocks only the assembled button node.
 class _CupertinoButtonSemantics extends SingleChildRenderObjectWidget {
   const _CupertinoButtonSemantics({
     required this.enabled,
+    required this.isolateContentActions,
     required super.child,
   });
 
   final bool enabled;
+  final bool isolateContentActions;
 
   @override
   RenderObject createRenderObject(BuildContext context) =>
-      _RenderCupertinoButtonSemantics(enabled);
+      _RenderCupertinoButtonSemantics(
+        enabled: enabled,
+        isolateContentActions: isolateContentActions,
+      );
 
   @override
   void updateRenderObject(
     BuildContext context,
     _RenderCupertinoButtonSemantics renderObject,
   ) {
-    renderObject.enabled = enabled;
+    renderObject
+      ..enabled = enabled
+      ..isolateContentActions = isolateContentActions;
   }
 }
 
 class _RenderCupertinoButtonSemantics extends RenderProxyBox {
-  _RenderCupertinoButtonSemantics(this._enabled);
+  _RenderCupertinoButtonSemantics({
+    required this._enabled,
+    required this._isolateContentActions,
+  });
 
   bool _enabled;
+  bool _isolateContentActions;
 
   bool get enabled => _enabled;
 
@@ -417,12 +437,21 @@ class _RenderCupertinoButtonSemantics extends RenderProxyBox {
     markNeedsSemanticsUpdate();
   }
 
+  bool get isolateContentActions => _isolateContentActions;
+
+  set isolateContentActions(bool value) {
+    if (value == _isolateContentActions) return;
+    _isolateContentActions = value;
+    markNeedsSemanticsUpdate();
+  }
+
   @override
   void describeSemanticsConfiguration(SemanticsConfiguration config) {
     super.describeSemanticsConfiguration(config);
     config
-      ..isSemanticBoundary = true
-      ..isEnabled = _enabled;
+      ..isSemanticBoundary = _isolateContentActions
+      ..isEnabled = _enabled
+      ..isBlockingUserActions = !_enabled && !_isolateContentActions;
   }
 
   @override

@@ -24,8 +24,9 @@ and its indicator remain together in `async_cupertino_button.dart` for copying.
 | Original errors/stacks, handler forwarding, and retry | `async_button_contract_test.dart` and `async_button_error_test.dart` shared matrices | Consuming unhandled failures or skipping an explicitly supplied error handler. Recovery/capture/disposal policy stays owned by the existing shared-helper tests. |
 | Stack, switcher, and custom-builder content; nullable custom loading content | `async_button_contract_test.dart` shared matrix | Missing current content, applying a builder outside custom mode, or substituting an unwanted default indicator. |
 | Localized default loading label, null default, locale updates, disabled outer role, and keyboard/semantics activation | `async_button_contract_test.dart` shared matrix | Hidden labels remaining accessible or loading buttons advertising activation. |
+| Ancestor labels describe the native button node while idle and default-loading | `async_cupertino_button_test.dart` | A forced semantics boundary leaving an icon-only action unnamed. |
 | Inactive content cannot receive pointer input, focus, or semantics actions; current loading content remains actionable | `async_cupertino_button_test.dart` | Cupertino wiring bypassing guards or disabling a custom Cancel action. |
-| Default Cupertino spinner uses the theme primary color or explicit foreground on every variant, and stays within the idle text size across native sizes and text scaling | `async_cupertino_button_test.dart` | Material indicator dependency, a contrasting spinner disappearing on the disabled fill shown while loading, or stack loading resizing the button. |
+| Default Cupertino spinner uses the theme primary color or explicit foreground on every variant, and stays within the idle text size across native sizes and text scaling, with a valid radius at zero scaling | `async_cupertino_button_test.dart` | Material indicator dependency, a contrasting spinner disappearing on the disabled fill shown while loading, or stack loading resizing the button. |
 
 All tests observe public widget behavior or the native renderer, with no
 production API or keys added solely for testing. Existing contract matrices are
@@ -34,11 +35,17 @@ Native reference measurements protect the documented native layout contract;
 they do not fix expectations to numeric sizes or one Cupertino release.
 
 Native CupertinoButton currently omits enabled-state semantics and advertises a
-tap action even when disabled. A small render adapter supplies enabled state and
-blocks actions only on the assembled outer semantics node. Blocking the entire
-subtree would disable intentional loading actions. Custom loading content gets
-its own semantics boundary; its labels, roles, and actions remain consumer-owned.
-Custom builders retain responsibility for all content semantics and boundaries.
+tap action even when disabled. A small render adapter supplies enabled state.
+Like the native button, it stays mergeable, so an ancestor `Semantics` label or
+hint still describes an icon-only button, and disabled actions are blocked
+through the subtree. Blocking propagates to every descendant, so while custom
+loading content or a custom builder is current, the adapter instead becomes the
+button's semantics boundary and blocks actions only on that assembled node. An
+intentional Cancel action stays available; in that state, describe the button
+inside the loading content rather than with an ancestor label. Custom loading
+content gets its own semantics boundary; its labels, roles, and actions remain
+consumer-owned. Custom builders retain responsibility for all content semantics
+and boundaries.
 
 Run `bash tool/resolve_design_ui.sh oldest|latest` to pin or unlock both design
 libraries for the package and example. CI runs the full suite and analyzer/plugin
