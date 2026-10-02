@@ -2,6 +2,19 @@
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) for development and validation commands.
 
+## Editing and tooling
+
+- Use direct patch edits for small, localized changes. When a Dart change
+  depends on symbols, imports, or types, use Dart-aware tooling or targeted
+  patches instead of plain text replacement.
+- If installed, prefer `rg` for search and `fd` for file discovery, and `sd` or
+  `yq` for repetitive mechanical or structured YAML edits. Otherwise use
+  standard tools; don't install new tools for a task.
+- Don't write ad-hoc Python scripts to edit files. Reuse the scripts in `tool/`
+  first, and reserve new scripts for complex bulk changes.
+- Format only the Dart files you changed (`dart format <files>`), then run the
+  validation commands in CONTRIBUTING.md and `git diff --check`.
+
 ## File organization and copyability
 
 This package supports copying button implementations into application projects.
@@ -19,6 +32,16 @@ need to copy and adapt.
   merely to put each declaration in its own file.
 - Keep the README's copy instructions accurate when changing source files,
   imports, or companion `part` files.
+
+## Readability and native behavior
+
+- Prefer `if`, ternaries, and `is` for simple choices. Use switches or patterns
+  when they clarify branching or add useful exhaustiveness.
+- Keep locals and private widgets that clarify responsibilities or preserve
+  behavior. Reducing their count alone is not a reason to refactor.
+- Keep shared native loading wrappers in family main files and icon adapters
+  and layout in companion parts. Preserve explicit Filled regular/tonal
+  construction and native superclass wiring.
 
 ## Structural audits
 
