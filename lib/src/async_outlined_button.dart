@@ -299,7 +299,8 @@ class _AsyncOutlinedButtonState extends State<AsyncOutlinedButton>
 }
 
 // Share full-button stack loading between regular and icon variants.
-// Keep native constructor and icon defaults so Material owns style precedence.
+// Native icon padding is private to the `.icon` constructor; delegate to it so
+// defaults track Material while widget and theme styles keep precedence.
 class _LoadingOutlinedButton extends OutlinedButton with StackLoadingButton {
   const _LoadingOutlinedButton({
     required this._hasIcon,

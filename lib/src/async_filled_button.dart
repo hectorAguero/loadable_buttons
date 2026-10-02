@@ -454,7 +454,9 @@ class _AsyncFilledButtonState extends State<AsyncFilledButton>
 }
 
 // Share full-button stack loading between regular and icon variants.
-// Keep native constructor and icon defaults so Material owns style precedence.
+// Native icon padding is private to the `.icon` and `.tonalIcon` constructors;
+// delegate to them so defaults track Material while widget and theme styles
+// keep precedence.
 class _LoadingFilledButton extends FilledButton with StackLoadingButton {
   const _LoadingFilledButton({
     required this._hasIcon,

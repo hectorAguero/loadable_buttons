@@ -299,7 +299,8 @@ class _AsyncElevatedButtonState extends State<AsyncElevatedButton>
 }
 
 // Share full-button stack loading between regular and icon variants.
-// Keep native constructor and icon defaults so Material owns style precedence.
+// Native icon padding is private to the `.icon` constructor; delegate to it so
+// defaults track Material while widget and theme styles keep precedence.
 class _LoadingElevatedButton extends ElevatedButton with StackLoadingButton {
   const _LoadingElevatedButton({
     required this._hasIcon,
