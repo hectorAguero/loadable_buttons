@@ -41,12 +41,15 @@ class _LoadingContractDemoState extends State<LoadingContractDemo> {
     try {
       await operation.future;
       if (mounted) setState(() => _result = 'Operation completed');
-    } on Exception catch (error) {
-      // The application chooses how to report a failed operation.
-      if (mounted) setState(() => _result = 'Handled error: $error');
     } finally {
       if (mounted) setState(() => _operation = null);
     }
+  }
+
+  void _handleOperationError(Object error, StackTrace _) {
+    // This handler explicitly consumes the failure. The demo owns its feedback
+    // and checks its lifecycle because error handlers may run after disposal.
+    if (mounted) setState(() => _result = 'Handled error: $error');
   }
 
   void _finishOperation({bool fail = false}) {
@@ -150,6 +153,7 @@ class _LoadingContractDemoState extends State<LoadingContractDemo> {
                       transitionType: widget.transitionType,
                       loadingChild: loadingContent,
                       onPressed: _disabled ? null : _startOperation,
+                      onError: _handleOperationError,
                       onLongPress: _disabled
                           ? null
                           : () => setState(() => _longPressCount++),

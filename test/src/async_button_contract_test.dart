@@ -156,7 +156,10 @@ void main() {
           tester,
         ) async {
           final failure = StateError('Consumer failure');
-          final errors = <Object>[];
+          final originalTrace = StackTrace.fromString(
+            'original callback trace',
+          );
+          final errors = <(Object, StackTrace)>[];
           var calls = 0;
           // Material takes a VoidCallback. Uncaught consumer failures reach the
           // caller's zone, which we observe without accessing private State.
@@ -170,25 +173,29 @@ void main() {
                     calls++;
                     if (calls > 1) return Future<void>.value();
                     if (asynchronous) return pending.future;
-                    throw failure;
+                    Error.throwWithStackTrace(failure, originalTrace);
                   },
                 ),
               ),
             );
             await tester.tap(materialButton);
             await tester.pump();
-            if (asynchronous) pending.completeError(failure);
+            if (asynchronous) pending.completeError(failure, originalTrace);
             await tester.pump();
-          }, (error, _) => errors.add(error));
+          }, (error, trace) => errors.add((error, trace)));
           // Keep matchers outside the error zone so a failing assertion cannot
           // be mistaken for a consumer error or prevent the test completing.
-          expect(errors, [failure]);
+          expect(errors, hasLength(1));
+          expect(errors.single.$1, same(failure));
+          expect(errors.single.$2.toString(), originalTrace.toString());
           expect(find.byType(CircularProgressIndicator), findsNothing);
           await tester.pumpAndSettle();
           await tester.tap(materialButton);
           await tester.pumpAndSettle();
           expect(calls, 2);
-          expect(errors, [failure]);
+          expect(errors, hasLength(1));
+          expect(errors.single.$1, same(failure));
+          expect(errors.single.$2.toString(), originalTrace.toString());
         });
       }
 

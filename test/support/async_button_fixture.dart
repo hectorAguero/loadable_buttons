@@ -11,6 +11,7 @@ typedef AsyncButtonBuilder =
     Widget Function({
       required Widget child,
       required FutureOr<void> Function()? onPressed,
+      AsyncButtonErrorHandler? onError,
       bool loading,
       Widget? loadingChild,
       TransitionAnimationType transitionType,
@@ -24,6 +25,7 @@ typedef _LabelBuilder =
     Widget Function({
       required Widget label,
       required FutureOr<void> Function()? onPressed,
+      AsyncButtonErrorHandler? onError,
       Widget? icon,
       bool loading,
       Widget? loadingChild,
@@ -38,6 +40,7 @@ typedef _IconBuilder =
     Widget Function({
       required Widget icon,
       required FutureOr<void> Function()? onPressed,
+      AsyncButtonErrorHandler? onError,
       bool loading,
       Widget? loadingChild,
       TransitionAnimationType transitionType,
@@ -72,6 +75,28 @@ final asyncButtonBuilders = <String, AsyncButtonBuilder>{
   ),
 };
 
+// Include both factory branches without multiplying unrelated contract tests.
+final asyncButtonErrorBuilders = <String, AsyncButtonBuilder>{
+  ...asyncButtonBuilders,
+  'Elevated.icon without icon': _withLabel(
+    AsyncElevatedButton.icon,
+    icon: null,
+  ),
+  'Filled.icon without icon': _withLabel(AsyncFilledButton.icon, icon: null),
+  'Filled.tonalIcon without icon': _withLabel(
+    AsyncFilledButton.tonalIcon,
+    icon: null,
+  ),
+  'Outlined.icon without icon': _withLabel(
+    AsyncOutlinedButton.icon,
+    icon: null,
+  ),
+  'Text.icon without icon': _withLabel(AsyncTextButton.icon, icon: null),
+  'Floating action.extended with icon': _withLabel(
+    AsyncFloatingActionButton.extended,
+  ),
+};
+
 AsyncButtonBuilder _withLabel(
   _LabelBuilder builder, {
   Widget? icon = const Icon(Icons.add),
@@ -79,6 +104,7 @@ AsyncButtonBuilder _withLabel(
     ({
       required child,
       required onPressed,
+      onError,
       loading = false,
       loadingChild,
       transitionType = TransitionAnimationType.stack,
@@ -90,6 +116,7 @@ AsyncButtonBuilder _withLabel(
       label: child,
       icon: icon,
       onPressed: onPressed,
+      onError: onError,
       loading: loading,
       loadingChild: loadingChild,
       transitionType: transitionType,
@@ -103,6 +130,7 @@ AsyncButtonBuilder _withIcon(_IconBuilder builder) =>
     ({
       required child,
       required onPressed,
+      onError,
       loading = false,
       loadingChild,
       transitionType = TransitionAnimationType.stack,
@@ -113,6 +141,7 @@ AsyncButtonBuilder _withIcon(_IconBuilder builder) =>
     }) => builder(
       icon: child,
       onPressed: onPressed,
+      onError: onError,
       loading: loading,
       loadingChild: loadingChild,
       transitionType: transitionType,
