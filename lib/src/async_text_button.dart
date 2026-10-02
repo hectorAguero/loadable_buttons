@@ -253,7 +253,7 @@ class _AsyncTextButtonState extends State<AsyncTextButton>
 
   @override
   Widget build(BuildContext context) {
-    return _TextButtonWithIconPadding(
+    return _LoadingTextButton(
       hasIcon: widget is _AsyncTextButtonWithIcon,
       onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
       onLongPress: isLoading || widget.onLongPress == null
@@ -295,5 +295,36 @@ class _AsyncTextButtonState extends State<AsyncTextButton>
               minimumChildOpacity: widget.minimumChildOpacity,
             ),
     );
+  }
+}
+
+// Share full-button stack loading between regular and icon variants.
+// Keep native constructor and icon defaults so Material owns style precedence.
+class _LoadingTextButton extends TextButton with StackLoadingButton {
+  const _LoadingTextButton({
+    required this._hasIcon,
+    required super.onPressed,
+    required super.child,
+    super.onLongPress,
+    super.onHover,
+    super.onFocusChange,
+    super.style,
+    super.focusNode,
+    super.autofocus,
+    super.clipBehavior,
+    super.statesController,
+  });
+
+  final bool _hasIcon;
+
+  @override
+  ButtonStyle defaultStyleOf(BuildContext context) {
+    if (!_hasIcon) return super.defaultStyleOf(context);
+
+    return TextButton.icon(
+      onPressed: null,
+      icon: const SizedBox.shrink(),
+      label: const SizedBox.shrink(),
+    ).defaultStyleOf(context);
   }
 }

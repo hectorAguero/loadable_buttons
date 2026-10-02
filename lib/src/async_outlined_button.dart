@@ -253,7 +253,7 @@ class _AsyncOutlinedButtonState extends State<AsyncOutlinedButton>
 
   @override
   Widget build(BuildContext context) {
-    return _OutlinedButtonWithIconPadding(
+    return _LoadingOutlinedButton(
       hasIcon: widget is _AsyncOutlinedButtonWithIcon,
       onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
       onLongPress: isLoading || widget.onLongPress == null
@@ -295,5 +295,36 @@ class _AsyncOutlinedButtonState extends State<AsyncOutlinedButton>
               minimumChildOpacity: widget.minimumChildOpacity,
             ),
     );
+  }
+}
+
+// Share full-button stack loading between regular and icon variants.
+// Keep native constructor and icon defaults so Material owns style precedence.
+class _LoadingOutlinedButton extends OutlinedButton with StackLoadingButton {
+  const _LoadingOutlinedButton({
+    required this._hasIcon,
+    required super.onPressed,
+    required super.child,
+    super.onLongPress,
+    super.onHover,
+    super.onFocusChange,
+    super.style,
+    super.focusNode,
+    super.autofocus,
+    super.clipBehavior,
+    super.statesController,
+  });
+
+  final bool _hasIcon;
+
+  @override
+  ButtonStyle defaultStyleOf(BuildContext context) {
+    if (!_hasIcon) return super.defaultStyleOf(context);
+
+    return OutlinedButton.icon(
+      onPressed: null,
+      icon: const SizedBox.shrink(),
+      label: const SizedBox.shrink(),
+    ).defaultStyleOf(context);
   }
 }

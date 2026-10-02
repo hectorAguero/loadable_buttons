@@ -383,11 +383,54 @@ class _AsyncFilledButtonState extends State<AsyncFilledButton>
 
   @override
   Widget build(BuildContext context) {
-    final buttonBuilder = widget._variant == _AsyncFilledButtonVariant.tonal
-        ? _FilledButtonWithIconPadding.tonal
-        : _FilledButtonWithIconPadding.new;
+    final child = widget.transitionType == TransitionAnimationType.customBuilder
+        ? widget.customBuilder?.call(
+                isLoading,
+                widget.child,
+                widget.loadingChild,
+              ) ??
+              widget.child
+        : LoadingTransition(
+            child: widget.child,
+            loadingChild:
+                widget.loadingChild ??
+                DefaultLoadingIndicator(
+                  style: widget.style,
+                  loadingSemanticsLabel: widget.loadingSemanticsLabel,
+                  themeStyleOf: (context) =>
+                      FilledButtonTheme.of(context).style,
+                ),
+            isLoading: isLoading,
+            transitionType: widget.transitionType,
+            animationDuration: widget.animationDuration,
+            minimumChildOpacity: widget.minimumChildOpacity,
+          );
 
-    return buttonBuilder(
+    if (widget._variant == _AsyncFilledButtonVariant.tonal) {
+      return _LoadingFilledButton.tonal(
+        hasIcon: widget is _AsyncFilledButtonWithIcon,
+        onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
+        onLongPress: isLoading || widget.onLongPress == null
+            ? null
+            : _handleLongPress,
+        onHover: widget.onHover,
+        onFocusChange: widget.onFocusChange,
+        style:
+            widget.style ??
+            FilledButton.styleFrom(splashFactory: widget.splashFactory),
+        focusNode: widget.focusNode,
+        autofocus: widget.autofocus,
+        clipBehavior: resolveButtonClipBehavior(
+          clipBehavior: widget.clipBehavior,
+          style: widget.style,
+          themeStyle: FilledButtonTheme.of(context).style,
+        ),
+        statesController: widget.statesController,
+        child: child,
+      );
+    }
+
+    return _LoadingFilledButton(
       hasIcon: widget is _AsyncFilledButtonWithIcon,
       onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
       onLongPress: isLoading || widget.onLongPress == null
@@ -406,28 +449,61 @@ class _AsyncFilledButtonState extends State<AsyncFilledButton>
         themeStyle: FilledButtonTheme.of(context).style,
       ),
       statesController: widget.statesController,
-      child: widget.transitionType == TransitionAnimationType.customBuilder
-          ? widget.customBuilder?.call(
-                  isLoading,
-                  widget.child,
-                  widget.loadingChild,
-                ) ??
-                widget.child
-          : LoadingTransition(
-              child: widget.child,
-              loadingChild:
-                  widget.loadingChild ??
-                  DefaultLoadingIndicator(
-                    style: widget.style,
-                    loadingSemanticsLabel: widget.loadingSemanticsLabel,
-                    themeStyleOf: (context) =>
-                        FilledButtonTheme.of(context).style,
-                  ),
-              isLoading: isLoading,
-              transitionType: widget.transitionType,
-              animationDuration: widget.animationDuration,
-              minimumChildOpacity: widget.minimumChildOpacity,
-            ),
+      child: child,
     );
+  }
+}
+
+// Share full-button stack loading between regular and icon variants.
+// Keep native constructor and icon defaults so Material owns style precedence.
+class _LoadingFilledButton extends FilledButton with StackLoadingButton {
+  const _LoadingFilledButton({
+    required this._hasIcon,
+    required super.onPressed,
+    required super.child,
+    super.onLongPress,
+    super.onHover,
+    super.onFocusChange,
+    super.style,
+    super.focusNode,
+    super.autofocus,
+    super.clipBehavior,
+    super.statesController,
+  }) : _tonal = false;
+
+  const _LoadingFilledButton.tonal({
+    required this._hasIcon,
+    required super.onPressed,
+    required super.child,
+    super.onLongPress,
+    super.onHover,
+    super.onFocusChange,
+    super.style,
+    super.focusNode,
+    super.autofocus,
+    super.clipBehavior,
+    super.statesController,
+  }) : _tonal = true,
+       super.tonal();
+
+  final bool _tonal;
+  final bool _hasIcon;
+
+  @override
+  ButtonStyle defaultStyleOf(BuildContext context) {
+    if (!_hasIcon) return super.defaultStyleOf(context);
+    final nativeButton = _tonal
+        ? FilledButton.tonalIcon(
+            onPressed: null,
+            icon: const SizedBox.shrink(),
+            label: const SizedBox.shrink(),
+          )
+        : FilledButton.icon(
+            onPressed: null,
+            icon: const SizedBox.shrink(),
+            label: const SizedBox.shrink(),
+          );
+
+    return nativeButton.defaultStyleOf(context);
   }
 }
