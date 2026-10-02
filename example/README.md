@@ -5,10 +5,8 @@ loading transitions, and theme colors. It uses the package from the parent
 directory through a path dependency.
 
 Requires Flutter 3.44.0 / Dart 3.12.0 or newer, standalone Material UI and
-Cupertino UI >=1.0.0 <2.0.0, and uses the implemented, unreleased v2 API.
-The parent path dependency deliberately runs repository source even while
-pub.dev still provides 1.x. See the [migration guide](../doc/migration-v2.md)
-and [release validation](../doc/release-validation.md).
+Cupertino UI 1.0.0+, and uses the v2 API. The parent path dependency runs
+the package from this checkout. See the [migration guide](../doc/migration-v2.md).
 
 From this directory, run:
 

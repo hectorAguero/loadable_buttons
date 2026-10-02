@@ -23,6 +23,10 @@ migrate_working_dir/
 build/
 **/pubspec_overrides.yaml
 
-# Maintainer instructions and generated coverage are not consumer artifacts.
+# Maintainer resources and generated coverage are not consumer artifacts.
 /AGENTS.md
+/CONTRIBUTING.md
+/doc/*-audit.md
+/doc/release-validation.md
+/tool/
 /coverage/

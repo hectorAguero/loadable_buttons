@@ -83,14 +83,19 @@ jobs:
         run: flutter test --no-pub
 
       # Archive checks must not re-resolve an exact lower-bound graph.
+      - name: Check Archive Exclusions
+        if: matrix.sdk == 'stable' && matrix.design == 'latest'
+        run: bash tool/check_pubignore.sh
+
       - name: Validate Publish Dry Run
+        id: publish
         if: matrix.sdk == 'stable' && matrix.design == 'latest'
         run: |
           set -o pipefail
           dart pub publish --dry-run 2>&1 | tee "$RUNNER_TEMP/publish-dry-run.txt"
 
       - name: Save Publish Dry Run for Review
-        if: always() && matrix.sdk == 'stable' && matrix.design == 'latest'
+        if: always() && steps.publish.outcome != 'skipped'
         uses: actions/upload-artifact@v7
         with:
           name: publish-dry-run

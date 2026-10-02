@@ -1,9 +1,7 @@
 # Migrating from 1.x to 2.0
 
-This guide describes the implemented 2.0.0 API in this repository. It is
-unreleased; a version in `pubspec.yaml` is not evidence of publication. Check
-the [release status and validation procedure](release-validation.md) before
-selecting a dependency. The runnable [Material](../example/lib/main.dart) and
+This guide describes the loadable_buttons 2.0.0 API.
+The runnable [Material](../example/lib/main.dart) and
 [Cupertino](../example/lib/cupertino_main.dart) examples use this checkout.
 
 ## Choose the release line
@@ -11,15 +9,14 @@ selecting a dependency. The runnable [Material](../example/lib/main.dart) and
 | Line | SDK floor | Design libraries | Maintenance |
 | --- | --- | --- | --- |
 | 1.1.x | Flutter 3.29.0, Dart 3.7.0 | Built-in Flutter Material | Compatibility fixes for existing applications; no v2 APIs or SDK-floor increase in patch releases. |
-| 2.0.x | Flutter 3.44.0, Dart 3.12.0 (below 4.0.0) | `material_ui >=1.0.0 <2.0.0`, `cupertino_ui >=1.0.0 <2.0.0` | Standalone design libraries, shared async contracts, and native Cupertino buttons. |
+| 2.0.x | Flutter 3.44.0, Dart 3.12.0 | `material_ui` 1.0.0+, `cupertino_ui` 1.0.0+ | Standalone design libraries, shared async contracts, and native Cupertino buttons. |
 
 Stay on `loadable_buttons: ^1.1.1` if you need built-in Material or Flutter
-below 3.44. Backport applicable correctness fixes to the 1.x release line,
-validate them on Flutter 3.29 and stable, and release them separately. New v2
+below 3.44. The 1.1.x line receives applicable compatibility fixes. New v2
 features belong on 2.x; there is no promised 1.x support end date. Historical
 1.0.x constraints are listed in the [compatibility roadmap](compatibility-roadmap.md).
 
-After 2.0.0 is published, use these constraints for a Material application:
+Use these constraints for a Material application:
 
 ```yaml
 dependencies:
@@ -29,21 +26,13 @@ dependencies:
   material_ui: '>=1.0.0 <2.0.0'
 ```
 
-For a Cupertino application, declare `cupertino_ui: '>=1.0.0 <2.0.0'`
+For a Cupertino application, declare `cupertino_ui`
 directly instead of `material_ui`. The package itself depends on both libraries.
 Let Pub select versions compatible with your SDK; pinning newer design-library
 releases can raise your application's floor above the package's floor.
 
-Before publication, use a local path dependency on this checkout instead of
-the hosted `^2.0.0` constraint, adjusting the relative path for your application:
-
-```yaml
-  loadable_buttons:
-    path: ../loadable_buttons
-```
-
-Run `flutter pub get` after changing SDKs or
-dependencies, then analyze and test your application.
+Run `flutter pub get` after changing SDKs or dependencies, then analyze and test
+your application.
 
 ## Imports and public types
 

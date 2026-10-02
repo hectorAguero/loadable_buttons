@@ -1,7 +1,7 @@
 # Development and linting
 
 Version 2 supports Flutter **3.44.0+**, Dart **3.12.0+**, and standalone
-**material_ui >=1.0.0 <2.0.0** and **cupertino_ui >=1.0.0 <2.0.0**. CI tests
+**material_ui 1.0.0+** and **cupertino_ui 1.0.0+**. CI tests
 the exact Flutter minimum declared in `pubspec.yaml` and the moving stable
 channel, each with exact Material UI and Cupertino UI 1.0.0 and their newest compatible releases. See
 [the compatibility roadmap](doc/compatibility-roadmap.md).
@@ -19,7 +19,7 @@ the latest-compatible design-library jobs; plugin checks run in all four jobs.
 | [Solid Lints 1.0.0](https://pub.dev/packages/solid_lints) | Custom checks for null safety, context usage, code complexity, and widget/lifecycle conventions. |
 | [Dart Code Linter 4.4.0](https://pub.dev/packages/dart_code_linter) | Complementary checks for listener cleanup, redundant `async`, `async`/`await` style, test assertions, and test filenames. |
 
-The package and example allow VGA >=10.3.0 <12.0.0 so Pub can select a release
+The package and example allow VGA 10.3.0+ so Pub can select a release
 compatible with each SDK, while the included preset stays fixed at 10.3.0.
 VGA 10.3.0 supports the consumer Dart 3.12 floor; VGA 11.0.0 requires Dart
 3.13 and resolves on stable. Solid Lints 1.0.0 and DCL 4.4.0 are already current.
@@ -133,6 +133,7 @@ bash tool/analyze.sh
 bash tool/check_dcl.sh
 flutter test --no-pub
 git diff --check
+bash tool/check_pubignore.sh
 ```
 
 Flutter 3.44.0 runs the same plugin and CLI checks as stable; no minimum-SDK
@@ -162,20 +163,32 @@ versions. CI permits those expected resolutions without overwriting the committe
 lockfile. Review any local lockfile diff before committing it, and finish with the
 stable example resolution when updating its baseline.
 
-## Consumer agent skill
+## Release validation
 
 The [v2 release-validation procedure](doc/release-validation.md) records the
 candidate matrix, archive review, consumer installation, and separately
 authorized publication and post-release checks. Run `dart pub publish --dry-run`
 on stable/latest before release; CI keeps its output for inspection. Keep the
-[migration guide](doc/migration-v2.md) and availability notes aligned with the
-implemented API and actual hosted release.
+[migration guide](doc/migration-v2.md) aligned with the released API.
+
+Backport applicable correctness fixes to the 1.x release line, validate them
+on Flutter 3.29 and stable, and release them separately. Keep v2 APIs and SDK-floor
+increases out of 1.x patch releases.
+
+`.pubignore` takes precedence over the root `.gitignore`. When adding a Git
+exclusion, add the same pattern to `.pubignore`; `bash tool/check_pubignore.sh`
+checks this locally and in CI. The archive excludes maintainer instructions,
+CONTRIBUTING, release procedures, structural audits, and `tool/`. Consumer docs
+link to those resources in the repository.
+
+## Consumer agent skill
 
 `skills/loadable-buttons-usage/` is published with the package and installed
 into consumer projects by the [skills CLI](https://pub.dev/packages/skills).
 Its directory and frontmatter `name` must start with `loadable-buttons-`;
 `test/src/package_skill_test.dart` checks the naming and relative links. Keep
-it consumer-facing: maintainer workflows belong in this file and `AGENTS.md`.
+it consumer-facing: maintainer workflows belong in this file and
+[AGENTS.md](AGENTS.md).
 
 When a change affects public constructors, imports, loading, error, semantics,
 theming, or sizing behavior, update the skill alongside the README and API

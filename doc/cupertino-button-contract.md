@@ -6,7 +6,7 @@ exports those buttons, `AsyncButtonErrorHandler`, and `TransitionAnimationType`
 without importing Material implementation code. The combined barrel and
 `material.dart` retain all Material APIs.
 
-The direct dependency is `cupertino_ui >=1.0.0 <2.0.0`. Version 1.0.0 supplies
+The direct dependency is `cupertino_ui` 1.0.0+. Version 1.0.0 supplies
 all supported native options and declares Flutter >=3.44 / Dart ^3.12, matching
 the existing package minimum. The deprecated `minSize` argument is omitted in
 favor of `minimumSize`. Latest resolution remains SDK-dependent.
@@ -47,8 +47,10 @@ content gets its own semantics boundary; its labels, roles, and actions remain
 consumer-owned. Custom builders retain responsibility for all content semantics
 and boundaries.
 
-Run `bash tool/resolve_design_ui.sh oldest|latest` to pin or unlock both design
-libraries for the package and example. CI runs the full suite and analyzer/plugin
+For repository validation, run `bash tool/resolve_design_ui.sh oldest|latest`
+to pin or unlock both design libraries for the package and example. See the
+[development checks](https://github.com/hectorAguero/loadable_buttons/blob/main/CONTRIBUTING.md).
+CI runs the full suite and analyzer/plugin
 checks in four combinations: exact Flutter 3.44.0 and stable, each with both
 libraries at 1.0.0 or their latest compatible releases. The old Material resolver
 name remains a forwarding entry point for existing development commands.

@@ -4,46 +4,6 @@ Issue [#48](https://github.com/hectorAguero/loadable_buttons/issues/48) prepares
 release readiness. Neither this procedure nor a readiness PR authorizes uploading
 the package, creating a release tag, or publishing a GitHub release.
 
-## Availability
-
-Checked October 2, 2026:
-
-| Surface | Available version | Meaning |
-| --- | --- | --- |
-| Repository `pubspec.yaml` | 2.0.0 | Implemented v2 source; `CHANGELOG.md` still says unreleased. |
-| [pub.dev version history](https://pub.dev/packages/loadable_buttons/versions) | 1.1.1 latest | Hosted archive available to consumers; 2.0.0 is not published. |
-| [GitHub releases](https://github.com/hectorAguero/loadable_buttons/releases) | `v1.1.1` latest | Released 1.x tag; no v2 tag/release at this check. |
-
-The repository README and consumer skill describe the implemented v2 source.
-Hosted `latest` documentation and `flutter pub add loadable_buttons` follow the
-published release until 2.0.0 is uploaded. Use a local path dependency to try v2
-before publication. Keep the [migration guide](migration-v2.md), changelog,
-package version, release notes, and eventual versioned API links consistent.
-
-## Readiness evidence (October 2, 2026)
-
-The issue #48 readiness changes were checked against the implemented source
-from main `16e07ac`, including Material style shortcuts. No button implementation
-changed in this readiness work. Each graph passed formatting, package/test/example
-analysis with analyzer plugins, the isolated DCL CLI, and the full suite:
-
-| Flutter | Dart | Material UI | Cupertino UI | Tests |
-| --- | --- | --- | --- | --- |
-| 3.44.0 | 3.12.0 | 1.0.0 | 1.0.0 | 865 passed |
-| 3.44.0 | 3.12.0 | 1.2.0 | 1.0.2 | 865 passed |
-| 3.47.5 (stable) | 3.13.4 | 1.0.0 | 1.0.0 | 865 passed |
-| 3.47.5 (stable) | 3.13.4 | 1.5.0 | 1.1.1 | 865 passed |
-
-The migration guide's Dart snippets analyzed in isolated consumers: before
-examples against hosted 1.1.1 and after examples against a path dependency on
-v2. The documented skills CLI command installed the consumer skill and its
-reference unchanged. Relative documentation links and workflow YAML parsed
-successfully. The archive review retains examples, screenshot, documentation,
-and consumer skills while excluding coverage and maintainer `AGENTS.md`.
-
-This is readiness evidence, not publication or post-release verification. The
-final release commit must rerun the checks below after any further changes.
-
 ## Candidate checks
 
 Freeze the candidate commit after the chosen v2 scope is merged. Record its SHA,
@@ -75,6 +35,7 @@ bash tool/analyze.sh
 bash tool/check_dcl.sh
 flutter test --no-pub
 git diff --check
+bash tool/check_pubignore.sh
 ```
 
 The resolver verifies both package and example graphs, and removes temporary
@@ -113,8 +74,11 @@ its output as an artifact for review. Require zero warnings. Confirm that
 documentation, examples, and the configured screenshot are present. Confirm
 `skills/loadable-buttons-usage/SKILL.md` and `references/customization.md` are
 present. Check for credentials, editor state, build output, local overrides,
-coverage, and maintainer agent instructions. `.pubignore` repeats the relevant
-Git exclusions because Pub uses it in preference to `.gitignore`.
+coverage, and maintainer resources. `.pubignore` excludes `AGENTS.md`,
+`CONTRIBUTING.md`, structural audits, this release procedure, and `tool/`.
+Consumer-facing documentation links to those resources in the repository.
+Because Pub uses `.pubignore` in preference to the root `.gitignore`, run
+`bash tool/check_pubignore.sh` to catch missing Git exclusion patterns.
 
 Before release, install the skill from an isolated Flutter consumer project with
 a path dependency on the candidate and a direct design-library dependency:
@@ -130,7 +94,7 @@ itself. The skill's contract tests run with the full suite.
 
 ## Authorized publication and follow-up
 
-These steps remain pending until the maintainer authorizes publication:
+After the maintainer authorizes publication, follow these steps:
 
 1. On the validated commit, finalize the release date in the 2.0.0 changelog
    heading and release notes. Recheck the package version and hosted availability,
@@ -139,15 +103,14 @@ These steps remain pending until the maintainer authorizes publication:
    hosted version and archive before recording publication as successful.
 3. Tag that same source commit `v2.0.0` and create its GitHub release with the
    breaking SDK/import changes, migration link, and implemented feature list.
-   Update the availability table with the actual version, tag, source SHA, and
-   publication date. A tag alone does not prove a hosted archive exists.
+   Record the actual version, tag, source SHA, archive URL, and publication date
+   in the release issue. A tag alone does not prove a hosted archive exists.
 4. Resolve `loadable_buttons: 2.0.0` from pub.dev in a fresh Flutter application
    with no path override. Analyze/run Material and Cupertino examples against
    that hosted package; install the consumer skill from that resolution.
 5. Verify the hosted README, changelog, example tab, screenshot, repository and
    issue links, dependency constraints, archive contents, and generated
    [2.0.0 API reference](https://pub.dev/documentation/loadable_buttons/2.0.0/).
-   Replace the README's temporary source API link with that verified API link.
    Record results and any follow-up fixes in the release issue.
 
 Do not check off publication or post-release verification in #48 based on the

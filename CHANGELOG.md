@@ -1,10 +1,9 @@
-## 2.0.0 (unreleased)
+## 2.0.0
 
 * Add a before/after 1.x migration guide and release-validation procedure,
-  distinguish repository APIs from hosted availability, retain the 1.x
-  compatibility maintenance line, and verify the publish dry run in CI.
-  Exclude generated coverage and maintainer agent instructions from the archive
-  while retaining consumer skills and runnable examples.
+  retain the 1.x compatibility maintenance line, and verify the publish dry run
+  and archive exclusions in CI. Keep maintainer files and generated coverage
+  out of the archive while retaining consumer skills and runnable examples.
 
 * Add nullable Material style shortcuts for padding, minimum size, alignment,
   enabled/disabled colors, and mouse cursors to Elevated, Filled, Outlined, and
@@ -21,7 +20,7 @@
   indicators sized to the button text, loading/error/accessibility contracts,
   and a standalone example.
   Add design-specific `cupertino.dart` and `material.dart` entry points while
-  preserving the combined barrel. Depend directly on `cupertino_ui >=1.0.0 <2.0.0`
+  preserving the combined barrel. Depend directly on `cupertino_ui` 1.0.0+
   and validate both design libraries at exact lower bounds and latest compatible
   versions on the minimum SDK and stable. Shared async/transition helpers use
   Flutter widgets; Material presentation helpers stay in a separate source file.
@@ -37,10 +36,10 @@
   Async handlers retain the loading lock, handler failures propagate, and captured
   handlers still run after disposal without changing disposed widget state.
 
-* **Breaking:** use standalone `material_ui >=1.0.0 <2.0.0` for all Material
+* **Breaking:** use standalone `material_ui` 1.0.0+ for all Material
   widgets and public types. Applications must import
   `package:material_ui/material_ui.dart` for themes and `ButtonStyle` values.
-* **Breaking:** require Flutter >=3.44.0 and Dart >=3.12.0 <4.0.0.
+* **Breaking:** require Flutter 3.44.0+ and Dart 3.12.0+.
 * Honor inherited `FloatingActionButtonTheme` padding and icon spacing for
   extended FAB stack transitions, matching the native standalone button.
 * Preserve native icon padding, loading ownership, selection, keyboard,

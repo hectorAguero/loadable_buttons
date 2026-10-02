@@ -185,7 +185,7 @@ improves clarity without multiplying files or loading implementations.
   formatting, package/test/example analysis, plugin checks, DCL checks, tests,
   and whitespace validation. Check the exact minimum and stable SDKs with
   exact-oldest and latest-compatible Material UI resolution. The current v2
-  floor is Flutter 3.44 / Dart 3.12 with Material UI >=1.0.0 <2.0.0.
+  floor is Flutter 3.44 / Dart 3.12 with Material UI 1.0.0+.
 
 Useful existing regression owners are `async_button_icon_padding_test.dart`,
 `async_button_icon_interaction_test.dart`, `async_button_transition_test.dart`,

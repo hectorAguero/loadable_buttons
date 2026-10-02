@@ -5,9 +5,7 @@ description: Use when writing, reviewing, or migrating Flutter code that uses th
 
 # Using loadable_buttons
 
-This skill describes the implemented loadable_buttons 2.0 API. In a repository
-checkout, check `CHANGELOG.md` for release status; an unreleased source version
-does not mean the API is available on pub.dev. Each button wraps the native
+This skill describes the loadable_buttons 2.0 API. Each button wraps the native
 standalone Material UI or Cupertino UI button, shows loading content while
 work is pending, and blocks repeated activation. Only use the APIs listed here
 or in the package API reference; do not invent controllers, adaptive buttons,
