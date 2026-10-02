@@ -1,6 +1,7 @@
 import 'dart:ui' show PointerDeviceKind;
 
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart' show MouseCursorSession;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:loadable_buttons/loadable_buttons.dart';
 import 'package:material_ui/material_ui.dart';
@@ -462,16 +463,56 @@ void _mouseCursorTests(_Variant variant) {
     WidgetState.disabled: SystemMouseCursors.forbidden,
     WidgetState.any: SystemMouseCursors.grab,
   });
-  final cases = <({String name, ButtonStyle? style, MouseCursor? cursor})>[
-    (name: 'native default', style: null, cursor: null),
-    (name: 'supplied style', style: suppliedStyle, cursor: null),
-    (
-      name: 'plain shortcut over style',
-      style: suppliedStyle,
-      cursor: SystemMouseCursors.grab,
-    ),
-    (name: 'state shortcut', style: suppliedStyle, cursor: stateCursor),
-  ];
+  const themeStyle = ButtonStyle(
+    mouseCursor: WidgetStatePropertyAll(SystemMouseCursors.alias),
+  );
+  const cases =
+      <
+        ({
+          String name,
+          ButtonStyle? style,
+          ButtonStyle? themeStyle,
+          MouseCursor? cursor,
+        })
+      >[
+        (name: 'native default', style: null, themeStyle: null, cursor: null),
+        (
+          name: 'supplied style',
+          style: suppliedStyle,
+          themeStyle: null,
+          cursor: null,
+        ),
+        (
+          name: 'plain shortcut over style',
+          style: suppliedStyle,
+          themeStyle: null,
+          cursor: SystemMouseCursors.grab,
+        ),
+        (
+          name: 'state shortcut',
+          style: suppliedStyle,
+          themeStyle: null,
+          cursor: stateCursor,
+        ),
+        (
+          name: 'nullable shortcut over style',
+          style: suppliedStyle,
+          themeStyle: themeStyle,
+          cursor: _NullableStateCursor(),
+        ),
+        (
+          name: 'nullable shortcut over theme',
+          style: null,
+          themeStyle: themeStyle,
+          cursor: _NullableStateCursor(),
+        ),
+        (
+          name: 'nullable shortcut over native default',
+          style: null,
+          themeStyle: null,
+          cursor: _NullableStateCursor(),
+        ),
+      ];
 
   for (final cursorCase in cases) {
     testWidgets('${cursorCase.name} mouse cursor', (tester) async {
@@ -499,6 +540,7 @@ void _mouseCursorTests(_Variant variant) {
             style: cursorCase.style,
             mouseCursor: cursorCase.cursor,
           ),
+          themeStyle: cursorCase.themeStyle,
         );
 
         Future<MouseCursor?> hoveredCursor(Key key) async {
@@ -512,13 +554,17 @@ void _mouseCursorTests(_Variant variant) {
           return cursor;
         }
 
+        // Null shortcut results follow the native style, theme, and default
+        // resolution for the same state.
         final cursor = cursorCase.cursor;
-        final expected = cursor == null
-            ? await hoveredCursor(_nativeKey)
-            : WidgetStateProperty.resolveAs<MouseCursor>(cursor, {
-                if (state != _ButtonState.enabled) WidgetState.disabled,
-                WidgetState.hovered,
-              });
+        final expected =
+            (cursor == null
+                ? null
+                : WidgetStateProperty.resolveAs<MouseCursor?>(cursor, {
+                    if (state != _ButtonState.enabled) WidgetState.disabled,
+                    WidgetState.hovered,
+                  })) ??
+            await hoveredCursor(_nativeKey);
         expect(
           await hoveredCursor(_asyncKey),
           expected,
@@ -657,4 +703,21 @@ Color? _textColor(WidgetTester tester, Finder finder) =>
         ? tester.getTopLeft(within(find.byIcon(Icons.save))) - rect.topLeft
         : null,
   );
+}
+
+/// Resolves to null outside enabled states and fails if used unresolved.
+class _NullableStateCursor extends MouseCursor
+    implements WidgetStateProperty<MouseCursor?> {
+  const _NullableStateCursor();
+
+  @override
+  MouseCursor? resolve(Set<WidgetState> states) =>
+      states.contains(WidgetState.disabled) ? null : SystemMouseCursors.precise;
+
+  @override
+  MouseCursorSession createSession(int device) =>
+      throw UnsupportedError('Resolve this cursor before creating a session');
+
+  @override
+  String get debugDescription => '_NullableStateCursor';
 }

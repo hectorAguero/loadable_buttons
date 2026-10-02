@@ -271,7 +271,7 @@ AsyncFilledButton(
   style: FilledButton.styleFrom(shape: const StadiumBorder()),
   disabledBackgroundColor: Colors.blueGrey.shade100,
   padding: const EdgeInsetsDirectional.symmetric(horizontal: 32),
-  child: const Text(Save),
+  child: const Text('Save'),
 );
 ```
 
@@ -283,7 +283,9 @@ disabled and loading colors, and disabled colors keep the enabled ones.
 Overlay, shape, elevation, typography, and splash settings are unchanged.
 `foregroundColor` also colors icons without an explicit `iconColor` and the
 default spinner. A plain `mouseCursor` applies in every state, including
-loading; use a `WidgetStateMouseCursor` for state-dependent cursors. Null
+loading. A state-dependent cursor, such as a `WidgetStateMouseCursor`,
+resolves per state, with loading using the disabled state; where it resolves to
+null, the cursor falls back to `style`, the theme, and native defaults. Null
 shortcuts preserve the current behavior. `AsyncIconButton` and
 `AsyncFloatingActionButton` keep their native options.
 

@@ -58,7 +58,8 @@ mixin StackLoadingButton on ButtonStyleButton {
 /// leave disabled states to [style], disabled colors leave other states to
 /// [style], and states a shortcut doesn't cover keep resolving through [style],
 /// then the family theme and native defaults. A plain [mouseCursor] applies in
-/// every state; a [WidgetStateMouseCursor] resolves per state.
+/// every state; a state-dependent cursor resolves per state, and a null result
+/// falls back the same way.
 ButtonStyle? applyButtonStyleShortcuts(
   ButtonStyle? style, {
   EdgeInsetsGeometry? padding,
@@ -96,16 +97,22 @@ ButtonStyle? applyButtonStyleShortcuts(
       disabled: disabledForegroundColor,
       fallback: style?.foregroundColor,
     ),
-    mouseCursor: _composeMouseCursor(mouseCursor),
+    mouseCursor: _composeMouseCursor(mouseCursor, style?.mouseCursor),
   );
 }
 
-/// Applies a plain cursor in every state or resolves a state-aware cursor.
-WidgetStateProperty<MouseCursor?>? _composeMouseCursor(MouseCursor? cursor) {
-  if (cursor == null) return null;
+/// Resolves [cursor] per state while keeping [fallback] for null results.
+WidgetStateProperty<MouseCursor?>? _composeMouseCursor(
+  MouseCursor? cursor,
+  WidgetStateProperty<MouseCursor?>? fallback,
+) {
+  if (cursor == null) return fallback;
 
+  // Nullable resolution also accepts cursors that resolve to null per state.
   return WidgetStateProperty.resolveWith<MouseCursor?>(
-    (states) => WidgetStateProperty.resolveAs<MouseCursor>(cursor, states),
+    (states) =>
+        WidgetStateProperty.resolveAs<MouseCursor?>(cursor, states) ??
+        fallback?.resolve(states),
   );
 }
 

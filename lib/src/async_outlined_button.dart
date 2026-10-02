@@ -267,7 +267,9 @@ class AsyncOutlinedButton extends StatefulWidget {
   /// Overrides [ButtonStyle.mouseCursor] when non-null.
   ///
   /// A plain cursor applies in every state, including disabled and loading.
-  /// A [WidgetStateMouseCursor] resolves for each state.
+  /// A state-dependent cursor, such as a [WidgetStateMouseCursor], resolves
+  /// for each state; a null result falls back to [style], the theme, and
+  /// native defaults.
   final MouseCursor? mouseCursor;
 
   /// The focusNode of the button, OutlinedButton property.
