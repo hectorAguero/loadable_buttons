@@ -1,5 +1,10 @@
 ## 2.0.0 (unreleased)
 
+* Ship a `loadable-buttons-usage` agent skill, installable with
+  `dart run skills@ get --package loadable_buttons`, covering imports,
+  constructors, loading ownership, errors, accessibility, theming, sizing, and
+  custom loading content.
+
 * Add native `AsyncCupertinoButton`, `.filled`, and `.tinted` with Cupertino
   indicators sized to the button text, loading/error/accessibility contracts,
   and a standalone example.

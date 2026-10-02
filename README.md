@@ -412,6 +412,22 @@ AsyncIconButton.filled(
 Your application owns the selection state. If `selectedIcon` is omitted,
 `icon` is used for both states.
 
+## AI agent skill
+
+The package ships a `loadable-buttons-usage` skill that teaches coding agents
+its imports, constructors, loading and error contracts, accessibility, theming,
+and custom loading content. Install it from your application's root with the
+[skills CLI](https://pub.dev/packages/skills); select your agent with `--agent`
+(for example `claude`, `codex`, `copilot`, `cursor`, or `generic`):
+
+```sh
+dart run skills@ get --package loadable_buttons --agent claude
+```
+
+The CLI copies the skill into your agent's skills directory, such as
+`.claude/skills/`. Rerun it after upgrading loadable_buttons to update the
+skill. The package itself never installs agent configuration.
+
 ## FAQ
 
 <details>
