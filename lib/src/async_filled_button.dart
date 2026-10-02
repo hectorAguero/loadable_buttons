@@ -40,6 +40,14 @@ class AsyncFilledButton extends StatefulWidget {
     this.clipBehavior,
     this.statesController,
     this.style,
+    this.padding,
+    this.minimumSize,
+    this.alignment,
+    this.backgroundColor,
+    this.foregroundColor,
+    this.disabledBackgroundColor,
+    this.disabledForegroundColor,
+    this.mouseCursor,
     this.focusNode,
     this.onLongPress,
     this.onHover,
@@ -79,6 +87,14 @@ class AsyncFilledButton extends StatefulWidget {
     ValueChanged<bool>? onHover,
     ValueChanged<bool>? onFocusChange,
     ButtonStyle? style,
+    EdgeInsetsGeometry? padding,
+    Size? minimumSize,
+    AlignmentGeometry? alignment,
+    Color? backgroundColor,
+    Color? foregroundColor,
+    Color? disabledBackgroundColor,
+    Color? disabledForegroundColor,
+    MouseCursor? mouseCursor,
     FocusNode? focusNode,
     Clip? clipBehavior,
     WidgetStatesController? statesController,
@@ -107,6 +123,14 @@ class AsyncFilledButton extends StatefulWidget {
         clipBehavior: clipBehavior,
         statesController: statesController,
         style: style,
+        padding: padding,
+        minimumSize: minimumSize,
+        alignment: alignment,
+        backgroundColor: backgroundColor,
+        foregroundColor: foregroundColor,
+        disabledBackgroundColor: disabledBackgroundColor,
+        disabledForegroundColor: disabledForegroundColor,
+        mouseCursor: mouseCursor,
         focusNode: focusNode,
         onLongPress: onLongPress,
         onHover: onHover,
@@ -134,6 +158,14 @@ class AsyncFilledButton extends StatefulWidget {
       onFocusChange: onFocusChange,
       focusNode: focusNode,
       style: style,
+      padding: padding,
+      minimumSize: minimumSize,
+      alignment: alignment,
+      backgroundColor: backgroundColor,
+      foregroundColor: foregroundColor,
+      disabledBackgroundColor: disabledBackgroundColor,
+      disabledForegroundColor: disabledForegroundColor,
+      mouseCursor: mouseCursor,
       iconAlignment: iconAlignment,
       autofocus: autofocus,
       clipBehavior: clipBehavior ?? Clip.none,
@@ -163,6 +195,14 @@ class AsyncFilledButton extends StatefulWidget {
     this.clipBehavior,
     this.statesController,
     this.style,
+    this.padding,
+    this.minimumSize,
+    this.alignment,
+    this.backgroundColor,
+    this.foregroundColor,
+    this.disabledBackgroundColor,
+    this.disabledForegroundColor,
+    this.mouseCursor,
     this.focusNode,
     this.onLongPress,
     this.onHover,
@@ -195,6 +235,14 @@ class AsyncFilledButton extends StatefulWidget {
     ValueChanged<bool>? onHover,
     ValueChanged<bool>? onFocusChange,
     ButtonStyle? style,
+    EdgeInsetsGeometry? padding,
+    Size? minimumSize,
+    AlignmentGeometry? alignment,
+    Color? backgroundColor,
+    Color? foregroundColor,
+    Color? disabledBackgroundColor,
+    Color? disabledForegroundColor,
+    MouseCursor? mouseCursor,
     FocusNode? focusNode,
     Clip? clipBehavior,
     WidgetStatesController? statesController,
@@ -223,6 +271,14 @@ class AsyncFilledButton extends StatefulWidget {
         clipBehavior: clipBehavior ?? Clip.none,
         statesController: statesController,
         style: style,
+        padding: padding,
+        minimumSize: minimumSize,
+        alignment: alignment,
+        backgroundColor: backgroundColor,
+        foregroundColor: foregroundColor,
+        disabledBackgroundColor: disabledBackgroundColor,
+        disabledForegroundColor: disabledForegroundColor,
+        mouseCursor: mouseCursor,
         focusNode: focusNode,
         onLongPress: onLongPress,
         onHover: onHover,
@@ -246,6 +302,14 @@ class AsyncFilledButton extends StatefulWidget {
       onHover: onHover,
       onFocusChange: onFocusChange,
       style: style,
+      padding: padding,
+      minimumSize: minimumSize,
+      alignment: alignment,
+      backgroundColor: backgroundColor,
+      foregroundColor: foregroundColor,
+      disabledBackgroundColor: disabledBackgroundColor,
+      disabledForegroundColor: disabledForegroundColor,
+      mouseCursor: mouseCursor,
       focusNode: focusNode,
       autofocus: autofocus,
       clipBehavior: clipBehavior,
@@ -322,6 +386,50 @@ class AsyncFilledButton extends StatefulWidget {
   /// The style of the button, FilledButton property.
   final ButtonStyle? style;
 
+  /// Overrides [ButtonStyle.padding] in every state when non-null.
+  ///
+  /// Shortcuts take precedence over [style], then [FilledButtonTheme] and
+  /// native defaults. Null keeps the existing resolution, including icon
+  /// padding.
+  final EdgeInsetsGeometry? padding;
+
+  /// Overrides [ButtonStyle.minimumSize] in every state when non-null.
+  ///
+  /// Visual density, constraints, and tap-target sizing still apply natively.
+  final Size? minimumSize;
+
+  /// Overrides [ButtonStyle.alignment] when non-null.
+  final AlignmentGeometry? alignment;
+
+  /// Overrides the enabled [ButtonStyle.backgroundColor] when non-null.
+  ///
+  /// Disabled and loading states keep resolving through [style], the theme,
+  /// and native defaults unless [disabledBackgroundColor] is also supplied.
+  final Color? backgroundColor;
+
+  /// Overrides the enabled [ButtonStyle.foregroundColor] when non-null.
+  ///
+  /// Text, icons without an explicit icon color, and the default loading
+  /// indicator use it. Disabled states keep their existing colors unless
+  /// [disabledForegroundColor] is also supplied.
+  final Color? foregroundColor;
+
+  /// Overrides the disabled and loading [ButtonStyle.backgroundColor].
+  ///
+  /// Enabled states keep resolving through [style], the theme, and defaults.
+  final Color? disabledBackgroundColor;
+
+  /// Overrides the disabled and loading [ButtonStyle.foregroundColor].
+  ///
+  /// Enabled states keep resolving through [style], the theme, and defaults.
+  final Color? disabledForegroundColor;
+
+  /// Overrides [ButtonStyle.mouseCursor] when non-null.
+  ///
+  /// A plain cursor applies in every state, including disabled and loading.
+  /// A [WidgetStateMouseCursor] resolves for each state.
+  final MouseCursor? mouseCursor;
+
   /// The focusNode of the button, FilledButton property.
   final FocusNode? focusNode;
 
@@ -384,6 +492,18 @@ class _AsyncFilledButtonState extends State<AsyncFilledButton>
 
   @override
   Widget build(BuildContext context) {
+    final style = applyButtonStyleShortcuts(
+      widget.style ??
+          FilledButton.styleFrom(splashFactory: widget.splashFactory),
+      padding: widget.padding,
+      minimumSize: widget.minimumSize,
+      alignment: widget.alignment,
+      backgroundColor: widget.backgroundColor,
+      foregroundColor: widget.foregroundColor,
+      disabledBackgroundColor: widget.disabledBackgroundColor,
+      disabledForegroundColor: widget.disabledForegroundColor,
+      mouseCursor: widget.mouseCursor,
+    );
     final child = widget.transitionType == TransitionAnimationType.customBuilder
         ? widget.customBuilder?.call(
                 isLoading,
@@ -396,7 +516,7 @@ class _AsyncFilledButtonState extends State<AsyncFilledButton>
             loadingChild:
                 widget.loadingChild ??
                 DefaultLoadingIndicator(
-                  style: widget.style,
+                  style: style,
                   loadingSemanticsLabel: widget.loadingSemanticsLabel,
                   themeStyleOf: (context) =>
                       FilledButtonTheme.of(context).style,
@@ -414,12 +534,9 @@ class _AsyncFilledButtonState extends State<AsyncFilledButton>
     final onLongPress = isLoading || widget.onLongPress == null
         ? null
         : _handleLongPress;
-    final style =
-        widget.style ??
-        FilledButton.styleFrom(splashFactory: widget.splashFactory);
     final clipBehavior = resolveButtonClipBehavior(
       clipBehavior: widget.clipBehavior,
-      style: widget.style,
+      style: style,
       themeStyle: FilledButtonTheme.of(context).style,
     );
 

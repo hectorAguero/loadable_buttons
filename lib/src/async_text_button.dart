@@ -36,6 +36,14 @@ class AsyncTextButton extends StatefulWidget {
     this.clipBehavior,
     this.statesController,
     this.style,
+    this.padding,
+    this.minimumSize,
+    this.alignment,
+    this.backgroundColor,
+    this.foregroundColor,
+    this.disabledBackgroundColor,
+    this.disabledForegroundColor,
+    this.mouseCursor,
     this.focusNode,
     this.onLongPress,
     this.onHover,
@@ -67,6 +75,14 @@ class AsyncTextButton extends StatefulWidget {
     ValueChanged<bool>? onHover,
     ValueChanged<bool>? onFocusChange,
     ButtonStyle? style,
+    EdgeInsetsGeometry? padding,
+    Size? minimumSize,
+    AlignmentGeometry? alignment,
+    Color? backgroundColor,
+    Color? foregroundColor,
+    Color? disabledBackgroundColor,
+    Color? disabledForegroundColor,
+    MouseCursor? mouseCursor,
     FocusNode? focusNode,
     Clip? clipBehavior,
     WidgetStatesController? statesController,
@@ -95,6 +111,14 @@ class AsyncTextButton extends StatefulWidget {
         clipBehavior: clipBehavior,
         statesController: statesController,
         style: style,
+        padding: padding,
+        minimumSize: minimumSize,
+        alignment: alignment,
+        backgroundColor: backgroundColor,
+        foregroundColor: foregroundColor,
+        disabledBackgroundColor: disabledBackgroundColor,
+        disabledForegroundColor: disabledForegroundColor,
+        mouseCursor: mouseCursor,
         focusNode: focusNode,
         onLongPress: onLongPress,
         onHover: onHover,
@@ -122,6 +146,14 @@ class AsyncTextButton extends StatefulWidget {
       onFocusChange: onFocusChange,
       focusNode: focusNode,
       style: style,
+      padding: padding,
+      minimumSize: minimumSize,
+      alignment: alignment,
+      backgroundColor: backgroundColor,
+      foregroundColor: foregroundColor,
+      disabledBackgroundColor: disabledBackgroundColor,
+      disabledForegroundColor: disabledForegroundColor,
+      mouseCursor: mouseCursor,
       iconAlignment: iconAlignment,
       autofocus: autofocus,
       clipBehavior: clipBehavior ?? Clip.none,
@@ -194,6 +226,50 @@ class AsyncTextButton extends StatefulWidget {
   /// The style of the button, TextButton property.
   final ButtonStyle? style;
 
+  /// Overrides [ButtonStyle.padding] in every state when non-null.
+  ///
+  /// Shortcuts take precedence over [style], then [TextButtonTheme] and
+  /// native defaults. Null keeps the existing resolution, including icon
+  /// padding.
+  final EdgeInsetsGeometry? padding;
+
+  /// Overrides [ButtonStyle.minimumSize] in every state when non-null.
+  ///
+  /// Visual density, constraints, and tap-target sizing still apply natively.
+  final Size? minimumSize;
+
+  /// Overrides [ButtonStyle.alignment] when non-null.
+  final AlignmentGeometry? alignment;
+
+  /// Overrides the enabled [ButtonStyle.backgroundColor] when non-null.
+  ///
+  /// Disabled and loading states keep resolving through [style], the theme,
+  /// and native defaults unless [disabledBackgroundColor] is also supplied.
+  final Color? backgroundColor;
+
+  /// Overrides the enabled [ButtonStyle.foregroundColor] when non-null.
+  ///
+  /// Text, icons without an explicit icon color, and the default loading
+  /// indicator use it. Disabled states keep their existing colors unless
+  /// [disabledForegroundColor] is also supplied.
+  final Color? foregroundColor;
+
+  /// Overrides the disabled and loading [ButtonStyle.backgroundColor].
+  ///
+  /// Enabled states keep resolving through [style], the theme, and defaults.
+  final Color? disabledBackgroundColor;
+
+  /// Overrides the disabled and loading [ButtonStyle.foregroundColor].
+  ///
+  /// Enabled states keep resolving through [style], the theme, and defaults.
+  final Color? disabledForegroundColor;
+
+  /// Overrides [ButtonStyle.mouseCursor] when non-null.
+  ///
+  /// A plain cursor applies in every state, including disabled and loading.
+  /// A [WidgetStateMouseCursor] resolves for each state.
+  final MouseCursor? mouseCursor;
+
   /// The focusNode of the button, TextButton property.
   final FocusNode? focusNode;
 
@@ -254,6 +330,18 @@ class _AsyncTextButtonState extends State<AsyncTextButton>
 
   @override
   Widget build(BuildContext context) {
+    final style = applyButtonStyleShortcuts(
+      widget.style ?? TextButton.styleFrom(splashFactory: widget.splashFactory),
+      padding: widget.padding,
+      minimumSize: widget.minimumSize,
+      alignment: widget.alignment,
+      backgroundColor: widget.backgroundColor,
+      foregroundColor: widget.foregroundColor,
+      disabledBackgroundColor: widget.disabledBackgroundColor,
+      disabledForegroundColor: widget.disabledForegroundColor,
+      mouseCursor: widget.mouseCursor,
+    );
+
     return _LoadingTextButton(
       hasIcon: widget is _AsyncTextButtonWithIcon,
       onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
@@ -262,14 +350,12 @@ class _AsyncTextButtonState extends State<AsyncTextButton>
           : _handleLongPress,
       onHover: widget.onHover,
       onFocusChange: widget.onFocusChange,
-      style:
-          widget.style ??
-          TextButton.styleFrom(splashFactory: widget.splashFactory),
+      style: style,
       focusNode: widget.focusNode,
       autofocus: widget.autofocus,
       clipBehavior: resolveButtonClipBehavior(
         clipBehavior: widget.clipBehavior,
-        style: widget.style,
+        style: style,
         themeStyle: TextButtonTheme.of(context).style,
       ),
       statesController: widget.statesController,
@@ -285,7 +371,7 @@ class _AsyncTextButtonState extends State<AsyncTextButton>
               loadingChild:
                   widget.loadingChild ??
                   DefaultLoadingIndicator(
-                    style: widget.style,
+                    style: style,
                     loadingSemanticsLabel: widget.loadingSemanticsLabel,
                     themeStyleOf: (context) =>
                         TextButtonTheme.of(context).style,

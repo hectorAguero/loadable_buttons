@@ -51,6 +51,78 @@ mixin StackLoadingButton on ButtonStyleButton {
   }
 }
 
+/// Applies optional constructor shortcuts over the supplied [style].
+///
+/// Returns [style] unchanged when every shortcut is null. Otherwise, each
+/// non-null shortcut replaces only its property and state. Enabled colors
+/// leave disabled states to [style], disabled colors leave other states to
+/// [style], and states a shortcut doesn't cover keep resolving through [style],
+/// then the family theme and native defaults. A plain [mouseCursor] applies in
+/// every state; a [WidgetStateMouseCursor] resolves per state.
+ButtonStyle? applyButtonStyleShortcuts(
+  ButtonStyle? style, {
+  EdgeInsetsGeometry? padding,
+  Size? minimumSize,
+  AlignmentGeometry? alignment,
+  Color? backgroundColor,
+  Color? foregroundColor,
+  Color? disabledBackgroundColor,
+  Color? disabledForegroundColor,
+  MouseCursor? mouseCursor,
+}) {
+  if (padding == null &&
+      minimumSize == null &&
+      alignment == null &&
+      backgroundColor == null &&
+      foregroundColor == null &&
+      disabledBackgroundColor == null &&
+      disabledForegroundColor == null &&
+      mouseCursor == null) {
+    return style;
+  }
+
+  return (style ?? const ButtonStyle()).copyWith(
+    padding: padding == null
+        ? null
+        : WidgetStatePropertyAll<EdgeInsetsGeometry?>(padding),
+    minimumSize: minimumSize == null
+        ? null
+        : WidgetStatePropertyAll<Size?>(minimumSize),
+    alignment: alignment,
+    backgroundColor: _composeStateColor(
+      enabled: backgroundColor,
+      disabled: disabledBackgroundColor,
+      fallback: style?.backgroundColor,
+    ),
+    foregroundColor: _composeStateColor(
+      enabled: foregroundColor,
+      disabled: disabledForegroundColor,
+      fallback: style?.foregroundColor,
+    ),
+    mouseCursor: mouseCursor == null
+        ? null
+        : WidgetStateProperty.resolveWith<MouseCursor?>(
+            (states) =>
+                WidgetStateProperty.resolveAs<MouseCursor>(mouseCursor, states),
+          ),
+  );
+}
+
+/// Overrides enabled or disabled colors while keeping [fallback] per state.
+WidgetStateProperty<Color?>? _composeStateColor({
+  required Color? enabled,
+  required Color? disabled,
+  required WidgetStateProperty<Color?>? fallback,
+}) {
+  if (enabled == null && disabled == null) return fallback;
+
+  return WidgetStateProperty.resolveWith<Color?>(
+    (states) =>
+        (states.contains(WidgetState.disabled) ? disabled : enabled) ??
+        fallback?.resolve(states),
+  );
+}
+
 /// Keeps Material's original clipping policy when adding the loading layer.
 Clip resolveButtonClipBehavior({
   required Clip? clipBehavior,

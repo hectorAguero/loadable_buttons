@@ -1,5 +1,13 @@
 ## 2.0.0 (unreleased)
 
+* Add optional `padding`, `minimumSize`, `alignment`, `backgroundColor`,
+  `foregroundColor`, `disabledBackgroundColor`, `disabledForegroundColor`, and
+  `mouseCursor` shortcuts to every Elevated, Filled, Outlined, and Text
+  constructor, including `.icon`, `.tonal`, `.tonalIcon`, and null-icon
+  fallbacks. Shortcuts override only their property and state, then defer to
+  `style`, the family theme, and native defaults per state. Omitting them
+  preserves existing behavior.
+
 * Ship a `loadable-buttons-usage` agent skill, installable with
   `dart run skills@ get --package loadable_buttons`, covering imports,
   constructors, loading ownership, errors, accessibility, theming, sizing, and

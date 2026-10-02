@@ -207,6 +207,16 @@ spinner. It defaults to `null`; the package provides no English fallback.
 - The default Material spinner uses the style's enabled `foregroundColor`,
   then the family theme, then the ambient icon or text color. Set the
   foreground color in `style` to change it; FABs use `foregroundColor`.
+- Elevated, Filled, Outlined, and Text constructors (including `.icon`,
+  `.tonal`, and `.tonalIcon`) also accept optional `padding`, `minimumSize`,
+  `alignment`, `backgroundColor`, `foregroundColor`,
+  `disabledBackgroundColor`, `disabledForegroundColor`, and `mouseCursor`.
+  Each non-null shortcut overrides only its property and state, before
+  `style`, the family theme, and native defaults; uncovered states keep the
+  `style` resolver. Use `disabledBackgroundColor` and
+  `disabledForegroundColor` for the loading appearance, since loading
+  disables the native button. A plain `mouseCursor` applies in every state.
+  Keep using `style` for other properties such as `shape` or `overlayColor`.
 - Cupertino buttons accept native `sizeStyle`, `padding`, `color`,
   `foregroundColor`, `disabledColor`, `minimumSize`, `pressedOpacity`,
   `borderRadius`, `alignment`, and focus options. Use `minimumSize`; `minSize`

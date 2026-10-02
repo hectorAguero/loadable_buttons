@@ -141,7 +141,8 @@ style arguments to standalone types. See the
 
 Use native Material options such as `style`, or Cupertino options such as
 `sizeStyle`, `minimumSize`, `padding`, and `foregroundColor`. Both support
-`focusNode`.
+`focusNode`. Elevated, Filled, Outlined, and Text buttons also accept optional
+[style shortcuts](#material-style-shortcuts).
 For each widget's supported properties, see the
 [API reference](https://pub.dev/documentation/loadable_buttons/latest/).
 
@@ -255,6 +256,36 @@ AsyncElevatedButton(
 
 `animationDuration` defaults to 200 milliseconds (`Durations.medium1` in
 Material); `minimumChildOpacity` defaults to `0.0` for stack transitions.
+
+### Material style shortcuts
+
+Every `AsyncElevatedButton`, `AsyncFilledButton`, `AsyncOutlinedButton`, and
+`AsyncTextButton` constructor, including `.icon`, `.tonal`, and `.tonalIcon`,
+accepts optional `padding`, `minimumSize`, `alignment`, `backgroundColor`,
+`foregroundColor`, `disabledBackgroundColor`, `disabledForegroundColor`, and
+`mouseCursor`:
+
+```dart
+AsyncFilledButton(
+  onPressed: saveChanges,
+  style: FilledButton.styleFrom(shape: const StadiumBorder()),
+  disabledBackgroundColor: Colors.blueGrey.shade100,
+  padding: const EdgeInsetsDirectional.symmetric(horizontal: 32),
+  child: const Text(Save),
+);
+```
+
+Each non-null shortcut overrides only its property and state, then falls back
+to `style`, the family theme (such as `FilledButtonThemeData`), and native
+defaults. State-dependent `style` resolvers still apply to states a shortcut
+does not cover, even when they return null. Enabled colors keep the existing
+disabled and loading colors, and disabled colors keep the enabled ones.
+Overlay, shape, elevation, typography, and splash settings are unchanged.
+`foregroundColor` also colors icons without an explicit `iconColor` and the
+default spinner. A plain `mouseCursor` applies in every state, including
+loading; use a `WidgetStateMouseCursor` for state-dependent cursors. Null
+shortcuts preserve the current behavior. `AsyncIconButton` and
+`AsyncFloatingActionButton` keep their native options.
 
 ### Sizing and text scaling
 
