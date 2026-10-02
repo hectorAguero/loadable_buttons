@@ -1,4 +1,4 @@
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 
 /// The type of animation between idle and loading content.
 enum TransitionAnimationType {

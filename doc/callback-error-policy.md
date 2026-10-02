@@ -10,7 +10,7 @@ it returns. It does not intercept `onLongPress`, builders, or unreturned/unawait
 application Futures.
 
 - Without a handler, the original error propagates with its original stack trace.
-  Native Material activation accepts a synchronous callback, so an unhandled
+  Native button activation accepts a synchronous callback, so an unhandled
   failure reaches the caller's zone through the package's handler Future.
 - Supplying `onError` explicitly consumes the callback error when the handler
   completes successfully. The package does not also log or report that error.
@@ -30,5 +30,5 @@ application Futures.
   check their own lifecycle before accessing captured state or context.
 
 The package introduces no persistent error state, Snackbar, dialog, retry policy,
-or cancellation policy. Future Cupertino/adaptive buttons and shared controllers
-must use this contract rather than introduce another error route.
+or cancellation policy. Material and Cupertino buttons share this contract. Future adaptive buttons and
+shared controllers must preserve it.

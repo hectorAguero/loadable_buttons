@@ -1,15 +1,15 @@
 # Development and linting
 
 Version 2 supports Flutter **3.44.0+**, Dart **3.12.0+**, and standalone
-**material_ui >=1.0.0 <2.0.0**. CI tests the exact Flutter minimum declared in
-`pubspec.yaml` and the moving stable channel, each with exact Material UI 1.0.0
-and the newest compatible Material UI release. See
+**material_ui >=1.0.0 <2.0.0** and **cupertino_ui >=1.0.0 <2.0.0**. CI tests
+the exact Flutter minimum declared in `pubspec.yaml` and the moving stable
+channel, each with exact Material UI and Cupertino UI 1.0.0 and their newest compatible releases. See
 [the compatibility roadmap](doc/compatibility-roadmap.md).
 
 Both the minimum Flutter 3.44 / Dart 3.12 SDK and current stable run the full
 analyzer-plugin checks with strict casts, inference, and raw types. Infos and
 warnings fail validation. CI also runs the isolated DCL CLI on both SDKs in
-the latest-compatible Material UI jobs; plugin checks run in all four jobs.
+the latest-compatible design-library jobs; plugin checks run in all four jobs.
 
 ## Why these three lint packages
 
@@ -126,7 +126,7 @@ Run these checks with either supported SDK selected on `PATH`:
 
 ```sh
 flutter --version
-bash tool/resolve_material_ui.sh latest
+bash tool/resolve_design_ui.sh latest
 dart format --output=none --set-exit-if-changed lib test example/lib
 bash tool/analyze.sh
 (cd tool/dcl && dart pub get)
@@ -139,13 +139,14 @@ Flutter 3.44.0 runs the same plugin and CLI checks as stable; no minimum-SDK
 plugin bypass is needed. Do not claim minimum compatibility from a stable-only
 run.
 
-Run `bash tool/resolve_material_ui.sh oldest` in an isolated checkout to pin
-exact Material UI 1.0.0 for both the package and example. The script refuses to
-replace existing overrides, removes its temporary overrides on exit, and checks
+Run `bash tool/resolve_design_ui.sh oldest` in an isolated checkout to pin
+exact Material UI and Cupertino UI 1.0.0 for both the package and example.
+The script refuses to replace existing overrides, removes its temporary
+overrides on exit, and checks
 the resolved versions. Then run the same analysis and `flutter test --no-pub`
 checks; keep `--no-pub` so the verified resolution stays in use. Run this on the
-exact minimum and stable SDKs. The latest mode unlocks Material UI and all its
-transitive dependencies to resolve their newest compatible versions. Finish the
+exact minimum and stable SDKs. The latest mode unlocks both design libraries
+and all their transitive dependencies to resolve their newest compatible versions. Finish the
 primary checkout with latest resolution on stable.
 
 After changing SDKs or moving a checkout, run the dependency-resolution script

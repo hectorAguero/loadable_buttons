@@ -11,14 +11,14 @@ permissions:
 
 jobs:
   validate:
-    name: Flutter ${{ matrix.sdk }} / Material ${{ matrix.material }}
+    name: Flutter ${{ matrix.sdk }} / Design UI ${{ matrix.design }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
         sdk: [minimum, stable]
-        material: [oldest, latest]
+        design: [oldest, latest]
 
     steps:
       - uses: actions/checkout@v7
@@ -59,8 +59,8 @@ jobs:
 
       # Resolve anew after selecting the SDK, including the example's own graph.
       # Do not cache .dart_tool: it contains SDK and checkout-specific paths.
-      - name: Resolve and Verify Material UI Dependencies
-        run: bash tool/resolve_material_ui.sh ${{ matrix.material }}
+      - name: Resolve and Verify Design UI Dependencies
+        run: bash tool/resolve_design_ui.sh ${{ matrix.design }}
 
       - name: Check Formatting
         run: dart format --output=none --set-exit-if-changed lib test example/lib
@@ -71,12 +71,12 @@ jobs:
       # Keep lint-tool dependencies separate from Flutter's SDK-pinned graph.
       # Validate the CLI once per SDK; plugin checks run in every matrix job.
       - name: Resolve Lint Tools
-        if: matrix.material == 'latest'
+        if: matrix.design == 'latest'
         working-directory: tool/dcl
         run: dart pub get
 
       - name: Check Dart Code Linter Rules
-        if: matrix.material == 'latest'
+        if: matrix.design == 'latest'
         run: bash tool/check_dcl.sh
 
       - name: Run Tests

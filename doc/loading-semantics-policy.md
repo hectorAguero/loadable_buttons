@@ -3,9 +3,9 @@
 This is the v2 accessibility contract for
 [#36](https://github.com/hectorAguero/loadable_buttons/issues/36).
 
-All current Material constructors accept optional `String? loadingSemanticsLabel`.
-Future Cupertino/adaptive constructors must expose the same name, null default,
-and content ownership policy. Those families are not implemented yet.
+All Material and Cupertino constructors accept optional
+`String? loadingSemanticsLabel` with the same null default and content ownership
+policy. Future adaptive constructors must preserve that contract.
 
 - Built-in transitions forward the label only to their default indicator.
   Applications supply a localized description of the operation; the package

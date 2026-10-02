@@ -45,13 +45,13 @@ void main() {
             expect(find.text('Busy'), findsNothing);
             if (transition == TransitionAnimationType.customBuilder) {
               expect(
-                tester.getSemantics(materialButton).getSemanticsData().label,
+                tester.getSemantics(nativeButton).getSemanticsData().label,
                 contains('Custom idle'),
               );
             } else {
               expect(customBuilds, 0);
             }
-            await tester.tap(materialButton);
+            await tester.tap(nativeButton);
             // Text loading content has no indefinite animation. Settling also
             // waits for outgoing switcher entries in either direction.
             await tester.pumpAndSettle();
@@ -63,14 +63,14 @@ void main() {
             );
             if (transition == TransitionAnimationType.customBuilder) {
               expect(
-                tester.getSemantics(materialButton).getSemanticsData().label,
+                tester.getSemantics(nativeButton).getSemanticsData().label,
                 contains('Custom busy'),
               );
             } else {
               expect(customBuilds, 0);
             }
             expect(find.text('Missing loader'), findsNothing);
-            expect(find.byType(CircularProgressIndicator), findsNothing);
+            expect(defaultLoadingIndicator, findsNothing);
             if (transition != TransitionAnimationType.stack) {
               expect(find.text('Run'), findsNothing);
             }
@@ -80,7 +80,7 @@ void main() {
             expect(find.text('Busy'), findsNothing);
             if (transition == TransitionAnimationType.customBuilder) {
               expect(
-                tester.getSemantics(materialButton).getSemanticsData().label,
+                tester.getSemantics(nativeButton).getSemanticsData().label,
                 contains('Custom idle'),
               );
             } else {
@@ -108,7 +108,7 @@ void main() {
           );
           expect(find.text('Run'), findsOneWidget);
           expect(find.text('Fallback'), findsNothing);
-          await tester.tap(materialButton);
+          await tester.tap(nativeButton);
           await tester.pumpAndSettle();
           expect(find.text('Run'), findsNothing);
           expect(find.bySemanticsLabel('Fallback'), findsOneWidget);
@@ -116,7 +116,7 @@ void main() {
             find.semantics.byLabel(RegExp('Ignored default label')),
             findsNothing,
           );
-          expect(find.byType(CircularProgressIndicator), findsNothing);
+          expect(defaultLoadingIndicator, findsNothing);
           pending.complete();
           await tester.pumpAndSettle();
           expect(find.text('Run'), findsOneWidget);
@@ -154,7 +154,7 @@ void main() {
                 ),
               ),
             );
-            await tester.tap(materialButton);
+            await tester.tap(nativeButton);
             await tester.pump();
             if (asynchronous) pending.completeError(failure, originalTrace);
             await tester.pump();
@@ -164,9 +164,9 @@ void main() {
           expect(errors, hasLength(1));
           expect(errors.single.$1, same(failure));
           expect(errors.single.$2.toString(), originalTrace.toString());
-          expect(find.byType(CircularProgressIndicator), findsNothing);
+          expect(defaultLoadingIndicator, findsNothing);
           await tester.pumpAndSettle();
-          await tester.tap(materialButton);
+          await tester.tap(nativeButton);
           await tester.pumpAndSettle();
           expect(calls, 2);
           expect(errors, hasLength(1));
@@ -191,9 +191,9 @@ void main() {
             ),
           ),
         );
-        await tester.tap(materialButton);
+        await tester.tap(nativeButton);
         await tester.pump();
-        expect(find.byType(CircularProgressIndicator), findsOneWidget);
+        expect(defaultLoadingIndicator, findsOneWidget);
         await tester.pumpWidget(buttonHost(const Text('Removed')));
         pending.complete();
         await tester.pumpAndSettle();
@@ -258,7 +258,7 @@ void main() {
               expect(find.semantics.byLabel('Run'), findsNothing);
               expect(find.semantics.byLabel('Selected'), findsNothing);
               final outer = tester
-                  .getSemantics(materialButton)
+                  .getSemantics(nativeButton)
                   .getSemanticsData();
               expect(outer.flagsCollection.isButton, isTrue);
               expect(outer.flagsCollection.isEnabled, Tristate.isFalse);
@@ -274,7 +274,7 @@ void main() {
             await tester.pump(_duration ~/ 2);
             expect(
               tester
-                  .getSemantics(find.byType(CircularProgressIndicator))
+                  .getSemantics(defaultLoadingIndicator)
                   .getSemanticsData()
                   .label,
               isEmpty,
@@ -309,7 +309,7 @@ void main() {
             await tester.pump(_duration ~/ 2);
             expectIdleLabel();
             await tester.pumpAndSettle();
-            expect(find.byType(CircularProgressIndicator), findsNothing);
+            expect(defaultLoadingIndicator, findsNothing);
             tester.semantics.performAction(
               find.semantics.byLabel(idleLabel),
               SemanticsAction.tap,
@@ -329,7 +329,9 @@ void main() {
   // and FAB have distinct native controls, so cover their activation here.
   for (final entry in asyncButtonBuilders.entries.where(
     (entry) =>
-        entry.key.startsWith('Icon') || entry.key.startsWith('Floating action'),
+        entry.key.startsWith('Cupertino') ||
+        entry.key.startsWith('Icon') ||
+        entry.key.startsWith('Floating action'),
   )) {
     testWidgets(
       '${entry.key} gates keyboard and semantic tap actions on loading',
@@ -354,7 +356,7 @@ void main() {
             ),
           );
           void expectLoading() {
-            final data = tester.getSemantics(materialButton).getSemanticsData();
+            final data = tester.getSemantics(nativeButton).getSemanticsData();
             // flagsCollection is unavailable on Flutter 3.29.
             // ignore: deprecated_member_use
             expect(data.hasFlag(SemanticsFlag.hasEnabledState), isTrue);
@@ -384,7 +386,7 @@ void main() {
 
           await tester.pumpWidget(host(false));
           await tester.pumpAndSettle();
-          final node = tester.getSemantics(materialButton);
+          final node = tester.getSemantics(nativeButton);
           expect(
             node.getSemanticsData().hasAction(SemanticsAction.tap),
             isTrue,

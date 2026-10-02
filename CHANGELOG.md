@@ -1,5 +1,14 @@
 ## 2.0.0 (unreleased)
 
+* Add native `AsyncCupertinoButton`, `.filled`, and `.tinted` with Cupertino
+  indicators sized to the button text, loading/error/accessibility contracts,
+  and a standalone example.
+  Add design-specific `cupertino.dart` and `material.dart` entry points while
+  preserving the combined barrel. Depend directly on `cupertino_ui >=1.0.0 <2.0.0`
+  and validate both design libraries at exact lower bounds and latest compatible
+  versions on the minimum SDK and stable. Shared async/transition helpers use
+  Flutter widgets; Material presentation helpers stay in a separate source file.
+
 * Add optional localized `loadingSemanticsLabel` to every Material constructor,
   including tonal, selected-icon, and extended FAB loading paths. Labels apply
   only to default spinners; custom loading content owns its semantics and live

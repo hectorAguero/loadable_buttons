@@ -27,8 +27,9 @@ on Dart 3.12 and stable. Their independent dependency graphs keep analyzer
 requirements separate from Flutter's SDK-pinned consumer and test dependencies.
 
 CI runs four SDK/dependency combinations: exact Flutter 3.44.0 and current
-stable, each with exact Material UI 1.0.0 and the latest compatible resolution.
-`tool/resolve_material_ui.sh` uses temporary overrides in both package roots for
+stable, each with exact Material UI and Cupertino UI 1.0.0 and the latest compatible
+resolution.
+`tool/resolve_design_ui.sh` uses temporary overrides in both package roots for
 the exact lower-bound check and verifies the resolved versions. Analysis,
 formatting, and the full contract suite run against each resolved graph. See
 [the migration guide](../README.md#migrating-from-1x) for downstream import/type
@@ -49,7 +50,8 @@ retain interaction with custom loading content.
 
 ## Version 2 validation
 
-Validated locally on October 2, 2026 in isolated dependency graphs:
+The Material migration baseline, before the later error, loading-semantics,
+and Cupertino features, was validated on October 2, 2026 in isolated graphs:
 
 | Flutter | Dart | Material UI | Full contract suite |
 | --- | --- | --- | --- |
@@ -67,6 +69,30 @@ The inherited-FAB native-reference matrix failed eight cases before the lookup
 fix and passed afterward. It checks inherited and empty inherited themes,
 explicit overrides, typography, icon spacing, LTR/RTL, and centered loading
 content without fixing expectations to a particular Material release.
+
+## Cupertino support
+
+Version 2 also depends directly on standalone `cupertino_ui >=1.0.0 <2.0.0`.
+The inclusive 1.0.0 floor provides default, filled, and tinted CupertinoButton
+variants on Flutter 3.44 / Dart 3.12. Cupertino UI 1.1.1 raises its own minimum
+to Flutter 3.47 / Dart 3.13; Pub selects a compatible release for each SDK.
+`cupertino.dart` exposes Cupertino buttons and shared contracts without Material
+implementation imports. See the
+[Cupertino contract matrix](cupertino-button-contract.md).
+
+The complete suite, including Cupertino, passed on October 2, 2026:
+
+| Flutter | Dart | Material UI | Cupertino UI | Full suite |
+| --- | --- | --- | --- | --- |
+| 3.44.0 | 3.12.0 | 1.0.0 | 1.0.0 | 805 passed |
+| 3.44.0 | 3.12.0 | 1.2.0 | 1.0.2 | 805 passed |
+| 3.47.5 (stable) | 3.13.4 | 1.0.0 | 1.0.0 | 805 passed |
+| 3.47.5 (stable) | 3.13.4 | 1.5.0 | 1.1.1 | 805 passed |
+
+Formatting, package/test/example analysis, analyzer plugins, and the DCL CLI
+passed in all four graphs. The standalone Cupertino macOS example built and
+hot reloaded successfully; save, handled-error, and external-loading flows
+were exercised through the UI with no runtime errors.
 
 ## Flutter 3.22 compatibility check
 

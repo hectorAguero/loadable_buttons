@@ -38,11 +38,11 @@ void main() {
         await tester.pumpWidget(host(false));
         await tester.tapAt(position);
         expect(calls, 1);
-        expect(find.byType(CircularProgressIndicator), findsOneWidget);
+        expect(defaultLoadingIndicator, findsOneWidget);
 
         pending.complete();
         await tester.pump();
-        expect(find.byType(CircularProgressIndicator), findsNothing);
+        expect(defaultLoadingIndicator, findsNothing);
 
         await tester.tapAt(position);
         await tester.pump();
@@ -75,10 +75,10 @@ void main() {
         await tester.pump();
         await tester.tapAt(position);
         expect(calls, 1);
-        expect(find.byType(CircularProgressIndicator), findsOneWidget);
+        expect(defaultLoadingIndicator, findsOneWidget);
 
         await tester.pumpWidget(host(false));
-        expect(find.byType(CircularProgressIndicator), findsNothing);
+        expect(defaultLoadingIndicator, findsNothing);
         await tester.tapAt(position);
         await tester.pump();
         expect(calls, 2);

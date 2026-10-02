@@ -36,7 +36,7 @@ void main() {
               ),
             ),
           );
-          await tester.tap(materialButton);
+          await tester.tap(nativeButton);
           await tester.pump();
           if (asynchronous) pending.completeError(failure, originalTrace);
           await tester.pumpAndSettle();
@@ -47,7 +47,7 @@ void main() {
         expect(uncaught, isEmpty);
         expect(find.bySemanticsLabel('Run'), findsOneWidget);
         expect(find.bySemanticsLabel('Busy'), findsNothing);
-        await tester.tap(materialButton);
+        await tester.tap(nativeButton);
         await tester.pumpAndSettle();
         expect(calls, 2);
         expect(handled, hasLength(1));
@@ -84,7 +84,7 @@ void main() {
         ),
       );
       await tester.pumpWidget(host(false));
-      final activate = tester.widget<ElevatedButton>(materialButton).onPressed;
+      final activate = tester.widget<ElevatedButton>(nativeButton).onPressed;
       if (activate == null) throw StateError('Missing activation callback');
       // Stale native callbacks must also honor the synchronous reentry lock.
       activate();
@@ -93,7 +93,7 @@ void main() {
       operation.completeError(StateError('Operation failed'));
       await tester.pumpAndSettle();
       activate();
-      await tester.tap(materialButton);
+      await tester.tap(nativeButton);
       expect(calls, 1);
       expect(handlerCalls, 1);
       expect(find.bySemanticsLabel('Busy'), findsOneWidget);
@@ -113,7 +113,7 @@ void main() {
 
       await tester.pumpWidget(host(false));
       await tester.pumpAndSettle();
-      await tester.tap(materialButton);
+      await tester.tap(nativeButton);
       await tester.pumpAndSettle();
       expect(calls, 2);
       expect(handlerCalls, 1);
@@ -153,7 +153,7 @@ void main() {
               ),
             ),
           );
-          await tester.tap(materialButton);
+          await tester.tap(nativeButton);
           await tester.pump();
           if (asynchronous) recovery.completeError(failure, handlerTrace);
           await tester.pumpAndSettle();
@@ -163,7 +163,7 @@ void main() {
         expect(uncaught.single.$2.toString(), handlerTrace.toString());
         expect(handlerCalls, 1);
         expect(find.bySemanticsLabel('Busy'), findsNothing);
-        await tester.tap(materialButton);
+        await tester.tap(nativeButton);
         await tester.pumpAndSettle();
         expect(calls, 2);
         expect(handlerCalls, 1);
@@ -192,13 +192,13 @@ void main() {
       ),
     );
     await tester.pumpWidget(host((_, _) => originalCalls++));
-    await tester.tap(materialButton);
+    await tester.tap(nativeButton);
     await tester.pumpWidget(host((_, _) => replacementCalls++));
     operation.completeError(StateError('Operation failed'));
     await tester.pumpAndSettle();
     expect(originalCalls, 1);
     expect(replacementCalls, 0);
-    await tester.tap(materialButton);
+    await tester.tap(nativeButton);
     await tester.pumpAndSettle();
     expect(callbackCalls, 2);
     expect(originalCalls, 1);
@@ -228,7 +228,7 @@ void main() {
               ),
             ),
           );
-          await tester.tap(materialButton);
+          await tester.tap(nativeButton);
           await tester.pumpWidget(buttonHost(const Text('Removed')));
           operation.completeError(failure, originalTrace);
           await tester.pump();
@@ -273,7 +273,7 @@ void main() {
               ),
             ),
           );
-          await tester.tap(materialButton);
+          await tester.tap(nativeButton);
           await tester.pumpAndSettle();
           await tester.pumpWidget(buttonHost(const Text('Removed')));
           if (handlerFails) {

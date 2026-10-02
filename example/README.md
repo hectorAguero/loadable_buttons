@@ -48,3 +48,14 @@ these labels and announcements in your application.
 
 See the [package README](../README.md) for installation, external loading,
 selection, custom content, and error handling guidance.
+
+The standalone Cupertino example uses no Material ancestor:
+
+```sh
+flutter run -t lib/cupertino_main.dart
+```
+
+Try default, filled, and tinted buttons, the external loading and disabled
+switches, idle long presses, custom loading content, and a handled failure.
+It imports `package:loadable_buttons/cupertino.dart` and
+`package:cupertino_ui/cupertino_ui.dart`.
