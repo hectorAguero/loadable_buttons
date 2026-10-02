@@ -20,6 +20,16 @@ need to copy and adapt.
 - Keep the README's copy instructions accurate when changing source files,
   imports, or companion `part` files.
 
+## Readability and native behavior
+
+- Prefer `if`, ternaries, and `is` for simple choices. Use switches or patterns
+  when they clarify branching or add useful exhaustiveness.
+- Keep locals and private widgets that clarify responsibilities or preserve
+  behavior. Reducing their count alone is not a reason to refactor.
+- Keep shared native loading wrappers in family main files and icon adapters
+  and layout in companion parts. Preserve explicit Filled regular/tonal
+  construction and native superclass wiring.
+
 ## Structural audits
 
 Use the optional commands in [CONTRIBUTING.md](CONTRIBUTING.md#optional-structural-audits)
