@@ -21,6 +21,20 @@ part 'async_outlined_button_with_icon.dart';
 /// Larger [loadingChild] content can affect layout within Material and parent
 /// constraints. Custom content owns its accessible labels; [customBuilder] also
 /// owns sizing and inactive content's interaction, focus, and semantics.
+///
+/// Optional style shortcuts default to null. For each property and state,
+/// precedence is a non-null shortcut, [style], the family theme, then native
+/// defaults. Shortcuts can be combined with [style] and preserve unrelated
+/// properties and interaction feedback.
+///
+/// For example, customize only the disabled/loading background:
+/// ```dart
+/// AsyncOutlinedButton(
+///   onPressed: saveChanges,
+///   disabledBackgroundColor: Colors.blueGrey,
+///   child: const Text('Save'),
+/// );
+/// ```
 class AsyncOutlinedButton extends StatefulWidget {
   /// Creates a button with a synchronous or asynchronous callback.
   ///
@@ -36,6 +50,14 @@ class AsyncOutlinedButton extends StatefulWidget {
     this.clipBehavior,
     this.statesController,
     this.style,
+    this.padding,
+    this.minimumSize,
+    this.alignment,
+    this.backgroundColor,
+    this.foregroundColor,
+    this.disabledBackgroundColor,
+    this.disabledForegroundColor,
+    this.mouseCursor,
     this.focusNode,
     this.onLongPress,
     this.onHover,
@@ -67,6 +89,14 @@ class AsyncOutlinedButton extends StatefulWidget {
     ValueChanged<bool>? onHover,
     ValueChanged<bool>? onFocusChange,
     ButtonStyle? style,
+    EdgeInsetsGeometry? padding,
+    Size? minimumSize,
+    AlignmentGeometry? alignment,
+    Color? backgroundColor,
+    Color? foregroundColor,
+    Color? disabledBackgroundColor,
+    Color? disabledForegroundColor,
+    MouseCursor? mouseCursor,
     FocusNode? focusNode,
     Clip? clipBehavior,
     WidgetStatesController? statesController,
@@ -95,6 +125,14 @@ class AsyncOutlinedButton extends StatefulWidget {
         clipBehavior: clipBehavior,
         statesController: statesController,
         style: style,
+        padding: padding,
+        minimumSize: minimumSize,
+        alignment: alignment,
+        backgroundColor: backgroundColor,
+        foregroundColor: foregroundColor,
+        disabledBackgroundColor: disabledBackgroundColor,
+        disabledForegroundColor: disabledForegroundColor,
+        mouseCursor: mouseCursor,
         focusNode: focusNode,
         onLongPress: onLongPress,
         onHover: onHover,
@@ -122,6 +160,14 @@ class AsyncOutlinedButton extends StatefulWidget {
       onFocusChange: onFocusChange,
       focusNode: focusNode,
       style: style,
+      padding: padding,
+      minimumSize: minimumSize,
+      alignment: alignment,
+      backgroundColor: backgroundColor,
+      foregroundColor: foregroundColor,
+      disabledBackgroundColor: disabledBackgroundColor,
+      disabledForegroundColor: disabledForegroundColor,
+      mouseCursor: mouseCursor,
       iconAlignment: iconAlignment,
       autofocus: autofocus,
       clipBehavior: clipBehavior ?? Clip.none,
@@ -191,8 +237,49 @@ class AsyncOutlinedButton extends StatefulWidget {
   /// The onFocusChange callback of the button, OutlinedButton property.
   final ValueChanged<bool>? onFocusChange;
 
-  /// The style of the button, OutlinedButton property.
+  /// The native style, below non-null shortcuts and above the family theme.
   final ButtonStyle? style;
+
+  /// Overrides [ButtonStyle.padding]; null preserves native style resolution.
+  final EdgeInsetsGeometry? padding;
+
+  /// Overrides [ButtonStyle.minimumSize] without changing native density,
+  /// constraints, or tap targets. Null preserves native style resolution.
+  final Size? minimumSize;
+
+  /// Overrides [ButtonStyle.alignment]; null preserves native style resolution.
+  final AlignmentGeometry? alignment;
+
+  /// The enabled background color, taking precedence over [style].
+  ///
+  /// Null preserves the supplied style, family theme, and native defaults.
+  /// Disabled and loading colors are unchanged; see [disabledBackgroundColor].
+  final Color? backgroundColor;
+
+  /// The enabled foreground color, taking precedence over [style].
+  ///
+  /// Null preserves the supplied style, family theme, and native defaults.
+  /// Also colors the default spinner. Native icon-color precedence is retained.
+  /// Disabled colors are unchanged; see [disabledForegroundColor].
+  final Color? foregroundColor;
+
+  /// The disabled and loading background color, taking precedence over [style].
+  ///
+  /// Null preserves native style resolution for this state. Enabled styling
+  /// is unchanged; see [backgroundColor].
+  final Color? disabledBackgroundColor;
+
+  /// The disabled foreground color, taking precedence over [style].
+  ///
+  /// Null preserves native style resolution for this state. Enabled styling
+  /// and the default spinner color are unchanged; see [foregroundColor].
+  final Color? disabledForegroundColor;
+
+  /// A plain or state-dependent cursor, taking precedence over [style].
+  ///
+  /// A null value or resolved state falls back to that state's supplied style,
+  /// then the family theme and native defaults.
+  final MouseCursor? mouseCursor;
 
   /// The focusNode of the button, OutlinedButton property.
   final FocusNode? focusNode;
@@ -254,6 +341,19 @@ class _AsyncOutlinedButtonState extends State<AsyncOutlinedButton>
 
   @override
   Widget build(BuildContext context) {
+    final style = resolveMaterialButtonStyle(
+      style: widget.style,
+      padding: widget.padding,
+      minimumSize: widget.minimumSize,
+      alignment: widget.alignment,
+      backgroundColor: widget.backgroundColor,
+      foregroundColor: widget.foregroundColor,
+      disabledBackgroundColor: widget.disabledBackgroundColor,
+      disabledForegroundColor: widget.disabledForegroundColor,
+      mouseCursor: widget.mouseCursor,
+      splashFactory: widget.splashFactory,
+    );
+
     return _LoadingOutlinedButton(
       hasIcon: widget is _AsyncOutlinedButtonWithIcon,
       onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
@@ -262,14 +362,12 @@ class _AsyncOutlinedButtonState extends State<AsyncOutlinedButton>
           : _handleLongPress,
       onHover: widget.onHover,
       onFocusChange: widget.onFocusChange,
-      style:
-          widget.style ??
-          OutlinedButton.styleFrom(splashFactory: widget.splashFactory),
+      style: style,
       focusNode: widget.focusNode,
       autofocus: widget.autofocus,
       clipBehavior: resolveButtonClipBehavior(
         clipBehavior: widget.clipBehavior,
-        style: widget.style,
+        style: style,
         themeStyle: OutlinedButtonTheme.of(context).style,
       ),
       statesController: widget.statesController,
@@ -285,7 +383,7 @@ class _AsyncOutlinedButtonState extends State<AsyncOutlinedButton>
               loadingChild:
                   widget.loadingChild ??
                   DefaultLoadingIndicator(
-                    style: widget.style,
+                    style: style,
                     loadingSemanticsLabel: widget.loadingSemanticsLabel,
                     themeStyleOf: (context) =>
                         OutlinedButtonTheme.of(context).style,

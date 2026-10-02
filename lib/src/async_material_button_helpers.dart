@@ -1,6 +1,68 @@
 import 'package:loadable_buttons/src/loading_transition.dart';
 import 'package:material_ui/material_ui.dart';
 
+/// Applies nullable Material shortcuts, preserving unrelated style fields.
+///
+/// For each property and state, a non-null shortcut wins over [style]. A null
+/// shortcut result preserves the supplied resolver, allowing the native button
+/// to fall back to its family theme and defaults when both return null.
+ButtonStyle resolveMaterialButtonStyle({
+  ButtonStyle? style,
+  EdgeInsetsGeometry? padding,
+  Size? minimumSize,
+  AlignmentGeometry? alignment,
+  Color? backgroundColor,
+  Color? foregroundColor,
+  Color? disabledBackgroundColor,
+  Color? disabledForegroundColor,
+  MouseCursor? mouseCursor,
+  InteractiveInkFeatureFactory? splashFactory,
+}) {
+  final base = style ?? ButtonStyle(splashFactory: splashFactory);
+
+  return base.copyWith(
+    padding: padding == null ? null : WidgetStatePropertyAll(padding),
+    minimumSize: minimumSize == null
+        ? null
+        : WidgetStatePropertyAll(minimumSize),
+    alignment: alignment,
+    backgroundColor: _overrideButtonColors(
+      base.backgroundColor,
+      backgroundColor,
+      disabledBackgroundColor,
+    ),
+    foregroundColor: _overrideButtonColors(
+      base.foregroundColor,
+      foregroundColor,
+      disabledForegroundColor,
+    ),
+    mouseCursor: mouseCursor == null
+        ? null
+        : WidgetStateProperty.resolveWith(
+            (states) =>
+                WidgetStateProperty.resolveAs<MouseCursor?>(
+                  mouseCursor,
+                  states,
+                ) ??
+                base.mouseCursor?.resolve(states),
+          ),
+  );
+}
+
+WidgetStateProperty<Color?>? _overrideButtonColors(
+  WidgetStateProperty<Color?>? original,
+  Color? enabled,
+  Color? disabled,
+) {
+  if (enabled == null && disabled == null) return original;
+
+  return WidgetStateProperty.resolveWith(
+    (states) =>
+        (states.contains(WidgetState.disabled) ? disabled : enabled) ??
+        original?.resolve(states),
+  );
+}
+
 /// Presents stack content in Material's full button layer, including padding.
 ///
 /// The native button keeps control of padding, alignment, sizing, state, and
