@@ -225,7 +225,9 @@ spinner. It defaults to `null`; the package provides no English fallback.
   animates the size change.
 - Text scaling can enlarge buttons, and narrow parents can overflow or clip,
   as with native buttons. Keep labels short and test large text and narrow
-  widths. Constrain both idle and loading content when a fixed size matters.
+  widths. When a fixed size matters, use `fixedSize` in a Material `style` or
+  a `SizedBox` around the button, and size loading content to fit.
+  `minimumSize` is only a lower bound.
 
 ## Review checklist
 

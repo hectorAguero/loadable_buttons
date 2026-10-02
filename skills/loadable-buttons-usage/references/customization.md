@@ -167,8 +167,14 @@ separately for its icon and label slots, so make the builder correct for both.
   constraints.
 - The default Cupertino indicator is sized to the button text, so stack
   loading keeps the idle size for text content across native sizes.
-- For a stable size, constrain both idle and loading content, for example with
-  a `SizedBox` around `loadingChild` or a fixed `minimumSize` in `style`.
+- For a stable size, give the button tight constraints and keep loading
+  content within them. On Material buttons, set `fixedSize` in `style` (for
+  example `ElevatedButton.styleFrom(fixedSize: const Size(160, 48))`), or wrap
+  the button in a `SizedBox` with both dimensions; on Cupertino, use the
+  `SizedBox`. `minimumSize` is only a lower bound, so larger loading content
+  still grows the button. Tight constraints do not shrink content, so size
+  `loadingChild` to fit, for example with a `SizedBox.square` spinner or
+  short text, or wide content overflows.
 
 ## IconButton selection
 
