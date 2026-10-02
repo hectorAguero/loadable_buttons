@@ -203,9 +203,10 @@ all four release snapshots still match. Historical runtime behavior was not
 re-executed for this source-history review.
 
 Moved and renamed the four native wrappers into their main files. Filled now
-builds its loading content once and explicitly chooses `_LoadingFilledButton`
-or `_LoadingFilledButton.tonal`, retaining native superclass construction and
-all forwarded options. Icon adapters and layout widgets stay in their companion
+builds its loading content and shared forwarded values once, then uses an
+exhaustive `switch` on its variant to choose `_LoadingFilledButton` or
+`_LoadingFilledButton.tonal`, matching native `FilledButton` variant dispatch
+and retaining native superclass construction and all forwarded options. Icon adapters and layout widgets stay in their companion
 parts; imports, public declarations, shared helpers, and tests are preserved.
 README copy instructions still require the companion parts and shared helpers
 and remain accurate.

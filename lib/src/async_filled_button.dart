@@ -406,51 +406,50 @@ class _AsyncFilledButtonState extends State<AsyncFilledButton>
             minimumChildOpacity: widget.minimumChildOpacity,
           );
 
-    if (widget._variant == _AsyncFilledButtonVariant.tonal) {
-      return _LoadingFilledButton.tonal(
-        hasIcon: widget is _AsyncFilledButtonWithIcon,
-        onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
-        onLongPress: isLoading || widget.onLongPress == null
-            ? null
-            : _handleLongPress,
+    final hasIcon = widget is _AsyncFilledButtonWithIcon;
+    final onPressed = isLoading || widget.onPressed == null
+        ? null
+        : handlePressed;
+    final onLongPress = isLoading || widget.onLongPress == null
+        ? null
+        : _handleLongPress;
+    final style =
+        widget.style ??
+        FilledButton.styleFrom(splashFactory: widget.splashFactory);
+    final clipBehavior = resolveButtonClipBehavior(
+      clipBehavior: widget.clipBehavior,
+      style: widget.style,
+      themeStyle: FilledButtonTheme.of(context).style,
+    );
+
+    return switch (widget._variant) {
+      _AsyncFilledButtonVariant.filled => _LoadingFilledButton(
+        hasIcon: hasIcon,
+        onPressed: onPressed,
+        onLongPress: onLongPress,
         onHover: widget.onHover,
         onFocusChange: widget.onFocusChange,
-        style:
-            widget.style ??
-            FilledButton.styleFrom(splashFactory: widget.splashFactory),
+        style: style,
         focusNode: widget.focusNode,
         autofocus: widget.autofocus,
-        clipBehavior: resolveButtonClipBehavior(
-          clipBehavior: widget.clipBehavior,
-          style: widget.style,
-          themeStyle: FilledButtonTheme.of(context).style,
-        ),
+        clipBehavior: clipBehavior,
         statesController: widget.statesController,
         child: child,
-      );
-    }
-
-    return _LoadingFilledButton(
-      hasIcon: widget is _AsyncFilledButtonWithIcon,
-      onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
-      onLongPress: isLoading || widget.onLongPress == null
-          ? null
-          : _handleLongPress,
-      onHover: widget.onHover,
-      onFocusChange: widget.onFocusChange,
-      style:
-          widget.style ??
-          FilledButton.styleFrom(splashFactory: widget.splashFactory),
-      focusNode: widget.focusNode,
-      autofocus: widget.autofocus,
-      clipBehavior: resolveButtonClipBehavior(
-        clipBehavior: widget.clipBehavior,
-        style: widget.style,
-        themeStyle: FilledButtonTheme.of(context).style,
       ),
-      statesController: widget.statesController,
-      child: child,
-    );
+      _AsyncFilledButtonVariant.tonal => _LoadingFilledButton.tonal(
+        hasIcon: hasIcon,
+        onPressed: onPressed,
+        onLongPress: onLongPress,
+        onHover: widget.onHover,
+        onFocusChange: widget.onFocusChange,
+        style: style,
+        focusNode: widget.focusNode,
+        autofocus: widget.autofocus,
+        clipBehavior: clipBehavior,
+        statesController: widget.statesController,
+        child: child,
+      ),
+    };
   }
 }
 
