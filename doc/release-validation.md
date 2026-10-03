@@ -96,8 +96,8 @@ itself. The skill's contract tests run with the full suite.
 
 After the maintainer authorizes publication, follow these steps:
 
-1. On the validated commit, finalize the release date in the 2.0.0 changelog
-   heading and release notes. Recheck the package version and hosted availability,
+1. On the validated commit, finalize the 2.0.0 changelog and release notes.
+   Recheck the package version and hosted availability,
    and rerun the dry run after any final edits. Ensure all four CI jobs pass.
 2. Upload 2.0.0 using the normal maintainer Pub authentication flow. Verify the
    hosted version and archive before recording publication as successful.

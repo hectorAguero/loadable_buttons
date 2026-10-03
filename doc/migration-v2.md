@@ -2,7 +2,8 @@
 
 This guide describes the loadable_buttons 2.0.0 API.
 The runnable [Material](../example/lib/main.dart) and
-[Cupertino](../example/lib/cupertino_main.dart) examples use this checkout.
+[Cupertino](../example/lib/cupertino_main.dart) examples use the package through
+a path dependency.
 
 ## Choose the release line
 

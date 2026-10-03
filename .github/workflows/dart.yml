@@ -82,11 +82,11 @@ jobs:
       - name: Run Tests
         run: flutter test --no-pub
 
-      # Archive checks must not re-resolve an exact lower-bound graph.
       - name: Check Archive Exclusions
         if: matrix.sdk == 'stable' && matrix.design == 'latest'
         run: bash tool/check_pubignore.sh
 
+      # The dry run must not re-resolve an exact lower-bound graph.
       - name: Validate Publish Dry Run
         id: publish
         if: matrix.sdk == 'stable' && matrix.design == 'latest'

@@ -1,55 +1,29 @@
 ## 2.0.0
 
-* Add a before/after 1.x migration guide and release-validation procedure,
-  retain the 1.x compatibility maintenance line, and verify the publish dry run
-  and archive exclusions in CI. Keep maintainer files and generated coverage
-  out of the archive while retaining consumer skills and runnable examples.
-
-* Add nullable Material style shortcuts for padding, minimum size, alignment,
-  enabled/disabled colors, and mouse cursors to Elevated, Filled, Outlined, and
-  Text buttons, including icon, tonal, and null-icon variants. Preserve supplied
-  style resolvers per state, inherited themes, native layout/feedback, and
-  loading-indicator foreground resolution.
-
-* Ship a `loadable-buttons-usage` agent skill, installable with
-  `dart run skills@ get --package loadable_buttons`, covering imports,
-  constructors, loading ownership, errors, accessibility, theming, sizing, and
-  custom loading content.
-
-* Add native `AsyncCupertinoButton`, `.filled`, and `.tinted` with Cupertino
-  indicators sized to the button text, loading/error/accessibility contracts,
-  and a standalone example.
-  Add design-specific `cupertino.dart` and `material.dart` entry points while
-  preserving the combined barrel. Depend directly on `cupertino_ui` 1.0.0+
-  and validate both design libraries at exact lower bounds and latest compatible
-  versions on the minimum SDK and stable. Shared async/transition helpers use
-  Flutter widgets; Material presentation helpers stay in a separate source file.
-
-* Add optional localized `loadingSemanticsLabel` to every Material constructor,
-  including tonal, selected-icon, and extended FAB loading paths. Labels apply
-  only to default spinners; custom loading content owns its semantics and live
-  announcements. Preserve null defaults and disabled outer button semantics.
-
-* Add optional `onError` to every constructor with a shared
-  `AsyncButtonErrorHandler` typedef. Successful handlers explicitly consume
-  activation errors; absent handlers preserve the original error and stack trace.
-  Async handlers retain the loading lock, handler failures propagate, and captured
-  handlers still run after disposal without changing disposed widget state.
-
+* **Breaking:** require Flutter 3.44.0+ and Dart 3.12.0+.
 * **Breaking:** use standalone `material_ui` 1.0.0+ for all Material
   widgets and public types. Applications must import
   `package:material_ui/material_ui.dart` for themes and `ButtonStyle` values.
-* **Breaking:** require Flutter 3.44.0+ and Dart 3.12.0+.
+* Add `AsyncCupertinoButton`, `.filled`, and `.tinted` using standalone
+  `cupertino_ui` 1.0.0+, with native Cupertino loading indicators and shared
+  loading, error, transition, and accessibility behavior.
+* Add design-specific `material.dart` and `cupertino.dart` entry points while
+  preserving the combined `loadable_buttons.dart` import.
+* Add optional `onError` and the `AsyncButtonErrorHandler` typedef to handle
+  activation failures. Successful handlers consume errors; omitted handlers
+  preserve propagation. Async handlers keep the button loading until completion,
+  and handler failures propagate.
+* Add optional localized `loadingSemanticsLabel` to every button constructor.
+  Labels apply to default spinners; custom loading content owns its semantics.
+* Add nullable Material style shortcuts for padding, minimum size, alignment,
+  enabled/disabled colors, and mouse cursors to Elevated, Filled, Outlined, and
+  Text buttons, including icon and tonal variants. Shortcuts fall back through
+  the supplied style, family theme, and native defaults per property and state.
 * Honor inherited `FloatingActionButtonTheme` padding and icon spacing for
   extended FAB stack transitions, matching the native standalone button.
-* Preserve native icon padding, loading ownership, selection, keyboard,
-  semantics, and custom loading-content behavior across the migration.
-* Validate exact Material UI and Cupertino UI 1.0.0 and their newest compatible
-  resolution on both the minimum Flutter SDK and current stable. Run Solid Lints 1.0.0 and
-  DCL 4.4.0 plugin checks on both SDKs, with an isolated DCL CLI graph that
-  also supports Dart 3.12.
-* Raise the Very Good Analysis development dependency minimum to 10.3.0 and
-  use its Dart 3.12-compatible preset on both SDKs; allow 11.x on stable.
+* Ship a `loadable-buttons-usage` consumer agent skill, installable with
+  `dart run skills@ get --package loadable_buttons`.
+* Add a [1.x migration guide](doc/migration-v2.md) with before/after examples.
 
 ## 1.1.1
 
