@@ -3,7 +3,7 @@
 Flutter Material and Cupertino buttons with automatic loading states,
 external loading control, and customizable indicators and transitions.
 
-![Async Material button examples](https://raw.githubusercontent.com/hectorAguero/loadable_buttons/main/screenshots/preview.gif)
+![Material gallery preview; Cupertino has a separate runnable example](screenshots/preview.gif)
 
 ## Installation
 
@@ -14,13 +14,15 @@ flutter pub add material_ui
 flutter pub add cupertino_ui
 ```
 
-Version 2 requires Flutter **3.44.0+**, Dart **3.12.0+ (below 4.0.0)**,
-and standalone **material_ui >=1.0.0 <2.0.0** and
-**cupertino_ui >=1.0.0 <2.0.0**. Pub selects compatible design-library
+Version 2 requires Flutter **3.44.0+**, Dart **3.12.0+**,
+and standalone **material_ui 1.0.0+** and
+**cupertino_ui 1.0.0+**. Pub selects compatible design-library
 releases for your SDK; Material UI 1.4.0 and newer require Flutter 3.47 / Dart 3.13.
 Cupertino UI 1.1.1 also requires Flutter 3.47 / Dart 3.13.
 Version 1.x remains the compatibility line for Flutter 3.29 and the built-in
-Material library. See the [compatibility roadmap](doc/compatibility-roadmap.md).
+Material library. 1.1.x receives applicable compatibility fixes without adopting
+v2 APIs or raising its SDK floor in patch releases. See the
+[compatibility roadmap](doc/compatibility-roadmap.md).
 
 ## Quick start
 
@@ -101,6 +103,10 @@ external loading, long presses, custom loading content, and handled errors.
 
 ## Migrating from 1.x
 
+Follow the [complete migration guide](doc/migration-v2.md) for release-line
+selection and before/after examples covering plain/icon buttons, loading labels,
+error hooks, custom transitions, and Cupertino.
+
 Add `material_ui` as a direct dependency and replace
 `package:flutter/material.dart` imports with `package:material_ui/material_ui.dart`.
 Create `MaterialApp`, themes, styles, and ink factories from that package too.
@@ -123,7 +129,8 @@ MaterialApp(
 );
 ```
 
-The bridge supplies legacy themes and localizations; it does not convert legacy
+The bridge is a temporary, deprecated migration utility. It supplies legacy
+themes and localizations; it does not convert legacy
 style arguments to standalone types. See the
 [official Material UI migration guide](https://pub.dev/packages/material_ui#migrating-existing-code-to-this-package).
 
@@ -520,8 +527,10 @@ loading state. Use `loading` when your application already manages that state.
 
 ## More
 
+- [Migration from 1.x](doc/migration-v2.md)
+- [Release validation](https://github.com/hectorAguero/loadable_buttons/blob/main/doc/release-validation.md)
 - [Example application](https://github.com/hectorAguero/loadable_buttons/tree/main/example)
-- [Contributing and development checks](CONTRIBUTING.md)
+- [Contributing and development checks](https://github.com/hectorAguero/loadable_buttons/blob/main/CONTRIBUTING.md)
 - [Changelog](CHANGELOG.md)
 - [Issues and feature requests](https://github.com/hectorAguero/loadable_buttons/issues)
 - [MIT license](LICENSE)

@@ -82,6 +82,26 @@ jobs:
       - name: Run Tests
         run: flutter test --no-pub
 
+      - name: Check Archive Exclusions
+        if: matrix.sdk == 'stable' && matrix.design == 'latest'
+        run: bash tool/check_pubignore.sh
+
+      # The dry run must not re-resolve an exact lower-bound graph.
+      - name: Validate Publish Dry Run
+        id: publish
+        if: matrix.sdk == 'stable' && matrix.design == 'latest'
+        run: |
+          set -o pipefail
+          dart pub publish --dry-run 2>&1 | tee "$RUNNER_TEMP/publish-dry-run.txt"
+
+      - name: Save Publish Dry Run for Review
+        if: always() && steps.publish.outcome != 'skipped'
+        uses: actions/upload-artifact@v7
+        with:
+          name: publish-dry-run
+          path: ${{ runner.temp }}/publish-dry-run.txt
+          if-no-files-found: error
+
       - name: Check Whitespace
         env:
           DIFF_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}

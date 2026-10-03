@@ -4,7 +4,7 @@
 | --- | --- | --- | --- |
 | 1.0.x | 3.29.0 | 3.6.0 | `package:flutter/material.dart`, with FAB settings from `ThemeData.floatingActionButtonTheme` or explicit constructor arguments. |
 | 1.1.x | 3.29.0 | 3.7.0 | `package:flutter/material.dart`, with Widget state types and FAB settings from `ThemeData.floatingActionButtonTheme` or explicit constructor arguments. |
-| 2.x | 3.44.0 | 3.12.0 | Standalone `material_ui >=1.0.0 <2.0.0`, including inherited `FloatingActionButtonTheme` support. |
+| 2.x | 3.44.0 | 3.12.0 | Standalone `material_ui` 1.0.0+, including inherited `FloatingActionButtonTheme` support. |
 
 The 1.1 release retains Flutter 3.29 support and aligns the Dart minimum with
 the bundled Dart 3.7 SDK. The existing extended-FAB padding and icon-spacing
@@ -32,10 +32,16 @@ resolution.
 `tool/resolve_design_ui.sh` uses temporary overrides in both package roots for
 the exact lower-bound check and verifies the resolved versions. Analysis,
 formatting, and the full contract suite run against each resolved graph. See
-[the migration guide](../README.md#migrating-from-1x) for downstream import/type
+[the migration guide](migration-v2.md) for downstream import/type
 changes and the compatibility bridge for legacy dependencies.
 
-Development dependencies use Very Good Analysis >=10.3.0 <12.0.0, resolving
+The 1.1.x line remains available for built-in Material applications; applicable
+compatibility fixes are backported and validated on Flutter 3.29 and stable.
+Its patch releases do not adopt v2 APIs or raise the SDK floor. See
+[release validation](https://github.com/hectorAguero/loadable_buttons/blob/main/doc/release-validation.md)
+for the repeatable release checklist.
+
+Development dependencies use Very Good Analysis 10.3.0+, resolving
 10.3.0 on the minimum SDK and 11.0.0 on stable. Both use the versioned 10.3.0
 preset so lint rules remain compatible with Dart 3.12. Solid Lints 1.0.0 and
 DCL 4.4.0 remain at their current versions and run on both SDKs.
@@ -72,7 +78,7 @@ content without fixing expectations to a particular Material release.
 
 ## Cupertino support
 
-Version 2 also depends directly on standalone `cupertino_ui >=1.0.0 <2.0.0`.
+Version 2 also depends directly on standalone `cupertino_ui` 1.0.0+.
 The inclusive 1.0.0 floor provides default, filled, and tinted CupertinoButton
 variants on Flutter 3.44 / Dart 3.12. Cupertino UI 1.1.1 raises its own minimum
 to Flutter 3.47 / Dart 3.13; Pub selects a compatible release for each SDK.
