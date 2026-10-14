@@ -113,6 +113,7 @@ mixin AsyncButtonState<ButtonWidget extends StatefulWidget>
     on State<ButtonWidget> {
   bool _internalLoading = false;
   AsyncButtonController? _controller;
+  bool _controllerLoading = false;
 
   /// The current loading flag supplied by the consumer.
   bool get externalLoading;
@@ -128,7 +129,7 @@ mixin AsyncButtonState<ButtonWidget extends StatefulWidget>
 
   /// External updates never clear an operation that is still pending.
   bool get isLoading =>
-      _internalLoading || externalLoading || (_controller?.isLoading ?? false);
+      _internalLoading || externalLoading || _controllerLoading;
 
   @override
   void initState() {
@@ -162,14 +163,21 @@ mixin AsyncButtonState<ButtonWidget extends StatefulWidget>
     final controller = asyncController;
     controller?._attach(_handleControllerChanged);
     _controller = controller;
+    _controllerLoading = controller?.isLoading ?? false;
   }
 
   void _detachController() {
     _controller?._detach(_handleControllerChanged);
     _controller = null;
+    _controllerLoading = false;
   }
 
-  void _handleControllerChanged() => setState(() {});
+  // Rebuild only when the controller changes this button's effective state.
+  void _handleControllerChanged() {
+    final controllerLoading = _controller?.isLoading ?? false;
+    if (controllerLoading == _controllerLoading) return;
+    setState(() => _controllerLoading = controllerLoading);
+  }
 
   /// Locks synchronously and releases only the operation's own loading state.
   Future<void> handlePressed() async {
