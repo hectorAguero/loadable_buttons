@@ -171,16 +171,18 @@ class AsyncCupertinoButton extends StatefulWidget {
 
   /// An optional controller that observes and requests loading.
   ///
-  /// Its [AsyncButtonController.loading] request adds to effective loading,
-  /// and [AsyncButtonController.isPending] reports this button's operation.
-  /// The caller owns and disposes the controller. Attach it to one button at a
-  /// time.
+  /// Its [AsyncButtonController.loading] request and pending operation both
+  /// add to effective loading. The pending operation may have started on an
+  /// earlier button that used the same controller. The caller owns and disposes
+  /// the controller.
   final AsyncButtonController? controller;
 
   /// Whether the application requests loading, independently of pending work.
   ///
-  /// Clearing this flag does not unlock a pending callback or error handler;
-  /// completing those callbacks does not clear this flag.
+  /// Effective loading combines this flag, any [controller] request, and a
+  /// pending [onPressed] or [onError]. Clearing this flag does not unlock a
+  /// pending callback or error handler; completing those callbacks does not
+  /// clear this flag.
   final bool loading;
 
   /// Optional loading content, replacing the default

@@ -170,8 +170,9 @@ ListenableBuilder(
   to false never unlocks pending work.
 - `isLoading`: `loading || isPending`, excluding the widget's `loading` parameter.
 - The caller owns and disposes the controller; buttons never dispose it.
-- Attach one controller to one button at a time. Debug builds report sharing;
-  it is not a group or mutual-exclusion mechanism.
+- Use one controller per logical button. It may move between widgets, such as
+  in an `AnimatedSwitcher` or across a route transition. It is not a group or
+  mutual-exclusion mechanism for separate buttons.
 
 ## Errors
 
@@ -282,7 +283,7 @@ spinner. It defaults to `null`; the package provides no English fallback.
 - Every async `onPressed` returns or awaits its Future.
 - `loading` is used only for application-owned state and is cleared by its owner.
 - Any `AsyncButtonController` is created once, disposed by its owner, and
-  attached to a single button.
+  used for one logical button.
 - `onError` is either omitted, letting errors propagate, or deliberately
   consumes errors and checks `mounted` before using state or context.
 - Default spinners have a localized `loadingSemanticsLabel`; custom loading

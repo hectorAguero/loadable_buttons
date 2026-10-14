@@ -234,56 +234,12 @@ class _LoadingContractDemoState extends State<LoadingContractDemo> {
                     ),
                   ],
                 ),
-                const Text(
-                  'A controller lets other widgets observe the Sync button '
-                  'and request loading. Clearing its loading request does not '
-                  'unlock a pending sync.',
-                ),
-                ListenableBuilder(
-                  listenable: _syncController,
-                  builder: (_, _) => Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    spacing: 8,
-                    children: [
-                      SwitchListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: const Text('Controller loading request'),
-                        value: _syncController.loading,
-                        onChanged: (value) => _syncController.loading = value,
-                      ),
-                      Wrap(
-                        spacing: 12,
-                        runSpacing: 8,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          AsyncFilledButton.tonal(
-                            controller: _syncController,
-                            transitionType: widget.transitionType,
-                            loadingSemanticsLabel: 'Syncing',
-                            onPressed: timedOperation,
-                            child: const Text('Sync'),
-                          ),
-                          // Another widget reacts to the button's own work.
-                          TextButton(
-                            onPressed: _syncController.isPending
-                                ? null
-                                : () => setState(
-                                    () => _result = 'Sync settings opened',
-                                  ),
-                            child: const Text('Sync settings'),
-                          ),
-                          Semantics(
-                            liveRegion: true,
-                            child: Text(
-                              _syncController.isPending
-                                  ? 'Sync pending'
-                                  : 'Sync idle',
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                _SyncControllerDemo(
+                  controller: _syncController,
+                  transitionType: widget.transitionType,
+                  onSync: timedOperation,
+                  onOpenSettings: () =>
+                      setState(() => _result = 'Sync settings opened'),
                 ),
               ],
             ),
@@ -292,4 +248,76 @@ class _LoadingContractDemoState extends State<LoadingContractDemo> {
       ),
     );
   }
+}
+
+/// Observes and requests the Sync button's loading through its controller.
+class _SyncControllerDemo extends StatelessWidget {
+  const _SyncControllerDemo({
+    required this.controller,
+    required this.transitionType,
+    required this.onSync,
+    required this.onOpenSettings,
+  });
+
+  final AsyncButtonController controller;
+  final TransitionAnimationType transitionType;
+  final Future<void> Function()? onSync;
+  final VoidCallback onOpenSettings;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    spacing: 12,
+    children: [
+      const Text(
+        'A controller lets other widgets observe the Sync button and request '
+        'loading. Clearing its loading request does not unlock a pending sync.',
+      ),
+      // Only widgets that read the controller listen to it; the Sync button
+      // already rebuilds itself from its controller.
+      ListenableBuilder(
+        listenable: controller,
+        builder: (_, _) => SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: const Text('Controller loading request'),
+          value: controller.loading,
+          onChanged: (value) => controller.loading = value,
+        ),
+      ),
+      Wrap(
+        spacing: 12,
+        runSpacing: 8,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          AsyncFilledButton.tonal(
+            controller: controller,
+            transitionType: transitionType,
+            loadingSemanticsLabel: 'Syncing',
+            onPressed: onSync,
+            child: const Text('Sync'),
+          ),
+          ListenableBuilder(
+            listenable: controller,
+            builder: (_, _) => Row(
+              mainAxisSize: MainAxisSize.min,
+              spacing: 12,
+              children: [
+                // Another widget reacts to the button's own work.
+                TextButton(
+                  onPressed: controller.isPending ? null : onOpenSettings,
+                  child: const Text('Sync settings'),
+                ),
+                Semantics(
+                  liveRegion: true,
+                  child: Text(
+                    controller.isPending ? 'Sync pending' : 'Sync idle',
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ],
+  );
 }

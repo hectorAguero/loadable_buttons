@@ -6,7 +6,8 @@
   the button's pending operation; setting it to false, replacing the controller,
   or disposing the button never unlocks unfinished work. Each operation clears
   only its own pending state, and a pending operation keeps locking any button
-  that adopts the controller. Attach a controller to one button at a time.
+  that adopts the controller, including during animated switches and route
+  transitions.
 
 ## 2.0.0
 

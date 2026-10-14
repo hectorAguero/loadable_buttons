@@ -256,8 +256,11 @@ ListenableBuilder(
   the button never unlocks unfinished work. A pending operation keeps locking
   any button that adopts the same controller until it finishes.
 - You own the controller: create it in a `State`, and dispose it in `dispose`.
-  Buttons only add and remove listeners. Attach it to one button at a time;
-  debug builds report a controller attached to two buttons.
+  Buttons only add and remove listeners.
+- Use one controller per logical button. It may move between widgets, for
+  example in an `AnimatedSwitcher` or across a route transition; while both
+  are shown, each reflects the same state and pending work locks both.
+  Coordinating separate buttons is not a controller feature.
 
 ### Callback errors
 

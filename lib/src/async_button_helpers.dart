@@ -17,25 +17,25 @@ import 'package:flutter/widgets.dart';
 typedef AsyncButtonErrorHandler =
     FutureOr<void> Function(Object error, StackTrace stackTrace);
 
-/// Observes and requests loading for one async button.
+/// Observes and requests loading for an async button.
 ///
 /// [loading] is a manual request owned by the application. [isPending] reports
-/// the attached button's own `onPressed` and `onError` work, and only that
-/// operation can clear it. A button's effective loading combines its `loading`
-/// parameter, [loading], and its pending operation; setting [loading] to false
-/// never cancels or unlocks unfinished work.
+/// `onPressed` and `onError` work started by a button using this controller,
+/// and only that operation can clear it. A button's effective loading combines
+/// its `loading` parameter, [loading], and [isPending]; setting [loading] to
+/// false never cancels or unlocks unfinished work.
 ///
 /// The caller owns the controller and must dispose it. Buttons add and remove
-/// listeners but never dispose it. Attach a controller to one button at a time;
-/// it can move between buttons, and a pending operation keeps locking any
-/// button that uses this controller until that operation finishes.
+/// listeners but never dispose it. Use a controller for one logical button. It
+/// can move between button widgets, including while an animated switch or
+/// route transition briefly shows both; every button using it reflects the
+/// same state, and pending work locks each of them until it finishes.
 class AsyncButtonController extends ChangeNotifier {
   /// Creates a controller with an optional initial manual [loading] request.
   AsyncButtonController({this._loading = false});
 
   bool _loading;
   int _pendingOperations = 0;
-  int _attachedButtons = 0;
   bool _disposed = false;
 
   /// Whether the application requests loading, independent of pending work.
@@ -60,33 +60,6 @@ class AsyncButtonController extends ChangeNotifier {
   /// The button's own `loading` parameter is not included; the application
   /// already owns that value.
   bool get isLoading => _loading || isPending;
-
-  void _attach(VoidCallback listener) {
-    // Report instead of throwing so a misused controller cannot leave the
-    // button half-mounted.
-    assert(() {
-      if (_attachedButtons > 0) {
-        FlutterError.reportError(
-          FlutterErrorDetails(
-            exception: FlutterError(
-              'An AsyncButtonController can be attached to only one button '
-              'at a time.',
-            ),
-            library: 'loadable_buttons',
-          ),
-        );
-      }
-
-      return true;
-    }());
-    _attachedButtons++;
-    addListener(listener);
-  }
-
-  void _detach(VoidCallback listener) {
-    _attachedButtons--;
-    removeListener(listener);
-  }
 
   void _beginOperation() {
     _pendingOperations++;
@@ -145,29 +118,21 @@ mixin AsyncButtonState<ButtonWidget extends StatefulWidget>
     _attachController();
   }
 
-  // Detaching on deactivation lets another button adopt the controller in the
-  // same frame, such as when an ancestor switches button types.
   @override
-  void activate() {
-    super.activate();
-    _attachController();
-  }
-
-  @override
-  void deactivate() {
+  void dispose() {
     _detachController();
-    super.deactivate();
+    super.dispose();
   }
 
   void _attachController() {
     final controller = asyncController;
-    controller?._attach(_handleControllerChanged);
+    controller?.addListener(_handleControllerChanged);
     _controller = controller;
     _controllerLoading = controller?.isLoading ?? false;
   }
 
   void _detachController() {
-    _controller?._detach(_handleControllerChanged);
+    _controller?.removeListener(_handleControllerChanged);
     _controller = null;
     _controllerLoading = false;
   }

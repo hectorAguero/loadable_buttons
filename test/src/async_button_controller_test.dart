@@ -266,39 +266,146 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('reports attaching one controller to two buttons', (
+  testWidgets('hands off during an animated switch while both are shown', (
     tester,
   ) async {
     final controller = AsyncButtonController();
     addTearDown(controller.dispose);
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Column(
-          children: [
-            AsyncTextButton(
-              controller: controller,
-              onPressed: () {},
-              child: const Text('First'),
-            ),
-            AsyncTextButton(
-              controller: controller,
-              onPressed: () {},
-              child: const Text('Second'),
-            ),
-          ],
+    final operation = Completer<void>();
+    var calls = 0;
+    Future<void> onPressed() {
+      calls++;
+
+      return operation.future;
+    }
+
+    Widget switcher({required bool text}) => MaterialApp(
+      home: Center(
+        child: AnimatedSwitcher(
+          duration: const Duration(seconds: 1),
+          child: text
+              ? AsyncTextButton(
+                  key: const ValueKey('text'),
+                  controller: controller,
+                  loadingChild: const Text('Text busy'),
+                  onPressed: onPressed,
+                  child: const Text('Text run'),
+                )
+              : AsyncElevatedButton(
+                  key: const ValueKey('elevated'),
+                  controller: controller,
+                  loadingChild: const Text('Elevated busy'),
+                  onPressed: onPressed,
+                  child: const Text('Elevated run'),
+                ),
         ),
       ),
     );
 
-    expect(
-      tester.takeException(),
-      isA<FlutterError>().having(
-        (error) => error.message,
-        'message',
-        contains('one button at a time'),
+    await tester.pumpWidget(switcher(text: false));
+    await tester.tap(find.text('Elevated run'));
+    await tester.pump();
+    await tester.pumpWidget(switcher(text: true));
+    await tester.pump(const Duration(milliseconds: 500));
+
+    // Both buttons are mounted mid-transition and share the pending lock.
+    expect(tester.takeException(), isNull);
+    expect(find.text('Elevated busy'), findsOneWidget);
+    expect(find.text('Text busy'), findsOneWidget);
+    await tester.tap(find.text('Text busy'), warnIfMissed: false);
+    expect(calls, 1);
+
+    await tester.pumpAndSettle();
+    operation.complete();
+    await tester.pumpAndSettle();
+    expect(find.text('Text run'), findsOneWidget);
+    await tester.tap(find.text('Text run'));
+    expect(calls, 2);
+  });
+
+  testWidgets('skips rebuilds when effective controller loading is unchanged', (
+    tester,
+  ) async {
+    final controller = AsyncButtonController();
+    addTearDown(controller.dispose);
+    final operation = Completer<void>();
+    var builds = 0;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: AsyncTextButton(
+          controller: controller,
+          transitionType: TransitionAnimationType.customBuilder,
+          customBuilder: (loading, child, _) {
+            builds++;
+
+            return loading ? const Text('Busy') : child;
+          },
+          onPressed: () => operation.future,
+          child: const Text('Run'),
+        ),
       ),
     );
-    // Reporting leaves both buttons mounted and the tree consistent.
-    expect(find.byType(AsyncTextButton), findsNWidgets(2));
+    await tester.tap(find.text('Run'));
+    await tester.pump();
+    final pendingBuilds = builds;
+
+    // isLoading stays true, so neither notification rebuilds the button.
+    controller
+      ..loading = true
+      ..loading = false;
+    await tester.pump();
+    expect(builds, pendingBuilds);
+
+    operation.complete();
+    await tester.pump();
+    expect(builds, greaterThan(pendingBuilds));
+    expect(find.text('Run'), findsOneWidget);
+  });
+
+  testWidgets('reads the current state of a newly supplied controller', (
+    tester,
+  ) async {
+    final idle = AsyncButtonController();
+    final requested = AsyncButtonController(loading: true);
+    addTearDown(idle.dispose);
+    addTearDown(requested.dispose);
+    await tester.pumpWidget(host(controller: idle, onPressed: () {}));
+    expect(find.text('Busy'), findsNothing);
+
+    await tester.pumpWidget(host(controller: requested, onPressed: () {}));
+    await tester.pumpAndSettle();
+    expect(find.text('Busy'), findsOneWidget);
+  });
+
+  testWidgets('keeps controller state when reparented with a GlobalKey', (
+    tester,
+  ) async {
+    final controller = AsyncButtonController(loading: true);
+    addTearDown(controller.dispose);
+    final buttonKey = GlobalKey();
+    Widget layout({required bool wrapped}) {
+      final button = AsyncElevatedButton(
+        key: buttonKey,
+        controller: controller,
+        loadingChild: const Text('Busy'),
+        onPressed: () {},
+        child: const Text('Run'),
+      );
+
+      return MaterialApp(
+        home: Center(
+          child: wrapped ? Card(child: button) : button,
+        ),
+      );
+    }
+
+    await tester.pumpWidget(layout(wrapped: false));
+    await tester.pumpWidget(layout(wrapped: true));
+    await tester.pumpAndSettle();
+    expect(find.text('Busy'), findsOneWidget);
+
+    controller.loading = false;
+    await tester.pumpAndSettle();
+    expect(find.text('Busy'), findsNothing);
   });
 }
