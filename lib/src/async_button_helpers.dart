@@ -92,6 +92,7 @@ mixin AsyncButtonState<ButtonWidget extends StatefulWidget>
   bool _internalLoading = false;
   AsyncButtonController? _controller;
   bool _controllerLoading = false;
+  _AsyncButtonGroupCoordinator? _group;
 
   /// The current loading flag supplied by the consumer.
   bool get externalLoading;
@@ -104,6 +105,9 @@ mixin AsyncButtonState<ButtonWidget extends StatefulWidget>
 
   /// The optional controller supplied by the consumer.
   AsyncButtonController? get asyncController;
+
+  /// Whether the consumer exempts this button from its [AsyncButtonGroup].
+  bool get excludeFromGroup;
 
   /// External updates never clear an operation that is still pending.
   bool get isLoading =>
@@ -118,6 +122,7 @@ mixin AsyncButtonState<ButtonWidget extends StatefulWidget>
   @override
   void didUpdateWidget(covariant ButtonWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
+    _lookUpGroup();
     if (asyncController == _controller) return;
     _detachController();
     _attachController();
@@ -149,16 +154,60 @@ mixin AsyncButtonState<ButtonWidget extends StatefulWidget>
     setState(() => _controllerLoading = controllerLoading);
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _lookUpGroup();
+  }
+
+  // Excluded buttons skip the dependency, so group changes do not rebuild
+  // them. Re-run when excludeFromGroup changes.
+  void _lookUpGroup() {
+    _group = excludeFromGroup
+        ? null
+        : context
+              .dependOnInheritedWidgetOfExactType<_AsyncButtonGroupScope>()
+              ?.notifier;
+  }
+
+  /// Whether activation is blocked: this button is loading, or a peer in its
+  /// [AsyncButtonGroup] has a pending operation. Peers are disabled natively
+  /// without showing loading content.
+  bool get isLocked => isLoading || (_group?._isBlocking(this) ?? false);
+
+  /// Returns [handler] while [callback] is supplied and activation is allowed.
+  ///
+  /// Every family wires native `onPressed` and `onLongPress` through this, so
+  /// loading and group blocking share one enablement policy.
+  VoidCallback? unlockedHandler(Object? callback, VoidCallback handler) =>
+      isLocked || callback == null ? null : handler;
+
   /// Locks synchronously and releases only the operation's own loading state.
   Future<void> handlePressed() async {
     final callback = asyncOnPressed;
-    if (!mounted || callback == null || isLoading) return;
+    // isLocked reads the group live, so a peer activated earlier in the same
+    // frame has already claimed it and this activation is refused here.
+    if (!mounted || callback == null || isLocked) return;
+    // The operation releases the group it claimed, even after disposal or
+    // group removal; a group holds one claim, so it cannot release another.
+    await _runOperation(callback, _group?.._claim(this));
+  }
+
+  Future<void> _runOperation(
+    FutureOr<void> Function() callback,
+    _AsyncButtonGroupCoordinator? group,
+  ) async {
     final errorHandler = asyncOnError;
     // The operation releases the controller it started with, even if the
     // button switches controllers or is disposed before it finishes.
     final controller = _controller;
-    // Begin before locking so a disposed controller cannot strand the lock.
-    controller?._beginOperation();
+    try {
+      // Begin before locking so a disposed controller cannot strand the lock.
+      controller?._beginOperation();
+    } on Object {
+      group?._release(this);
+      rethrow;
+    }
     setState(() => _internalLoading = true);
 
     try {
@@ -168,8 +217,105 @@ mixin AsyncButtonState<ButtonWidget extends StatefulWidget>
       await errorHandler(error, stackTrace);
     } finally {
       controller?._endOperation();
+      // Release before unlocking, so this button is never unlocked while it
+      // still holds the group's claim.
+      group?._release(this);
       // Consumer exceptions propagate even when the button has been disposed.
       if (mounted) setState(() => _internalLoading = false);
     }
+  }
+}
+
+/// Allows one pending operation at a time among descendant async buttons.
+///
+/// When a member's `onPressed` starts, that button shows loading as usual and
+/// every other member is disabled natively, blocking pointer, keyboard, and
+/// accessibility activation without showing loading content. Members recover
+/// when the operation and any `onError` finish. Buttons outside a group, and
+/// members with `excludeFromGroup: true` such as a Cancel action, are never
+/// blocked and never block others.
+///
+/// The nearest group applies; nested groups coordinate their own members
+/// independently. Only activations claim a group: a `loading` parameter or
+/// [AsyncButtonController.loading] request affects only its own button. An
+/// operation keeps its claim if its button is disposed, and it never releases
+/// a newer operation's claim. Removing the group releases its members. The
+/// group coordinates availability only; application code owns cancellation.
+///
+/// A claim belongs to the group where activation started. A button moved into
+/// another group mid-operation keeps loading but does not claim the new group,
+/// so that group's members stay available. A Future that never completes keeps
+/// its group blocked: give real work a timeout, or rebuild the group with a new
+/// [Key] to start a fresh one.
+class AsyncButtonGroup extends StatefulWidget {
+  /// Creates a group coordinating the async buttons below [child].
+  const AsyncButtonGroup({required this.child, super.key});
+
+  /// The subtree whose async buttons share this group.
+  final Widget child;
+
+  /// Whether a member operation is pending in the nearest group.
+  ///
+  /// Returns false without a group. Registers a dependency, so [context]
+  /// rebuilds when this changes; use it to disable non-async widgets as well.
+  static bool isActiveOf(BuildContext context) =>
+      context
+          .dependOnInheritedWidgetOfExactType<_AsyncButtonGroupScope>()
+          ?.notifier
+          ?._isActive ??
+      false;
+
+  @override
+  State<AsyncButtonGroup> createState() => _AsyncButtonGroupState();
+}
+
+class _AsyncButtonGroupState extends State<AsyncButtonGroup> {
+  final _coordinator = _AsyncButtonGroupCoordinator();
+
+  @override
+  void dispose() {
+    _coordinator.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) =>
+      _AsyncButtonGroupScope(notifier: _coordinator, child: widget.child);
+}
+
+class _AsyncButtonGroupScope
+    extends InheritedNotifier<_AsyncButtonGroupCoordinator> {
+  const _AsyncButtonGroupScope({
+    required super.notifier,
+    required super.child,
+  });
+}
+
+class _AsyncButtonGroupCoordinator extends ChangeNotifier {
+  State? _activeButton;
+  bool _disposed = false;
+
+  bool get _isActive => _activeButton != null;
+
+  bool _isBlocking(State button) =>
+      _isActive && !identical(_activeButton, button);
+
+  void _claim(State button) {
+    assert(!_isActive, 'Members check isLocked before claiming.');
+    _activeButton = button;
+    notifyListeners();
+  }
+
+  void _release(State button) {
+    assert(identical(_activeButton, button), 'Only the claimant releases.');
+    _activeButton = null;
+    // Operations outlive the group and may finish after it is removed.
+    if (!_disposed) notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
   }
 }

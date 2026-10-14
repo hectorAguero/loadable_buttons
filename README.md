@@ -265,6 +265,49 @@ ListenableBuilder(
   are shown, each reflects the same state and pending work locks both.
   Coordinating separate buttons is not a controller feature.
 
+### Blocking peers with a group
+
+Wrap related buttons in an `AsyncButtonGroup` when only one of them should run
+at a time. Starting Save shows Save loading and disables Delete without a
+spinner; Cancel stays available:
+
+```dart
+AsyncButtonGroup(
+  child: Row(
+    children: [
+      AsyncFilledButton(onPressed: save, child: const Text('Save')),
+      AsyncOutlinedButton(onPressed: delete, child: const Text('Delete')),
+      AsyncTextButton(
+        excludeFromGroup: true,
+        onPressed: cancel,
+        child: const Text('Cancel'),
+      ),
+    ],
+  ),
+);
+```
+
+- Peers are disabled natively, so pointer, keyboard, and accessibility
+  activation are all blocked. They recover when the operation and any
+  `onError` finish, whether it succeeds or fails.
+- The activation claims the group synchronously, so two taps in the same frame
+  cannot both start work.
+- The nearest group applies; a nested group coordinates only its own members.
+- Only activations claim the group. A `loading` parameter or controller request
+  shows loading on its own button without blocking peers.
+- If the active button is disposed, its operation keeps peers blocked until it
+  finishes. Removing the group releases its members. The group coordinates
+  availability only; cancelling the real work is up to your application.
+- A Future that never completes keeps the group blocked. Give real work a
+  timeout, or rebuild the group with a new `Key` to reset it.
+- A claim stays with the group where activation started. Moving a busy button
+  into another group does not block that group's members.
+- `AsyncButtonGroup.isActiveOf(context)` lets other widgets, such as a form
+  field, react while a member operation is pending.
+
+Without a group, buttons stay independent. For one or two buttons, application
+state is often simpler: `onPressed: isSaving ? null : delete`.
+
 ### Callback errors
 
 All constructors accept an optional `onError` callback using the exported

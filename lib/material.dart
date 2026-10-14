@@ -4,7 +4,7 @@
 library;
 
 export 'src/async_button_helpers.dart'
-    show AsyncButtonController, AsyncButtonErrorHandler;
+    show AsyncButtonController, AsyncButtonErrorHandler, AsyncButtonGroup;
 export 'src/async_elevated_button.dart';
 export 'src/async_filled_button.dart';
 export 'src/async_floating_action_button.dart';

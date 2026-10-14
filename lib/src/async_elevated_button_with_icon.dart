@@ -9,6 +9,7 @@ class _AsyncElevatedButtonWithIcon extends AsyncElevatedButton {
     required super.loadingChild,
     super.onError,
     super.controller,
+    super.excludeFromGroup,
     super.key,
     super.onLongPress,
     super.onHover,

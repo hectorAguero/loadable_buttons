@@ -4,6 +4,6 @@
 library;
 
 export 'src/async_button_helpers.dart'
-    show AsyncButtonController, AsyncButtonErrorHandler;
+    show AsyncButtonController, AsyncButtonErrorHandler, AsyncButtonGroup;
 export 'src/async_cupertino_button.dart' show AsyncCupertinoButton;
 export 'src/loading_transition.dart' show TransitionAnimationType;
