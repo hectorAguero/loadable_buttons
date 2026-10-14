@@ -98,7 +98,7 @@ localized strings in production. Constructor names and `child` versus `label`
 stay the same. 2.0 also ships nullable Material style shortcuts on Elevated,
 Filled, Outlined, and Text buttons, including icon and tonal variants. They
 override only the supplied property and state, falling back through `style`,
-family theme, and native defaults. See [style shortcuts](../README.md#material-style-shortcuts).
+family theme, and native defaults. See the [buttons overview](../README.md#buttons).
 
 ### Localizations and legacy subtrees
 
@@ -110,7 +110,17 @@ for Flutter and Cupertino localization migration as well.
 If a third-party dependency still uses built-in Material, the official
 `MaterialUiCompatibilityBridge` can supply legacy themes and localizations to
 that subtree under a standalone `MaterialApp`. Wrap only the subtree, or use
-`MaterialApp.builder` as in the [README](../README.md#migrating-from-1x).
+`MaterialApp.builder`:
+
+```dart
+MaterialApp(
+  builder: (context, child) => MaterialUiCompatibilityBridge(
+    child: child ?? const SizedBox.shrink(),
+  ),
+  home: const HomeScreen(), // Your application's screen.
+);
+```
+
 The bridge is a temporary migration utility and is marked deprecated by the
 design library; remove it when those dependencies migrate. It does not make
 legacy `ButtonStyle`, `ThemeData`, or other public types interchangeable with
@@ -235,8 +245,7 @@ AsyncOutlinedButton(
 This immediate replacement retains no inactive content. Builders that retain or
 animate both states must guard inactive/outgoing content with `IgnorePointer`,
 `ExcludeFocus`, and `ExcludeSemantics`. Opacity alone is insufficient. Extended
-FABs can invoke builders separately for icon and label. See the
-[custom builder responsibilities](../README.md#custom-builders).
+FABs can invoke builders separately for icon and label.
 
 ## Native Cupertino
 

@@ -31,8 +31,9 @@ policy. Future adaptive constructors must preserve that contract.
   Do not announce from builders, ordinary rebuilds, or animation frames. Any
   future announcement API needs a separate transition-based contract.
 
-The [README examples](../README.md#accessible-loading-content) show localization,
-custom accessible progress, and intentional cancellation. Public widget
+The [README accessibility section](../README.md#accessibility) covers localized
+labels, and the [example app](../example/lib/loading_contract_demo.dart) shows
+custom accessible progress and intentional cancellation. Public widget
 contracts in `test/src/async_button_contract_test.dart` own label visibility,
 null defaults, locale updates, constructor forwarding, and custom-content
 ownership. Existing transition tests own inactive-content isolation and active

@@ -56,9 +56,9 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md#local-checks).
   consumer skill snippets in an isolated application using the candidate.
 - Check README/API/migration links and changelog against the actual constructors.
   Keep controller/debounce/adaptive/custom-style proposals out of release notes.
-- Refresh `screenshots/preview.gif` when the presentation changes; label it as
-  the Material gallery because it does not demonstrate Cupertino. Documentation
-  edits alone do not require new screenshots.
+- Regenerate `screenshots/*.gif` with `bash tool/screenshots/render.sh` when
+  the presentation changes. Documentation edits alone do not require new
+  screenshots.
 
 ## Archive and consumer skill
 
