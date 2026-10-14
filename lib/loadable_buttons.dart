@@ -7,3 +7,4 @@ library;
 
 export 'cupertino.dart';
 export 'material.dart';
+export 'src/async_adaptive_button.dart';
