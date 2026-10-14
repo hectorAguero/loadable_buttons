@@ -35,6 +35,7 @@ class AsyncFloatingActionButton extends StatefulWidget {
     required this.onPressed,
     this.onError,
     this.controller,
+    this.excludeFromGroup = false,
     this.tooltip,
     this.foregroundColor,
     this.backgroundColor,
@@ -84,6 +85,7 @@ class AsyncFloatingActionButton extends StatefulWidget {
     required this.onPressed,
     this.onError,
     this.controller,
+    this.excludeFromGroup = false,
     this.tooltip,
     this.foregroundColor,
     this.backgroundColor,
@@ -136,6 +138,7 @@ class AsyncFloatingActionButton extends StatefulWidget {
     required this.onPressed,
     this.onError,
     this.controller,
+    this.excludeFromGroup = false,
     this.tooltip,
     this.foregroundColor,
     this.backgroundColor,
@@ -188,6 +191,7 @@ class AsyncFloatingActionButton extends StatefulWidget {
     required Widget label,
     this.onError,
     this.controller,
+    this.excludeFromGroup = false,
     this.tooltip,
     this.foregroundColor,
     this.backgroundColor,
@@ -281,6 +285,12 @@ class AsyncFloatingActionButton extends StatefulWidget {
   /// earlier button that used the same controller. The caller owns and disposes
   /// the controller.
   final AsyncButtonController? controller;
+
+  /// Whether this button ignores the nearest [AsyncButtonGroup].
+  ///
+  /// Defaults to false. Excluded buttons, such as a Cancel action, stay
+  /// available while a member operation is pending and do not block members.
+  final bool excludeFromGroup;
 
   /// Whether the application requests external loading.
   ///
@@ -422,6 +432,9 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton>
   @override
   AsyncButtonController? get asyncController => widget.controller;
 
+  @override
+  bool get excludeFromGroup => widget.excludeFromGroup;
+
   bool get _useFullExtendedStack =>
       widget.transitionType == TransitionAnimationType.stack &&
       widget.isExtended;
@@ -464,7 +477,7 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton>
         hoverElevation: widget.hoverElevation,
         highlightElevation: widget.highlightElevation,
         disabledElevation: widget.disabledElevation,
-        onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
+        onPressed: isLocked || widget.onPressed == null ? null : handlePressed,
         mouseCursor: widget.mouseCursor,
         mini: widget.mini,
         shape: widget.shape,
@@ -499,7 +512,7 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton>
         hoverElevation: widget.hoverElevation,
         highlightElevation: widget.highlightElevation,
         disabledElevation: widget.disabledElevation,
-        onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
+        onPressed: isLocked || widget.onPressed == null ? null : handlePressed,
         mouseCursor: widget.mouseCursor,
         shape: widget.shape,
         clipBehavior: widget.clipBehavior,
@@ -532,7 +545,7 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton>
         hoverElevation: widget.hoverElevation,
         highlightElevation: widget.highlightElevation,
         disabledElevation: widget.disabledElevation,
-        onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
+        onPressed: isLocked || widget.onPressed == null ? null : handlePressed,
         mouseCursor: widget.mouseCursor,
         shape: widget.shape,
         clipBehavior: widget.clipBehavior,
@@ -554,7 +567,7 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton>
         splashColor: widget.splashColor,
         highlightElevation: widget.highlightElevation,
         disabledElevation: widget.disabledElevation,
-        onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
+        onPressed: isLocked || widget.onPressed == null ? null : handlePressed,
         mouseCursor: widget.mouseCursor,
         shape: widget.shape,
         isExtended: widget.isExtended,

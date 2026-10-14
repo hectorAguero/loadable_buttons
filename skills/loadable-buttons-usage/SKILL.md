@@ -1,6 +1,6 @@
 ---
 name: loadable-buttons-usage
-description: Use when writing, reviewing, or migrating Flutter code that uses the loadable_buttons package (AsyncElevatedButton, AsyncFilledButton, AsyncOutlinedButton, AsyncTextButton, AsyncIconButton, AsyncFloatingActionButton, or AsyncCupertinoButton). Covers imports, choosing constructors, returning Futures from onPressed, external loading and AsyncButtonController, onError, disabled and long-press behavior, localized loading semantics, theming, sizing, and custom loading content.
+description: Use when writing, reviewing, or migrating Flutter code that uses the loadable_buttons package (AsyncElevatedButton, AsyncFilledButton, AsyncOutlinedButton, AsyncTextButton, AsyncIconButton, AsyncFloatingActionButton, or AsyncCupertinoButton). Covers imports, choosing constructors, returning Futures from onPressed, external loading, AsyncButtonController, AsyncButtonGroup, onError, disabled and long-press behavior, localized loading semantics, theming, sizing, and custom loading content.
 ---
 
 # Using loadable_buttons
@@ -28,8 +28,8 @@ flutter pub add loadable_buttons cupertino_ui
 
 | Import | Exports |
 | --- | --- |
-| `package:loadable_buttons/material.dart` | Material buttons, `AsyncButtonController`, `AsyncButtonErrorHandler`, `TransitionAnimationType` |
-| `package:loadable_buttons/cupertino.dart` | `AsyncCupertinoButton`, `AsyncButtonController`, `AsyncButtonErrorHandler`, `TransitionAnimationType` |
+| `package:loadable_buttons/material.dart` | Material buttons, `AsyncButtonController`, `AsyncButtonErrorHandler`, `AsyncButtonGroup`, `TransitionAnimationType` |
+| `package:loadable_buttons/cupertino.dart` | `AsyncCupertinoButton`, `AsyncButtonController`, `AsyncButtonErrorHandler`, `AsyncButtonGroup`, `TransitionAnimationType` |
 | `package:loadable_buttons/loadable_buttons.dart` | Both families |
 
 - Import `package:material_ui/material_ui.dart` (not
@@ -59,7 +59,7 @@ flutter pub add loadable_buttons cupertino_ui
 | `AsyncCupertinoButton` | default, `.filled`, `.tinted` | `child` |
 
 Every constructor requires `onPressed` (nullable) and accepts `loading`,
-`controller`, `onError`, `loadingChild`, `loadingSemanticsLabel`, `transitionType`,
+`controller`, `excludeFromGroup`, `onError`, `loadingChild`, `loadingSemanticsLabel`, `transitionType`,
 `customBuilder`, `animationDuration`, and `minimumChildOpacity`. Other
 parameters mirror the native widget, such as `style`, `focusNode`,
 `statesController`, `tooltip`, `heroTag`, `sizeStyle`, or `minimumSize`.
@@ -174,7 +174,40 @@ ListenableBuilder(
 - The caller owns and disposes the controller; buttons never dispose it.
 - Use one controller per logical button. It may move between widgets, such as
   in an `AnimatedSwitcher` or across a route transition. It is not a group or
-  mutual-exclusion mechanism for separate buttons.
+  mutual-exclusion mechanism for separate buttons; use `AsyncButtonGroup`.
+
+### One operation at a time with a group
+
+Requires loadable_buttons 2.1.0 or newer. To let only one of several related
+buttons run, wrap them in `AsyncButtonGroup` instead of hand-written
+`isSaving`/`isDeleting` flags:
+
+```dart
+AsyncButtonGroup(
+  child: Row(
+    children: [
+      AsyncFilledButton(onPressed: save, child: const Text('Save')),
+      AsyncOutlinedButton(onPressed: delete, child: const Text('Delete')),
+      AsyncTextButton(
+        excludeFromGroup: true, // escape action stays available
+        onPressed: cancel,
+        child: const Text('Cancel'),
+      ),
+    ],
+  ),
+);
+```
+
+- The active button shows loading; peers are disabled natively (pointer,
+  keyboard, accessibility) without spinners, and recover after success or error.
+- Activation claims the group synchronously; same-frame double taps cannot race.
+- The nearest group applies; nested groups are independent.
+- Only activations claim the group. `loading` and controller requests affect
+  only their own button.
+- Disposing the active button keeps peers blocked until its work finishes.
+  The group never cancels work; the application owns cancellation.
+- Plain Flutter widgets in the group, including non-async buttons, are not
+  blocked; gate them with `AsyncButtonGroup.isActiveOf(context)` when needed.
 
 ## Errors
 
@@ -286,6 +319,8 @@ spinner. It defaults to `null`; the package provides no English fallback.
 - `loading` is used only for application-owned state and is cleared by its owner.
 - Any `AsyncButtonController` is created once, disposed by its owner, and
   used for one logical button.
+- Mutually exclusive async buttons share an `AsyncButtonGroup`, and only
+  deliberate escape actions use `excludeFromGroup: true`.
 - `onError` is either omitted, letting errors propagate, or deliberately
   consumes errors and checks `mounted` before using state or context.
 - Default spinners have a localized `loadingSemanticsLabel`; custom loading

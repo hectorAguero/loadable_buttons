@@ -10,6 +10,7 @@ class _AsyncTextButtonWithIcon extends AsyncTextButton {
     super.loadingSemanticsLabel,
     super.onError,
     super.controller,
+    super.excludeFromGroup,
     super.key,
     super.onLongPress,
     super.onHover,

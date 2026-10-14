@@ -8,6 +8,13 @@
   only its own pending state, and a pending operation keeps locking any button
   that adopts the controller, including during animated switches and route
   transitions.
+* Add `AsyncButtonGroup` to allow one pending operation at a time among
+  descendant async buttons. The active button shows loading; peers are disabled
+  natively for pointer, keyboard, and accessibility activation without showing
+  loading content. Activations claim the group synchronously, the nearest group
+  applies, and an operation releases only its own claim. Add
+  `excludeFromGroup` to every constructor for escape actions such as Cancel,
+  and `AsyncButtonGroup.isActiveOf` for other widgets.
 
 ## 2.0.0
 

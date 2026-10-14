@@ -30,6 +30,7 @@ class AsyncCupertinoButton extends StatefulWidget {
     required this.onPressed,
     this.onError,
     this.controller,
+    this.excludeFromGroup = false,
     this.loading = false,
     this.loadingChild,
     this.loadingSemanticsLabel,
@@ -73,6 +74,7 @@ class AsyncCupertinoButton extends StatefulWidget {
     required this.onPressed,
     this.onError,
     this.controller,
+    this.excludeFromGroup = false,
     this.loading = false,
     this.loadingChild,
     this.loadingSemanticsLabel,
@@ -116,6 +118,7 @@ class AsyncCupertinoButton extends StatefulWidget {
     required this.onPressed,
     this.onError,
     this.controller,
+    this.excludeFromGroup = false,
     this.loading = false,
     this.loadingChild,
     this.loadingSemanticsLabel,
@@ -176,6 +179,12 @@ class AsyncCupertinoButton extends StatefulWidget {
   /// earlier button that used the same controller. The caller owns and disposes
   /// the controller.
   final AsyncButtonController? controller;
+
+  /// Whether this button ignores the nearest [AsyncButtonGroup].
+  ///
+  /// Defaults to false. Excluded buttons, such as a Cancel action, stay
+  /// available while a member operation is pending and do not block members.
+  final bool excludeFromGroup;
 
   /// Whether the application requests loading, independently of pending work.
   ///
@@ -297,8 +306,11 @@ class _AsyncCupertinoButtonState extends State<AsyncCupertinoButton>
   @override
   AsyncButtonController? get asyncController => widget.controller;
 
+  @override
+  bool get excludeFromGroup => widget.excludeFromGroup;
+
   void _handleLongPress() {
-    if (!mounted || isLoading) return;
+    if (!mounted || isLocked) return;
     widget.onLongPress?.call();
   }
 
@@ -314,16 +326,15 @@ class _AsyncCupertinoButtonState extends State<AsyncCupertinoButton>
     // enabled-state flag. Keep the shared disabled accessibility contract.
     return _CupertinoButtonSemantics(
       enabled:
-          !isLoading &&
-          (widget.onPressed != null || widget.onLongPress != null),
+          !isLocked && (widget.onPressed != null || widget.onLongPress != null),
       // Custom loading content may keep an intentional action, such as Cancel.
       isolateContentActions:
           isLoading &&
           (widget.loadingChild != null ||
               widget.transitionType == TransitionAnimationType.customBuilder),
       child: buttonBuilder(
-        onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
-        onLongPress: isLoading || widget.onLongPress == null
+        onPressed: isLocked || widget.onPressed == null ? null : handlePressed,
+        onLongPress: isLocked || widget.onLongPress == null
             ? null
             : _handleLongPress,
         sizeStyle: widget.sizeStyle,

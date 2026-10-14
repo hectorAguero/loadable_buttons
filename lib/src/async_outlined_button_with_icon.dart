@@ -10,6 +10,7 @@ class _AsyncOutlinedButtonWithIcon extends AsyncOutlinedButton {
     super.loadingSemanticsLabel,
     super.onError,
     super.controller,
+    super.excludeFromGroup,
     super.key,
     super.onLongPress,
     super.onHover,

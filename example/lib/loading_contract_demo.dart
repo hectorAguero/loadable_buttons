@@ -241,6 +241,11 @@ class _LoadingContractDemoState extends State<LoadingContractDemo> {
                   onOpenSettings: () =>
                       setState(() => _result = 'Sync settings opened'),
                 ),
+                _GroupDemo(
+                  transitionType: widget.transitionType,
+                  onRun: timedOperation,
+                  onCancel: () => setState(() => _result = 'Cancel pressed'),
+                ),
               ],
             ),
           ),
@@ -319,5 +324,68 @@ class _SyncControllerDemo extends StatelessWidget {
         ],
       ),
     ],
+  );
+}
+
+/// Lets only one of Save and Delete run, keeping Cancel available.
+class _GroupDemo extends StatelessWidget {
+  const _GroupDemo({
+    required this.transitionType,
+    required this.onRun,
+    required this.onCancel,
+  });
+
+  final TransitionAnimationType transitionType;
+  final Future<void> Function()? onRun;
+  final VoidCallback onCancel;
+
+  @override
+  Widget build(BuildContext context) => AsyncButtonGroup(
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: 12,
+      children: [
+        const Text(
+          'Save and Delete share a group: starting one disables the other '
+          'without a spinner. Cancel is excluded and stays available. Real '
+          'cancellation remains the app’s responsibility.',
+        ),
+        Wrap(
+          spacing: 12,
+          runSpacing: 8,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            AsyncFilledButton(
+              transitionType: transitionType,
+              loadingSemanticsLabel: 'Saving',
+              onPressed: onRun,
+              child: const Text('Save'),
+            ),
+            AsyncOutlinedButton(
+              transitionType: transitionType,
+              loadingSemanticsLabel: 'Deleting',
+              onPressed: onRun,
+              child: const Text('Delete'),
+            ),
+            AsyncTextButton(
+              excludeFromGroup: true,
+              onPressed: onCancel,
+              child: const Text('Cancel'),
+            ),
+            // Widgets outside the async family can follow the group too.
+            Builder(
+              builder: (context) => Semantics(
+                liveRegion: true,
+                child: Text(
+                  AsyncButtonGroup.isActiveOf(context)
+                      ? 'Group busy'
+                      : 'Group idle',
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    ),
   );
 }

@@ -45,6 +45,7 @@ class AsyncTextButton extends StatefulWidget {
     required this.onPressed,
     this.onError,
     this.controller,
+    this.excludeFromGroup = false,
     this.loadingChild,
     this.loadingSemanticsLabel,
     this.loading = false,
@@ -87,6 +88,7 @@ class AsyncTextButton extends StatefulWidget {
     required Widget label,
     AsyncButtonErrorHandler? onError,
     AsyncButtonController? controller,
+    bool excludeFromGroup = false,
     Key? key,
     VoidCallback? onLongPress,
     ValueChanged<bool>? onHover,
@@ -122,6 +124,7 @@ class AsyncTextButton extends StatefulWidget {
         onPressed: onPressed,
         onError: onError,
         controller: controller,
+        excludeFromGroup: excludeFromGroup,
         loadingChild: loadingChild,
         loadingSemanticsLabel: loadingSemanticsLabel,
         loading: loading,
@@ -156,6 +159,7 @@ class AsyncTextButton extends StatefulWidget {
       onPressed: onPressed,
       onError: onError,
       controller: controller,
+      excludeFromGroup: excludeFromGroup,
       loading: loading,
       loadingChild: loadingChild,
       loadingSemanticsLabel: loadingSemanticsLabel,
@@ -230,6 +234,12 @@ class AsyncTextButton extends StatefulWidget {
   /// earlier button that used the same controller. The caller owns and disposes
   /// the controller.
   final AsyncButtonController? controller;
+
+  /// Whether this button ignores the nearest [AsyncButtonGroup].
+  ///
+  /// Defaults to false. Excluded buttons, such as a Cancel action, stay
+  /// available while a member operation is pending and do not block members.
+  final bool excludeFromGroup;
 
   /// Whether the application requests external loading.
   ///
@@ -351,8 +361,11 @@ class _AsyncTextButtonState extends State<AsyncTextButton>
   @override
   AsyncButtonController? get asyncController => widget.controller;
 
+  @override
+  bool get excludeFromGroup => widget.excludeFromGroup;
+
   void _handleLongPress() {
-    if (isLoading) return;
+    if (isLocked) return;
     widget.onLongPress?.call();
   }
 
@@ -373,8 +386,8 @@ class _AsyncTextButtonState extends State<AsyncTextButton>
 
     return _LoadingTextButton(
       hasIcon: widget is _AsyncTextButtonWithIcon,
-      onPressed: isLoading || widget.onPressed == null ? null : handlePressed,
-      onLongPress: isLoading || widget.onLongPress == null
+      onPressed: isLocked || widget.onPressed == null ? null : handlePressed,
+      onLongPress: isLocked || widget.onLongPress == null
           ? null
           : _handleLongPress,
       onHover: widget.onHover,
