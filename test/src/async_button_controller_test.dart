@@ -408,4 +408,29 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Busy'), findsNothing);
   });
+
+  testWidgets('a disposed controller cannot leave the button locked', (
+    tester,
+  ) async {
+    final controller = AsyncButtonController();
+    var calls = 0;
+    final uncaught = <Object>[];
+    await tester.pumpWidget(
+      host(controller: controller, onPressed: () => calls++),
+    );
+    // Owner bug: disposing a controller that a mounted button still uses.
+    controller.dispose();
+
+    await runZonedGuarded(() async {
+      await tester.tap(nativeButton);
+      await tester.pumpAndSettle();
+    }, (error, _) => uncaught.add(error));
+
+    expect(uncaught, isNotEmpty);
+    expect(calls, 0);
+    expect(find.text('Busy'), findsNothing);
+    await tester.pumpWidget(host(controller: null, onPressed: () => calls++));
+    await tester.tap(nativeButton);
+    expect(calls, 1);
+  });
 }

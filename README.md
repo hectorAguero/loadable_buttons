@@ -254,7 +254,9 @@ ListenableBuilder(
   parameter, which your application already owns.
 - Setting `controller.loading = false`, replacing the controller, or disposing
   the button never unlocks unfinished work. A pending operation keeps locking
-  any button that adopts the same controller until it finishes.
+  any button that adopts the same controller until it finishes. Pending work
+  stays on the controller it started with: after switching a busy button to a
+  new controller, the new one reports idle while the button stays locked.
 - You own the controller: create it in a `State`, and dispose it in `dispose`.
   Buttons only add and remove listeners.
 - Use one controller per logical button. It may move between widgets, for

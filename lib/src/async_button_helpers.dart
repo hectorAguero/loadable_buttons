@@ -30,6 +30,10 @@ typedef AsyncButtonErrorHandler =
 /// can move between button widgets, including while an animated switch or
 /// route transition briefly shows both; every button using it reflects the
 /// same state, and pending work locks each of them until it finishes.
+///
+/// Pending work stays on the controller it started with. If a button switches
+/// to another controller mid-operation, the new controller reports idle while
+/// the button stays locked; keep the same controller to observe that work.
 class AsyncButtonController extends ChangeNotifier {
   /// Creates a controller with an optional initial manual [loading] request.
   AsyncButtonController({this._loading = false});
@@ -40,7 +44,8 @@ class AsyncButtonController extends ChangeNotifier {
 
   /// Whether the application requests loading, independent of pending work.
   ///
-  /// Changing this value notifies listeners and rebuilds the attached button.
+  /// Changing this value notifies listeners. Buttons using this controller
+  /// rebuild only when that changes their effective loading.
   bool get loading => _loading;
 
   set loading(bool value) {
@@ -152,8 +157,9 @@ mixin AsyncButtonState<ButtonWidget extends StatefulWidget>
     // The operation releases the controller it started with, even if the
     // button switches controllers or is disposed before it finishes.
     final controller = _controller;
-    setState(() => _internalLoading = true);
+    // Begin before locking so a disposed controller cannot strand the lock.
     controller?._beginOperation();
+    setState(() => _internalLoading = true);
 
     try {
       await callback();
