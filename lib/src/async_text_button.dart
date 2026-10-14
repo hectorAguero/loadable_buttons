@@ -386,10 +386,8 @@ class _AsyncTextButtonState extends State<AsyncTextButton>
 
     return _LoadingTextButton(
       hasIcon: widget is _AsyncTextButtonWithIcon,
-      onPressed: isLocked || widget.onPressed == null ? null : handlePressed,
-      onLongPress: isLocked || widget.onLongPress == null
-          ? null
-          : _handleLongPress,
+      onPressed: unlockedHandler(widget.onPressed, handlePressed),
+      onLongPress: unlockedHandler(widget.onLongPress, _handleLongPress),
       onHover: widget.onHover,
       onFocusChange: widget.onFocusChange,
       style: style,

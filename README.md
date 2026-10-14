@@ -298,6 +298,10 @@ AsyncButtonGroup(
 - If the active button is disposed, its operation keeps peers blocked until it
   finishes. Removing the group releases its members. The group coordinates
   availability only; cancelling the real work is up to your application.
+- A Future that never completes keeps the group blocked. Give real work a
+  timeout, or rebuild the group with a new `Key` to reset it.
+- A claim stays with the group where activation started. Moving a busy button
+  into another group does not block that group's members.
 - `AsyncButtonGroup.isActiveOf(context)` lets other widgets, such as a form
   field, react while a member operation is pending.
 

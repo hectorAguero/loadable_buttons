@@ -73,6 +73,12 @@ void main() {
       );
 
       for (final (active, peer) in [('Save', 'Delete'), ('Delete', 'Save')]) {
+        // Focus the peer while it is still enabled, then start the operation.
+        if (peer == 'Delete') {
+          peerFocus.requestFocus();
+          await tester.pump();
+          expect(peerFocus.hasFocus, isTrue);
+        }
         await tester.tap(_nativeButtonOf(active));
         await tester.pump();
         expect(find.text('$active busy'), findsOneWidget);
@@ -81,10 +87,9 @@ void main() {
 
         await tester.tap(_nativeButtonOf(peer), warnIfMissed: false);
         if (peer == 'Delete') {
-          peerFocus.requestFocus();
-          await tester.pump();
           await tester.sendKeyEvent(LogicalKeyboardKey.enter);
           await tester.sendKeyEvent(LogicalKeyboardKey.space);
+          await tester.pump();
         }
         expect(calls, [if (active == 'Delete') 'Save', active]);
 
@@ -93,6 +98,15 @@ void main() {
         expect(_isEnabled(tester, peer), isTrue);
         operation = Completer<void>();
       }
+
+      // Control: the same keyboard path activates the peer once unblocked.
+      peerFocus.requestFocus();
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+      expect(calls, ['Save', 'Delete', 'Delete']);
+      operation.complete();
+      await tester.pumpAndSettle();
       handle.dispose();
     });
   }
@@ -405,5 +419,96 @@ void main() {
     expect(active, isFalse);
     operation.complete();
     await tester.pumpAndSettle();
+  });
+
+  testWidgets('a claim stays with the group where activation started', (
+    tester,
+  ) async {
+    final operation = Completer<void>();
+    final calls = <String>[];
+    final saveKey = GlobalKey();
+    Widget layout({required bool inFirst}) {
+      final save = AsyncTextButton(
+        key: saveKey,
+        loadingChild: const Text('Save busy'),
+        onPressed: () {
+          calls.add('Save');
+
+          return operation.future;
+        },
+        child: const Text('Save'),
+      );
+
+      return MaterialApp(
+        home: Scaffold(
+          body: Column(
+            children: [
+              AsyncButtonGroup(
+                child: Column(
+                  children: [
+                    if (inFirst) save,
+                    button('First peer', () => calls.add('First peer')),
+                  ],
+                ),
+              ),
+              AsyncButtonGroup(
+                child: Column(
+                  children: [
+                    if (!inFirst) save,
+                    button('Second peer', () => calls.add('Second peer')),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    await tester.pumpWidget(layout(inFirst: true));
+    await tester.tap(_nativeButtonOf('Save'));
+    await tester.pump();
+    await tester.pumpWidget(layout(inFirst: false));
+    await tester.pump();
+
+    expect(find.text('Save busy'), findsOneWidget);
+    expect(_isEnabled(tester, 'First peer'), isFalse);
+    await tester.tap(_nativeButtonOf('Second peer'));
+    expect(calls, ['Save', 'Second peer']);
+
+    operation.complete();
+    await tester.pumpAndSettle();
+    await tester.tap(_nativeButtonOf('First peer'));
+    expect(calls, ['Save', 'Second peer', 'First peer']);
+  });
+
+  testWidgets('excluded buttons do not rebuild for group changes', (
+    tester,
+  ) async {
+    final operation = Completer<void>();
+    var cancelBuilds = 0;
+    await tester.pumpWidget(
+      group([
+        button('Save', () => operation.future),
+        AsyncTextButton(
+          excludeFromGroup: true,
+          transitionType: TransitionAnimationType.customBuilder,
+          customBuilder: (_, child, _) {
+            cancelBuilds++;
+
+            return child;
+          },
+          onPressed: () {},
+          child: const Text('Cancel'),
+        ),
+      ]),
+    );
+    final initialBuilds = cancelBuilds;
+
+    await tester.tap(_nativeButtonOf('Save'));
+    await tester.pump();
+    operation.complete();
+    await tester.pumpAndSettle();
+    expect(cancelBuilds, initialBuilds);
   });
 }

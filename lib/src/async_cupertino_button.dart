@@ -333,10 +333,8 @@ class _AsyncCupertinoButtonState extends State<AsyncCupertinoButton>
           (widget.loadingChild != null ||
               widget.transitionType == TransitionAnimationType.customBuilder),
       child: buttonBuilder(
-        onPressed: isLocked || widget.onPressed == null ? null : handlePressed,
-        onLongPress: isLocked || widget.onLongPress == null
-            ? null
-            : _handleLongPress,
+        onPressed: unlockedHandler(widget.onPressed, handlePressed),
+        onLongPress: unlockedHandler(widget.onLongPress, _handleLongPress),
         sizeStyle: widget.sizeStyle,
         padding: widget.padding,
         color: widget.color,

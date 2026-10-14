@@ -578,12 +578,8 @@ class _AsyncFilledButtonState extends State<AsyncFilledButton>
           );
 
     final hasIcon = widget is _AsyncFilledButtonWithIcon;
-    final onPressed = isLocked || widget.onPressed == null
-        ? null
-        : handlePressed;
-    final onLongPress = isLocked || widget.onLongPress == null
-        ? null
-        : _handleLongPress;
+    final onPressed = unlockedHandler(widget.onPressed, handlePressed);
+    final onLongPress = unlockedHandler(widget.onLongPress, _handleLongPress);
     final clipBehavior = resolveButtonClipBehavior(
       clipBehavior: widget.clipBehavior,
       style: style,

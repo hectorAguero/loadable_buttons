@@ -205,7 +205,11 @@ AsyncButtonGroup(
 - Only activations claim the group. `loading` and controller requests affect
   only their own button.
 - Disposing the active button keeps peers blocked until its work finishes.
-  The group never cancels work; the application owns cancellation.
+  The group never cancels work; the application owns cancellation. Give real
+  work a timeout, since a Future that never completes blocks the group (a new
+  group `Key` resets it).
+- A claim stays with the group where activation started; moving a busy button
+  into another group does not block that group's members.
 - Plain Flutter widgets in the group, including non-async buttons, are not
   blocked; gate them with `AsyncButtonGroup.isActiveOf(context)` when needed.
 
