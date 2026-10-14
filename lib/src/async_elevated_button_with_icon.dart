@@ -66,6 +66,26 @@ class _ElevatedButtonWithIconChild extends StatelessWidget {
   final IconAlignment? iconAlignment;
 
   @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(
+        DiagnosticsProperty<ButtonStyle>(
+          'buttonStyle',
+          buttonStyle,
+          defaultValue: null,
+        ),
+      )
+      ..add(
+        EnumProperty<IconAlignment>(
+          'iconAlignment',
+          iconAlignment,
+          defaultValue: null,
+        ),
+      );
+  }
+
+  @override
   Widget build(BuildContext context) {
     final double defaultFontSize =
         buttonStyle?.textStyle?.resolve(const <WidgetState>{})?.fontSize ??

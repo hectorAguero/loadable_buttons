@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:loadable_buttons/src/async_button_helpers.dart';
 import 'package:loadable_buttons/src/async_material_button_helpers.dart';
 import 'package:loadable_buttons/src/loading_transition.dart';
@@ -389,6 +390,96 @@ class AsyncIconButton extends StatefulWidget {
   final _IconButtonVariant _variant;
 
   @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    debugFillAsyncButtonProperties(
+      properties,
+      onPressed: onPressed,
+      onError: onError,
+      controller: controller,
+      excludeFromGroup: excludeFromGroup,
+      loading: loading,
+      loadingSemanticsLabel: loadingSemanticsLabel,
+      transitionType: transitionType,
+      animationDuration: animationDuration,
+      defaultAnimationDuration: Durations.medium1,
+      minimumChildOpacity: minimumChildOpacity,
+      customBuilder: customBuilder,
+    );
+    debugFillAsyncButtonInteractionProperties(
+      properties,
+      onLongPress: onLongPress,
+      focusNode: focusNode,
+      autofocus: autofocus,
+      mouseCursor: mouseCursor,
+    );
+    properties
+      ..add(EnumProperty<_IconButtonVariant>('variant', _variant))
+      ..add(ObjectFlagProperty<ValueChanged<bool>>.has('onHover', onHover))
+      ..add(
+        DiagnosticsProperty<ButtonStyle>('style', style, defaultValue: null),
+      )
+      ..add(DoubleProperty('iconSize', iconSize, defaultValue: null))
+      ..add(
+        DiagnosticsProperty<VisualDensity>(
+          'visualDensity',
+          visualDensity,
+          defaultValue: null,
+        ),
+      )
+      ..add(
+        DiagnosticsProperty<EdgeInsetsGeometry>(
+          'padding',
+          padding,
+          defaultValue: null,
+        ),
+      )
+      ..add(
+        DiagnosticsProperty<AlignmentGeometry>(
+          'alignment',
+          alignment,
+          defaultValue: null,
+        ),
+      )
+      ..add(DoubleProperty('splashRadius', splashRadius, defaultValue: null))
+      ..add(ColorProperty('color', color, defaultValue: null))
+      ..add(ColorProperty('focusColor', focusColor, defaultValue: null))
+      ..add(ColorProperty('hoverColor', hoverColor, defaultValue: null))
+      ..add(ColorProperty('highlightColor', highlightColor, defaultValue: null))
+      ..add(ColorProperty('splashColor', splashColor, defaultValue: null))
+      ..add(ColorProperty('disabledColor', disabledColor, defaultValue: null))
+      ..add(StringProperty('tooltip', tooltip, defaultValue: null))
+      ..add(
+        FlagProperty(
+          'enableFeedback',
+          value: enableFeedback,
+          ifFalse: 'feedback disabled',
+        ),
+      )
+      ..add(
+        DiagnosticsProperty<BoxConstraints>(
+          'constraints',
+          constraints,
+          defaultValue: null,
+        ),
+      )
+      ..add(
+        DiagnosticsProperty<WidgetStateProperty<bool>>(
+          'isSelected',
+          isSelected,
+          defaultValue: null,
+        ),
+      )
+      ..add(
+        DiagnosticsProperty<InteractiveInkFeatureFactory>(
+          'splashFactory',
+          splashFactory,
+          defaultValue: null,
+        ),
+      );
+  }
+
+  @override
   State<AsyncIconButton> createState() => _AsyncIconButtonState();
 }
 
@@ -584,6 +675,21 @@ class _AsyncIconButtonChild extends StatelessWidget {
   customBuilder;
 
   @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    _describeLoadingChild(
+      properties,
+      isLoading: isLoading,
+      loadingSemanticsLabel: loadingSemanticsLabel,
+      style: style,
+      transitionType: transitionType,
+      animationDuration: animationDuration,
+      minimumChildOpacity: minimumChildOpacity,
+      customBuilder: customBuilder,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     if (transitionType == TransitionAnimationType.customBuilder) {
       return customBuilder?.call(isLoading, icon, loadingChild) ?? icon;
@@ -604,4 +710,33 @@ class _AsyncIconButtonChild extends StatelessWidget {
       minimumChildOpacity: minimumChildOpacity,
     );
   }
+}
+
+// Describes the private loading child that IconButton and FAB variants build.
+void _describeLoadingChild(
+  DiagnosticPropertiesBuilder properties, {
+  required bool isLoading,
+  required String? loadingSemanticsLabel,
+  required ButtonStyle? style,
+  required TransitionAnimationType transitionType,
+  required Duration animationDuration,
+  required double minimumChildOpacity,
+  required Function? customBuilder,
+}) {
+  properties
+    ..add(FlagProperty('isLoading', value: isLoading, ifTrue: 'loading'))
+    ..add(
+      StringProperty(
+        'loadingSemanticsLabel',
+        loadingSemanticsLabel,
+        defaultValue: null,
+      ),
+    )
+    ..add(DiagnosticsProperty<ButtonStyle>('style', style, defaultValue: null))
+    ..add(
+      EnumProperty<TransitionAnimationType>('transitionType', transitionType),
+    )
+    ..add(DiagnosticsProperty<Duration>('animationDuration', animationDuration))
+    ..add(DoubleProperty('minimumChildOpacity', minimumChildOpacity))
+    ..add(ObjectFlagProperty<Function>.has('customBuilder', customBuilder));
 }

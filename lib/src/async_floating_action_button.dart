@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:loadable_buttons/src/async_button_helpers.dart';
 import 'package:loadable_buttons/src/async_material_button_helpers.dart';
 import 'package:loadable_buttons/src/loading_transition.dart';
@@ -407,6 +408,130 @@ class AsyncFloatingActionButton extends StatefulWidget {
   final InteractiveInkFeatureFactory? splashFactory;
 
   @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    debugFillAsyncButtonProperties(
+      properties,
+      onPressed: onPressed,
+      onError: onError,
+      controller: controller,
+      excludeFromGroup: excludeFromGroup,
+      loading: loading,
+      loadingSemanticsLabel: loadingSemanticsLabel,
+      transitionType: transitionType,
+      animationDuration: animationDuration,
+      defaultAnimationDuration: Durations.medium1,
+      minimumChildOpacity: minimumChildOpacity,
+      customBuilder: customBuilder,
+    );
+    debugFillAsyncButtonInteractionProperties(
+      properties,
+      focusNode: focusNode,
+      autofocus: autofocus,
+      mouseCursor: mouseCursor,
+    );
+    properties
+      ..add(
+        EnumProperty<_FloatingActionButtonType>(
+          'type',
+          _floatingActionButtonType,
+        ),
+      )
+      ..add(StringProperty('tooltip', tooltip, defaultValue: null))
+      ..add(
+        ColorProperty('foregroundColor', foregroundColor, defaultValue: null),
+      )
+      ..add(
+        ColorProperty('backgroundColor', backgroundColor, defaultValue: null),
+      )
+      ..add(ColorProperty('focusColor', focusColor, defaultValue: null))
+      ..add(ColorProperty('hoverColor', hoverColor, defaultValue: null))
+      ..add(ColorProperty('splashColor', splashColor, defaultValue: null))
+      ..add(
+        FlagProperty(
+          'enableFeedback',
+          value: enableFeedback,
+          ifFalse: 'feedback disabled',
+        ),
+      )
+      ..add(FlagProperty('mini', value: mini, ifTrue: 'mini'))
+      ..add(
+        DiagnosticsProperty<Object>(
+          'heroTag',
+          heroTag,
+          defaultValue: const _DefaultHeroTag(),
+        ),
+      )
+      ..add(DoubleProperty('elevation', elevation, defaultValue: null))
+      ..add(
+        DoubleProperty('focusElevation', focusElevation, defaultValue: null),
+      )
+      ..add(
+        DoubleProperty('hoverElevation', hoverElevation, defaultValue: null),
+      )
+      ..add(
+        DoubleProperty(
+          'highlightElevation',
+          highlightElevation,
+          defaultValue: null,
+        ),
+      )
+      ..add(
+        DoubleProperty(
+          'disabledElevation',
+          disabledElevation,
+          defaultValue: null,
+        ),
+      )
+      ..add(
+        DiagnosticsProperty<ShapeBorder>('shape', shape, defaultValue: null),
+      )
+      ..add(
+        EnumProperty<Clip>(
+          'clipBehavior',
+          clipBehavior,
+          defaultValue: Clip.none,
+        ),
+      )
+      ..add(
+        EnumProperty<MaterialTapTargetSize>(
+          'materialTapTargetSize',
+          materialTapTargetSize,
+          defaultValue: null,
+        ),
+      )
+      ..add(FlagProperty('isExtended', value: isExtended, ifTrue: 'extended'))
+      ..add(
+        DiagnosticsProperty<TextStyle>(
+          'extendedTextStyle',
+          extendedTextStyle,
+          defaultValue: null,
+        ),
+      )
+      ..add(
+        DiagnosticsProperty<EdgeInsetsGeometry>(
+          'extendedPadding',
+          extendedPadding,
+          defaultValue: null,
+        ),
+      )
+      ..add(
+        DoubleProperty(
+          'extendedIconLabelSpacing',
+          extendedIconLabelSpacing,
+          defaultValue: null,
+        ),
+      )
+      ..add(
+        DiagnosticsProperty<InteractiveInkFeatureFactory>(
+          'splashFactory',
+          splashFactory,
+          defaultValue: null,
+        ),
+      );
+  }
+
+  @override
   State<AsyncFloatingActionButton> createState() =>
       _AsyncFloatingActionButtonState();
 }
@@ -653,6 +778,43 @@ class _AsyncFloatingActionButtonChild extends StatelessWidget {
   final double minimumChildOpacity;
   final Widget Function(bool loading, Widget icon, Widget? loadingChild)?
   customBuilder;
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(
+        DiagnosticsProperty<EdgeInsetsGeometry>(
+          'contentPadding',
+          contentPadding,
+          defaultValue: EdgeInsets.zero,
+        ),
+      )
+      ..add(
+        DoubleProperty(
+          'iconLabelSpacing',
+          iconLabelSpacing,
+          defaultValue: null,
+        ),
+      )
+      ..add(
+        StringProperty(
+          'loadingSemanticsLabel',
+          loadingSemanticsLabel,
+          defaultValue: null,
+        ),
+      )
+      ..add(ColorProperty('color', color, defaultValue: null))
+      ..add(
+        EnumProperty<TransitionAnimationType>('transitionType', transitionType),
+      )
+      ..add(FlagProperty('isLoading', value: isLoading, ifTrue: 'loading'))
+      ..add(
+        DiagnosticsProperty<Duration>('animationDuration', animationDuration),
+      )
+      ..add(DoubleProperty('minimumChildOpacity', minimumChildOpacity))
+      ..add(ObjectFlagProperty<Function>.has('customBuilder', customBuilder));
+  }
 
   @override
   Widget build(BuildContext context) {

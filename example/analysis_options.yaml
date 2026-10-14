@@ -1,0 +1,8 @@
+# The analyzer discovers this filename automatically for the example app.
+include: ../analysis_options.yaml
+
+linter:
+  rules:
+    # Package widgets describe their properties for DevTools; demo widgets
+    # stay focused on showing package usage.
+    diagnostic_describe_all_properties: false

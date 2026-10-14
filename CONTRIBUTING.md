@@ -61,8 +61,18 @@ relax it to keep finder and fixture code readable. Where a constructor tear-off
 switch would spell out every parameter, a documented ignore keeps it inferred.
 Other available lints conflict with the preset or the package style (for
 example `prefer_double_quotes`, `prefer_relative_imports`, `always_specify_types`,
-and `unnecessary_final`). `diagnostic_describe_all_properties`
-is desirable for DevTools but needs `debugFillProperties` on every widget first.
+and `unnecessary_final`).
+
+`diagnostic_describe_all_properties` requires every widget, including private
+helpers and the semantics render object, to describe its public properties for
+the DevTools inspector. Shared helpers keep this short:
+`debugFillAsyncButtonProperties` and `debugFillAsyncButtonInteractionProperties`
+in `async_button_helpers.dart` describe the async contract, and
+`debugFillMaterialButtonProperties` describes the Material style shortcuts, which
+are otherwise folded into one native `style`. Each family describes only its own
+remaining fields inline. The shared State mixin also reports runtime state
+(`isLoading`, `operationPending`, `blockedByGroup`). Add a property to the
+matching helper or override when adding a constructor parameter.
 
 VGA supplies checks such as `unawaited_futures`, `discarded_futures`,
 `use_build_context_synchronously`, `cancel_subscriptions`,
@@ -152,8 +162,10 @@ Plugin test-assertion and filename checks run on both SDKs. Named callback typed
 remain allowed to keep parameterized fixtures readable. Lints can detect missing
 assertions, but reviewing the behavior a test protects is still necessary.
 
-The example inherits the package policy, with a function-length exception only
-for `_HomePageState.build`, which showcases all button variants.
+The example inherits the package policy through `example/analysis_options.yaml`,
+with a function-length exception only for `_HomePageState.build`, which
+showcases all button variants, and without `diagnostic_describe_all_properties`:
+demo widgets stay focused on package usage.
 
 ## Local checks
 

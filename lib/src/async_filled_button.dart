@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:loadable_buttons/src/async_button_helpers.dart';
 import 'package:loadable_buttons/src/async_material_button_helpers.dart';
 import 'package:loadable_buttons/src/async_outlined_button.dart'
@@ -514,6 +515,48 @@ class AsyncFilledButton extends StatefulWidget {
   final InteractiveInkFeatureFactory? splashFactory;
 
   final _AsyncFilledButtonVariant _variant;
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    debugFillAsyncButtonProperties(
+      properties,
+      onPressed: onPressed,
+      onError: onError,
+      controller: controller,
+      excludeFromGroup: excludeFromGroup,
+      loading: loading,
+      loadingSemanticsLabel: loadingSemanticsLabel,
+      transitionType: transitionType,
+      animationDuration: animationDuration,
+      defaultAnimationDuration: Durations.medium1,
+      minimumChildOpacity: minimumChildOpacity,
+      customBuilder: customBuilder,
+    );
+    debugFillAsyncButtonInteractionProperties(
+      properties,
+      onLongPress: onLongPress,
+      focusNode: focusNode,
+      autofocus: autofocus,
+      mouseCursor: mouseCursor,
+      onFocusChange: onFocusChange,
+    );
+    debugFillMaterialButtonProperties(
+      properties,
+      style: style,
+      padding: padding,
+      minimumSize: minimumSize,
+      alignment: alignment,
+      backgroundColor: backgroundColor,
+      foregroundColor: foregroundColor,
+      disabledBackgroundColor: disabledBackgroundColor,
+      disabledForegroundColor: disabledForegroundColor,
+      clipBehavior: clipBehavior,
+      statesController: statesController,
+      onHover: onHover,
+      splashFactory: splashFactory,
+    );
+  }
 
   @override
   State<AsyncFilledButton> createState() => _AsyncFilledButtonState();

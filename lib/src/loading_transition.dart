@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 /// The type of animation between idle and loading content.
@@ -66,6 +67,34 @@ class LoadingTransition extends StatelessWidget {
 
   /// Keeps native full-button constraints when wrapping its background layer.
   final bool preserveChildConstraints;
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(FlagProperty('isLoading', value: isLoading, ifTrue: 'loading'))
+      ..add(
+        EnumProperty<TransitionAnimationType>('transitionType', transitionType),
+      )
+      ..add(
+        DiagnosticsProperty<Duration>('animationDuration', animationDuration),
+      )
+      ..add(DoubleProperty('minimumChildOpacity', minimumChildOpacity))
+      ..add(
+        FlagProperty(
+          'animateChildSize',
+          value: animateChildSize,
+          ifFalse: 'fixed child size',
+        ),
+      )
+      ..add(
+        FlagProperty(
+          'preserveChildConstraints',
+          value: preserveChildConstraints,
+          ifTrue: 'preserves child constraints',
+        ),
+      );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -140,6 +169,12 @@ class _InactiveContent extends StatelessWidget {
 
   final bool active;
   final Widget child;
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(FlagProperty('active', value: active, ifFalse: 'inactive'));
+  }
 
   @override
   Widget build(BuildContext context) => IgnorePointer(

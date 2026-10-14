@@ -25,6 +25,10 @@
   operation keeps the newly rendered button loading and locked without
   repeating or cancelling the work, even if the controller changes too, and a
   focused button keeps keyboard focus.
+* Describe every button's configuration in the Flutter DevTools inspector,
+  including the async contract, Material style shortcuts, and family-specific
+  options, and report each button's runtime state: effective loading, a pending
+  operation, and blocking by an `AsyncButtonGroup` peer.
 
 ## 2.0.0
 
