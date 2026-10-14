@@ -26,13 +26,19 @@ plugins:
     # dart_code_linter.rules below for the CLI.
     diagnostics:
       always-remove-listener: true
+      avoid-banned-imports: true
+      avoid-border-all: true
       avoid-collection-methods-with-unrelated-types: true
       avoid-duplicate-exports: true
       avoid-redundant-async: true
+      avoid-throw-in-catch-block: true
       avoid-unnecessary-conditionals: true
+      avoid-wrapping-in-padding: true
       check-for-equals-in-render-object-setters: true
       consistent-update-render-object: true
       prefer-async-await: true
+      prefer-correct-edge-insets-constructor: true
+      prefer-iterable-of: true
       prefer-media-query-direct-access: true
       use-setstate-synchronously: true
       # Plugin diagnostics are enabled at the package root, including tests.
@@ -108,19 +114,47 @@ linter:
     # The existing public Widget builder callback takes a positional bool.
     # Changing its signature would break package consumers.
     avoid_positional_boolean_parameters: false
+    # Dart 3.12 rules beyond the VGA 10.3.0 preset that guard this package.
+    avoid_annotating_with_dynamic: true
+    avoid_classes_with_only_static_members: true
+    avoid_implementing_value_types: true
+    close_sinks: true
+    do_not_use_environment: true
+    library_names: true
+    no_runtimetype_tostring: true
+    prefer_for_elements_to_map_fromiterable: true
+    prefer_iterable_wheretype: true
+    prefer_void_to_null: true
+    use_decorated_box: true
 
 # CLI configuration for the DCL rules enabled above; Solid and VGA own the
 # overlapping checks.
 dart_code_linter:
   rules:
     - always-remove-listener
+    # Version 2 uses standalone design libraries; legacy Flutter types are
+    # distinct and rejected by the public API.
+    - avoid-banned-imports:
+        entries:
+          - paths: ['.*\.dart']
+            deny:
+              - 'package:flutter/material\.dart'
+              - 'package:flutter/cupertino\.dart'
+            message: >-
+              Import package:material_ui/material_ui.dart or
+              package:cupertino_ui/cupertino_ui.dart instead.
+    - avoid-border-all
     - avoid-collection-methods-with-unrelated-types
     - avoid-duplicate-exports
     - avoid-redundant-async
+    - avoid-throw-in-catch-block
     - avoid-unnecessary-conditionals
+    - avoid-wrapping-in-padding
     - check-for-equals-in-render-object-setters
     - consistent-update-render-object
     - prefer-async-await
+    - prefer-correct-edge-insets-constructor
+    - prefer-iterable-of
     - prefer-media-query-direct-access
     - use-setstate-synchronously
     - missing-test-assertion

@@ -49,6 +49,18 @@ instead of the default `test/**` pattern.
 casts, strict inference, and strict raw types. Public API documentation and public type
 annotations remain enabled because this is a reusable package.
 
+Beyond the preset, the package enables Dart 3.12 lints that guard it without
+conflicting with its conventions: `avoid_annotating_with_dynamic`,
+`avoid_classes_with_only_static_members`, `avoid_implementing_value_types`,
+`close_sinks`, `do_not_use_environment`, `library_names`,
+`no_runtimetype_tostring`, `prefer_for_elements_to_map_fromiterable`,
+`prefer_iterable_wheretype`, `prefer_void_to_null`, and `use_decorated_box`.
+Other available lints conflict with the preset or the package style (for
+example `prefer_double_quotes`, `prefer_relative_imports`, `always_specify_types`,
+and `unnecessary_final`) or require typing every local
+(`specify_nonobvious_local_variable_types`). `diagnostic_describe_all_properties`
+is desirable for DevTools but needs `debugFillProperties` on every widget first.
+
 VGA supplies checks such as `unawaited_futures`, `discarded_futures`,
 `use_build_context_synchronously`, `cancel_subscriptions`,
 `library_private_types_in_public_api`, `document_ignores`, and
@@ -94,14 +106,24 @@ The package overrides policies that conflict with its API or structure:
 All CI jobs check formatting using the package's declared Dart 3.12 language
 version, so the minimum and stable formatters share the same baseline.
 
-DCL enables `always-remove-listener`, `use-setstate-synchronously`,
+DCL enables `avoid-banned-imports` to reject legacy `package:flutter/material.dart`
+and `package:flutter/cupertino.dart` imports, plus `always-remove-listener`,
+`use-setstate-synchronously`, `avoid-throw-in-catch-block`,
 `check-for-equals-in-render-object-setters`, `consistent-update-render-object`,
-`avoid-collection-methods-with-unrelated-types`, `avoid-unnecessary-conditionals`,
-`avoid-duplicate-exports`, `prefer-media-query-direct-access`,
+`prefer-media-query-direct-access`, `avoid-wrapping-in-padding`,
+`avoid-border-all`, `prefer-correct-edge-insets-constructor`,
+`avoid-collection-methods-with-unrelated-types`, `prefer-iterable-of`,
+`avoid-unnecessary-conditionals`, `avoid-duplicate-exports`,
 `avoid-redundant-async`, `prefer-async-await`, `missing-test-assertion`, and
-`prefer-correct-test-file-name`.
-`no-equal-arguments` and `avoid-missing-enum-constant-in-map` were evaluated and
-left off: they flag intentional same-value arguments and partial state maps. Test rules recognize `testWidgets` as well as
+`prefer-correct-test-file-name`. The CLI (`tool/check_dcl.sh`) is the enforcing
+check: `dart analyze` does not print DCL plugin diagnostics.
+
+Evaluated and left off: `no-equal-arguments`, `avoid-missing-enum-constant-in-map`,
+`no-object-declaration`, and `prefer-first-or-null` flag intentional code such as
+same-value arguments, partial state maps, Flutter's `Object?` hero tag, and tests
+that expect `.first` to throw.
+
+Test rules recognize `testWidgets` as well as
 `test`. Plugin diagnostics are enabled at the package root; directory-specific
 policies are set through the included options and Solid's configuration.
 
