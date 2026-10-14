@@ -426,7 +426,15 @@ void main() {
       await tester.pumpAndSettle();
     }, (error, _) => uncaught.add(error));
 
-    expect(uncaught, isNotEmpty);
+    expect(uncaught, hasLength(1));
+    expect(
+      uncaught.single,
+      isA<FlutterError>().having(
+        (error) => error.message,
+        'message',
+        allOf(contains('AsyncButtonController'), contains('disposed')),
+      ),
+    );
     expect(calls, 0);
     expect(find.text('Busy'), findsNothing);
     await tester.pumpWidget(host(controller: null, onPressed: () => calls++));

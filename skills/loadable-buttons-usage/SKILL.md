@@ -164,8 +164,10 @@ ListenableBuilder(
 );
 ```
 
-- `isPending`: this button's `onPressed`/`onError` is running. Read-only;
-  only that operation clears it, even after controller replacement or disposal.
+- `isPending`: an `onPressed`/`onError` started with this controller is
+  running, possibly from an earlier button. Read-only; only that operation
+  clears it. Work stays on its starting controller: after a mid-operation
+  controller swap, the new controller reports idle while the button is locked.
 - `loading`: a manual request equivalent to the `loading` parameter. Setting it
   to false never unlocks pending work.
 - `isLoading`: `loading || isPending`, excluding the widget's `loading` parameter.

@@ -246,8 +246,9 @@ ListenableBuilder(
 );
 ```
 
-- `isPending` is true while this button's `onPressed` and any `onError` run.
-  Only that operation clears it.
+- `isPending` is true while an `onPressed` and any `onError` started with this
+  controller run, possibly from an earlier button. Only that operation clears
+  it.
 - `loading` is a manual request, like the `loading` parameter. Effective loading
   combines the parameter, `controller.loading`, and the pending operation.
 - `isLoading` is `loading || isPending`; it excludes the widget's own `loading`
