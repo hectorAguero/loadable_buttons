@@ -1,6 +1,111 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+import 'package:loadable_buttons/src/loading_transition.dart';
+
+/// Describes the loading contract shared by every async button family.
+///
+/// Native options forwarded unchanged are also described by the native button
+/// below it in the inspector; these properties describe the async layer.
+void debugFillAsyncButtonProperties(
+  DiagnosticPropertiesBuilder properties, {
+  required Function? onPressed,
+  required AsyncButtonErrorHandler? onError,
+  required AsyncButtonController? controller,
+  required bool excludeFromGroup,
+  required bool loading,
+  required String? loadingSemanticsLabel,
+  required TransitionAnimationType transitionType,
+  required Duration? animationDuration,
+  required Duration? defaultAnimationDuration,
+  required double minimumChildOpacity,
+  required Function? customBuilder,
+}) {
+  properties
+    ..add(
+      FlagProperty('enabled', value: onPressed != null, ifFalse: 'disabled'),
+    )
+    ..add(ObjectFlagProperty<Function>.has('onError', onError))
+    ..add(
+      DiagnosticsProperty<AsyncButtonController>(
+        'controller',
+        controller,
+        defaultValue: null,
+      ),
+    )
+    ..add(
+      FlagProperty(
+        'excludeFromGroup',
+        value: excludeFromGroup,
+        ifTrue: 'excluded from group',
+      ),
+    )
+    ..add(FlagProperty('loading', value: loading, ifTrue: 'loading requested'))
+    ..add(
+      StringProperty(
+        'loadingSemanticsLabel',
+        loadingSemanticsLabel,
+        defaultValue: null,
+      ),
+    )
+    ..add(
+      EnumProperty<TransitionAnimationType>(
+        'transitionType',
+        transitionType,
+        defaultValue: TransitionAnimationType.stack,
+      ),
+    )
+    ..add(
+      DiagnosticsProperty<Duration>(
+        'animationDuration',
+        animationDuration,
+        defaultValue: defaultAnimationDuration,
+      ),
+    )
+    ..add(
+      DoubleProperty(
+        'minimumChildOpacity',
+        minimumChildOpacity,
+        defaultValue: 0.0,
+      ),
+    )
+    ..add(ObjectFlagProperty<Function>.has('customBuilder', customBuilder));
+}
+
+/// Describes focus and pointer options that most families forward natively.
+void debugFillAsyncButtonInteractionProperties(
+  DiagnosticPropertiesBuilder properties, {
+  required FocusNode? focusNode,
+  required bool autofocus,
+  required MouseCursor? mouseCursor,
+  VoidCallback? onLongPress,
+  ValueChanged<bool>? onFocusChange,
+}) {
+  properties
+    ..add(ObjectFlagProperty<VoidCallback>.has('onLongPress', onLongPress))
+    ..add(
+      DiagnosticsProperty<FocusNode>(
+        'focusNode',
+        focusNode,
+        defaultValue: null,
+      ),
+    )
+    ..add(FlagProperty('autofocus', value: autofocus, ifTrue: 'autofocus'))
+    ..add(
+      DiagnosticsProperty<MouseCursor>(
+        'mouseCursor',
+        mouseCursor,
+        defaultValue: null,
+      ),
+    )
+    ..add(
+      ObjectFlagProperty<ValueChanged<bool>>.has(
+        'onFocusChange',
+        onFocusChange,
+      ),
+    );
+}
 
 /// A handler that consumes an activation error when it completes successfully.
 ///
@@ -176,6 +281,29 @@ mixin AsyncButtonState<ButtonWidget extends StatefulWidget>
   /// [AsyncButtonGroup] has a pending operation. Peers are disabled natively
   /// without showing loading content.
   bool get isLocked => isLoading || (_group?._isBlocking(this) ?? false);
+
+  // Shows the effective runtime state in the inspector, beside the widget's
+  // configuration.
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(FlagProperty('isLoading', value: isLoading, ifTrue: 'loading'))
+      ..add(
+        FlagProperty(
+          'operationPending',
+          value: _internalLoading,
+          ifTrue: 'operation pending',
+        ),
+      )
+      ..add(
+        FlagProperty(
+          'blockedByGroup',
+          value: _group?._isBlocking(this) ?? false,
+          ifTrue: 'blocked by group',
+        ),
+      );
+  }
 
   /// Returns [handler] while [callback] is supplied and activation is allowed.
   ///

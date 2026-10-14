@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:flutter/foundation.dart';
 import 'package:loadable_buttons/src/async_button_helpers.dart';
 import 'package:loadable_buttons/src/async_cupertino_button.dart';
 import 'package:loadable_buttons/src/async_filled_button.dart';
@@ -237,6 +238,86 @@ class AsyncAdaptiveButton extends StatefulWidget {
   final _AsyncAdaptiveButtonVariant _variant;
 
   @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    debugFillAsyncButtonProperties(
+      properties,
+      onPressed: onPressed,
+      onError: onError,
+      controller: controller,
+      excludeFromGroup: excludeFromGroup,
+      loading: loading,
+      loadingSemanticsLabel: loadingSemanticsLabel,
+      transitionType: transitionType,
+      animationDuration: animationDuration,
+      defaultAnimationDuration: null,
+      minimumChildOpacity: minimumChildOpacity,
+      customBuilder: customBuilder,
+    );
+    debugFillAsyncButtonInteractionProperties(
+      properties,
+      onLongPress: onLongPress,
+      focusNode: focusNode,
+      autofocus: autofocus,
+      mouseCursor: mouseCursor,
+      onFocusChange: onFocusChange,
+    );
+    properties
+      ..add(EnumProperty<_AsyncAdaptiveButtonVariant>('variant', _variant))
+      ..add(
+        EnumProperty<TargetPlatform>('platform', platform, defaultValue: null),
+      )
+      ..add(
+        DiagnosticsProperty<EdgeInsetsGeometry>(
+          'padding',
+          padding,
+          defaultValue: null,
+        ),
+      )
+      ..add(
+        DiagnosticsProperty<Size>(
+          'minimumSize',
+          minimumSize,
+          defaultValue: null,
+        ),
+      )
+      ..add(
+        DiagnosticsProperty<AlignmentGeometry>(
+          'alignment',
+          alignment,
+          defaultValue: null,
+        ),
+      )
+      ..add(
+        ColorProperty('backgroundColor', backgroundColor, defaultValue: null),
+      )
+      ..add(
+        ColorProperty(
+          'disabledBackgroundColor',
+          disabledBackgroundColor,
+          defaultValue: null,
+        ),
+      )
+      ..add(
+        ColorProperty('foregroundColor', foregroundColor, defaultValue: null),
+      )
+      ..add(
+        DiagnosticsProperty<ButtonStyle>(
+          'materialStyle',
+          materialStyle,
+          defaultValue: null,
+        ),
+      )
+      ..add(
+        EnumProperty<CupertinoButtonSize>(
+          'cupertinoSizeStyle',
+          cupertinoSizeStyle,
+          defaultValue: CupertinoButtonSize.large,
+        ),
+      );
+  }
+
+  @override
   State<AsyncAdaptiveButton> createState() => _AsyncAdaptiveButtonState();
 }
 
@@ -355,6 +436,12 @@ class _AdaptiveCupertinoButton extends StatelessWidget {
   final FocusNode focusNode;
 
   @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    _describeRendered(properties, onPressed, onError, loading, focusNode);
+  }
+
+  @override
   Widget build(BuildContext context) {
     // A constructor tear-off type would spell out every Cupertino parameter.
     // ignore: specify_nonobvious_local_variable_types
@@ -420,6 +507,12 @@ class _AdaptiveMaterialButton extends StatelessWidget {
   final FocusNode focusNode;
 
   @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    _describeRendered(properties, onPressed, onError, loading, focusNode);
+  }
+
+  @override
   Widget build(BuildContext context) {
     // The shared parameters of AsyncTextButton, AsyncFilledButton, and
     // AsyncFilledButton.tonal, so one call forwards them to any of the three.
@@ -483,4 +576,19 @@ class _AdaptiveMaterialButton extends StatelessWidget {
       child: button.child,
     );
   }
+}
+
+// Describes what the adaptive state passes to a rendered button.
+void _describeRendered(
+  DiagnosticPropertiesBuilder properties,
+  Function? onPressed,
+  Function? onError,
+  bool loading,
+  FocusNode focusNode,
+) {
+  properties
+    ..add(ObjectFlagProperty<Function>.has('onPressed', onPressed))
+    ..add(ObjectFlagProperty<Function>.has('onError', onError))
+    ..add(FlagProperty('loading', value: loading, ifTrue: 'loading'))
+    ..add(DiagnosticsProperty<FocusNode>('focusNode', focusNode));
 }

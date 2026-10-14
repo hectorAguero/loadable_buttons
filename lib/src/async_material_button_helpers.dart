@@ -1,5 +1,79 @@
+import 'package:flutter/foundation.dart';
 import 'package:loadable_buttons/src/loading_transition.dart';
 import 'package:material_ui/material_ui.dart';
+
+/// Describes the style shortcuts and native options of the Elevated, Filled,
+/// Outlined, and Text families.
+///
+/// Shortcuts are folded into the native button's single `style`, so they are
+/// described individually here.
+void debugFillMaterialButtonProperties(
+  DiagnosticPropertiesBuilder properties, {
+  required ButtonStyle? style,
+  required EdgeInsetsGeometry? padding,
+  required Size? minimumSize,
+  required AlignmentGeometry? alignment,
+  required Color? backgroundColor,
+  required Color? foregroundColor,
+  required Color? disabledBackgroundColor,
+  required Color? disabledForegroundColor,
+  required Clip? clipBehavior,
+  required WidgetStatesController? statesController,
+  required ValueChanged<bool>? onHover,
+  required InteractiveInkFeatureFactory? splashFactory,
+}) {
+  properties
+    ..add(DiagnosticsProperty<ButtonStyle>('style', style, defaultValue: null))
+    ..add(
+      DiagnosticsProperty<EdgeInsetsGeometry>(
+        'padding',
+        padding,
+        defaultValue: null,
+      ),
+    )
+    ..add(
+      DiagnosticsProperty<Size>('minimumSize', minimumSize, defaultValue: null),
+    )
+    ..add(
+      DiagnosticsProperty<AlignmentGeometry>(
+        'alignment',
+        alignment,
+        defaultValue: null,
+      ),
+    )
+    ..add(ColorProperty('backgroundColor', backgroundColor, defaultValue: null))
+    ..add(ColorProperty('foregroundColor', foregroundColor, defaultValue: null))
+    ..add(
+      ColorProperty(
+        'disabledBackgroundColor',
+        disabledBackgroundColor,
+        defaultValue: null,
+      ),
+    )
+    ..add(
+      ColorProperty(
+        'disabledForegroundColor',
+        disabledForegroundColor,
+        defaultValue: null,
+      ),
+    )
+    ..add(EnumProperty<Clip>('clipBehavior', clipBehavior, defaultValue: null))
+    ..add(
+      DiagnosticsProperty<WidgetStatesController>(
+        'statesController',
+        statesController,
+        defaultValue: null,
+      ),
+    )
+    ..add(ObjectFlagProperty<ValueChanged<bool>>.has('onHover', onHover))
+    ..add(
+      DiagnosticsProperty<InteractiveInkFeatureFactory>(
+        'splashFactory',
+        splashFactory,
+        defaultValue: null,
+      ),
+    );
+}
 
 /// Applies nullable Material shortcuts, preserving unrelated style fields.
 ///
@@ -166,6 +240,24 @@ class DefaultLoadingIndicator extends StatelessWidget {
 
   /// The optional localized accessibility label for the default spinner.
   final String? loadingSemanticsLabel;
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(
+        DiagnosticsProperty<ButtonStyle>('style', style, defaultValue: null),
+      )
+      ..add(ObjectFlagProperty<Function>.has('themeStyleOf', themeStyleOf))
+      ..add(ColorProperty('color', color, defaultValue: null))
+      ..add(
+        StringProperty(
+          'loadingSemanticsLabel',
+          loadingSemanticsLabel,
+          defaultValue: null,
+        ),
+      );
+  }
 
   @override
   Widget build(BuildContext context) => CircularProgressIndicator(

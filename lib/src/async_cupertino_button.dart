@@ -302,6 +302,85 @@ class AsyncCupertinoButton extends StatefulWidget {
   final _AsyncCupertinoButtonVariant _variant;
 
   @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    debugFillAsyncButtonProperties(
+      properties,
+      onPressed: onPressed,
+      onError: onError,
+      controller: controller,
+      excludeFromGroup: excludeFromGroup,
+      loading: loading,
+      loadingSemanticsLabel: loadingSemanticsLabel,
+      transitionType: transitionType,
+      animationDuration: animationDuration,
+      defaultAnimationDuration: asyncCupertinoAnimationDuration,
+      minimumChildOpacity: minimumChildOpacity,
+      customBuilder: customBuilder,
+    );
+    debugFillAsyncButtonInteractionProperties(
+      properties,
+      onLongPress: onLongPress,
+      focusNode: focusNode,
+      autofocus: autofocus,
+      mouseCursor: mouseCursor,
+      onFocusChange: onFocusChange,
+    );
+    properties
+      ..add(EnumProperty<_AsyncCupertinoButtonVariant>('variant', _variant))
+      ..add(
+        EnumProperty<CupertinoButtonSize>(
+          'sizeStyle',
+          sizeStyle,
+          defaultValue: CupertinoButtonSize.large,
+        ),
+      )
+      ..add(
+        DiagnosticsProperty<EdgeInsetsGeometry>(
+          'padding',
+          padding,
+          defaultValue: null,
+        ),
+      )
+      ..add(ColorProperty('color', color, defaultValue: null))
+      ..add(
+        ColorProperty('foregroundColor', foregroundColor, defaultValue: null),
+      )
+      ..add(
+        ColorProperty(
+          'disabledColor',
+          disabledColor,
+          defaultValue: _variant == _AsyncCupertinoButtonVariant.plain
+              ? asyncCupertinoPlainDisabledColor
+              : asyncCupertinoFilledDisabledColor,
+        ),
+      )
+      ..add(
+        DiagnosticsProperty<Size>(
+          'minimumSize',
+          minimumSize,
+          defaultValue: null,
+        ),
+      )
+      ..add(DoubleProperty('pressedOpacity', pressedOpacity, defaultValue: 0.4))
+      ..add(
+        DiagnosticsProperty<BorderRadius>(
+          'borderRadius',
+          borderRadius,
+          defaultValue: null,
+        ),
+      )
+      ..add(
+        DiagnosticsProperty<AlignmentGeometry>(
+          'alignment',
+          alignment,
+          defaultValue: Alignment.center,
+        ),
+      )
+      ..add(ColorProperty('focusColor', focusColor, defaultValue: null));
+  }
+
+  @override
   State<AsyncCupertinoButton> createState() => _AsyncCupertinoButtonState();
 }
 
@@ -407,6 +486,22 @@ class _CupertinoLoadingIndicator extends StatelessWidget {
   final String? loadingSemanticsLabel;
 
   @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(
+        ColorProperty('foregroundColor', foregroundColor, defaultValue: null),
+      )
+      ..add(
+        StringProperty(
+          'loadingSemanticsLabel',
+          loadingSemanticsLabel,
+          defaultValue: null,
+        ),
+      );
+  }
+
+  @override
   Widget build(BuildContext context) {
     // Loading disables the native button, so filled and tinted backgrounds use
     // disabledColor. The contrasting color can disappear on that light fill.
@@ -443,6 +538,12 @@ class _CupertinoButtonSemantics extends SingleChildRenderObjectWidget {
 
   final bool enabled;
   final bool isolateContentActions;
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    _describeSemantics(properties, enabled, isolateContentActions);
+  }
 
   @override
   RenderObject createRenderObject(BuildContext context) =>
@@ -488,6 +589,12 @@ class _RenderCupertinoButtonSemantics extends RenderProxyBox {
   }
 
   @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    _describeSemantics(properties, enabled, isolateContentActions);
+  }
+
+  @override
   void describeSemanticsConfiguration(SemanticsConfiguration config) {
     super.describeSemanticsConfiguration(config);
     config
@@ -508,4 +615,20 @@ class _RenderCupertinoButtonSemantics extends RenderProxyBox {
       children,
     );
   }
+}
+
+void _describeSemantics(
+  DiagnosticPropertiesBuilder properties,
+  bool enabled,
+  bool isolateContentActions,
+) {
+  properties
+    ..add(FlagProperty('enabled', value: enabled, ifFalse: 'disabled'))
+    ..add(
+      FlagProperty(
+        'isolateContentActions',
+        value: isolateContentActions,
+        ifTrue: 'isolates content actions',
+      ),
+    );
 }
