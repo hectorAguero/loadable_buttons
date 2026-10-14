@@ -16,13 +16,15 @@ the latest-compatible design-library jobs; plugin checks run in all four jobs.
 | Tool | Role in this package |
 | --- | --- |
 | [Very Good Analysis](https://pub.dev/packages/very_good_analysis) | The versioned 10.3.0 preset provides the same built-in rules on both SDKs, including public API documentation and strict types. |
-| [Solid Lints 1.0.0](https://pub.dev/packages/solid_lints) | Custom checks for null safety, context usage, code complexity, and widget/lifecycle conventions. |
-| [Dart Code Linter 4.4.0](https://pub.dev/packages/dart_code_linter) | Complementary checks for listener cleanup, redundant `async`, `async`/`await` style, test assertions, and test filenames. |
+| [Solid Lints 2.0.0](https://pub.dev/packages/solid_lints) | Custom checks for null safety, context usage, code complexity, and widget/lifecycle conventions. |
+| [Dart Code Linter 4.4.2](https://pub.dev/packages/dart_code_linter) | Complementary checks for listener cleanup, `setState` after `await`, render-object updates, whole-`MediaQuery` dependencies, redundant `async`, `async`/`await` style, collection and export mistakes, test assertions, and test filenames. |
 
 The package and example allow VGA 10.3.0+ so Pub can select a release
 compatible with each SDK, while the included preset stays fixed at 10.3.0.
 VGA 10.3.0 supports the consumer Dart 3.12 floor; VGA 11.0.0 requires Dart
-3.13 and resolves on stable. Solid Lints 1.0.0 and DCL 4.4.0 are already current.
+3.13 and resolves on stable. Every rule VGA 11.0.0 adds first shipped in Dart 3.13,
+so none can be enabled while the floor is 3.12; an unknown lint name fails the
+minimum job. Solid Lints 2.0.0 and DCL 4.4.2 support Dart 3.12 and are current.
 The root analyzer configuration enables the modern plugins directly by version;
 they resolve their own dependencies and do not need root development dependencies.
 The DCL CLI has a separate dependency graph in `tool/dcl/pubspec.yaml` so it cannot
@@ -32,8 +34,11 @@ the Dart Analysis Server after changing plugin configuration.
 
 DCL's `all` preset is intentionally replaced by an explicit rule list. VGA owns
 built-in rules, Solid owns its custom checks, and DCL adds selected complementary
-checks. We include VGA's preset and explicitly configure Solid's diagnostics,
-so switching the base preset preserves Solid's rule settings. CI also runs
+checks. We include VGA's preset but not Solid's. Solid enables each of its rules
+unless `analysis_options.yaml` sets it to `false`, so that file lists only rule
+options and deliberate opt-outs. New Solid rules arrive enabled; review them
+when upgrading. DCL rules are opt-in and must appear both under
+`plugins.dart_code_linter.diagnostics` (IDE) and `dart_code_linter.rules` (CLI). CI also runs
 the DCL CLI to check its configuration directly. Test-rule include patterns are
 relative to `test/analysis_options.yaml`, so the test policy uses `**/*.dart`
 instead of the default `test/**` pattern.
@@ -89,9 +94,14 @@ The package overrides policies that conflict with its API or structure:
 All CI jobs check formatting using the package's declared Dart 3.12 language
 version, so the minimum and stable formatters share the same baseline.
 
-DCL enables `always-remove-listener`, `avoid-redundant-async`,
-`prefer-async-await`, `missing-test-assertion`, and
-`prefer-correct-test-file-name`. Test rules recognize `testWidgets` as well as
+DCL enables `always-remove-listener`, `use-setstate-synchronously`,
+`check-for-equals-in-render-object-setters`, `consistent-update-render-object`,
+`avoid-collection-methods-with-unrelated-types`, `avoid-unnecessary-conditionals`,
+`avoid-duplicate-exports`, `prefer-media-query-direct-access`,
+`avoid-redundant-async`, `prefer-async-await`, `missing-test-assertion`, and
+`prefer-correct-test-file-name`.
+`no-equal-arguments` and `avoid-missing-enum-constant-in-map` were evaluated and
+left off: they flag intentional same-value arguments and partial state maps. Test rules recognize `testWidgets` as well as
 `test`. Plugin diagnostics are enabled at the package root; directory-specific
 policies are set through the included options and Solid's configuration.
 

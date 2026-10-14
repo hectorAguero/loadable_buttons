@@ -1,4 +1,6 @@
-# Use the same versioned baseline on minimum and stable.
+# Use the same versioned baseline on minimum and stable. VGA 11.0.0 requires
+# Dart 3.13 and its added rules do not exist on Dart 3.12, so the 10.3.0
+# preset stays until the SDK floor moves.
 include: package:very_good_analysis/analysis_options.10.3.0.yaml
 
 analyzer:
@@ -17,62 +19,43 @@ analyzer:
 # Very Good Analysis owns built-in rules; these plugins add custom checks.
 # Both plugins are validated on the minimum Dart 3.12 SDK and stable.
 plugins:
-  solid_lints: ^1.0.0
+  solid_lints: ^2.0.0
   dart_code_linter:
-    version: ^4.4.0
+    version: ^4.4.2
+    # DCL rules are opt-in: enable each here for the IDE and list it under
+    # dart_code_linter.rules below for the CLI.
     diagnostics:
       always-remove-listener: true
+      avoid-collection-methods-with-unrelated-types: true
+      avoid-duplicate-exports: true
       avoid-redundant-async: true
+      avoid-unnecessary-conditionals: true
+      check-for-equals-in-render-object-setters: true
+      consistent-update-render-object: true
       prefer-async-await: true
+      prefer-media-query-direct-access: true
+      use-setstate-synchronously: true
       # Plugin diagnostics are enabled at the package root, including tests.
       missing-test-assertion: true
       prefer-correct-test-file-name: true
 
+# Solid enables every rule unless it is set to false here, so list only rule
+# options and deliberate opt-outs. Its built-in preset is not included.
 solid_lints:
   diagnostics:
-    # Preserve Solid's custom policy without including its built-in preset.
-    avoid_global_state: true
     avoid_late_keyword:
       allow_initialized: true
       ignored_types:
         - AnimationController
-    avoid_non_null_assertion: true
-    avoid_returning_widgets: true
-    avoid_unnecessary_return_variable: true
-    avoid_unnecessary_setstate: true
-    avoid_unnecessary_type_assertions: true
-    avoid_unrelated_type_assertions: true
     avoid_unused_parameters:
       exclude_annotation:
         - freezed
         - unfreezed
-    avoid_debug_print_in_release: true
-    avoid_final_with_getter: true
-    double_literal_format: true
-    newline_before_return: true
-    no_empty_block: true
-    no_equal_then_else: true
     prefer_early_return:
       maximum_statements: 1
       ignore_if_case: true
     prefer_conditional_expressions:
       ignore_nested: true
-    prefer_first: true
-    prefer_last: true
-    proper_super_calls: true
-    named_parameters_ordering: false
-    use_nearest_context: true
-    use_descriptive_names_for_type_parameters: true
-    # Material-compatible public constructors legitimately have many options.
-    number_of_parameters: false
-    # Mirroring Flutter's button variants intentionally repeats widget wiring.
-    avoid_duplicate_code: false
-    # Keep related private State/widgets together and constructors first.
-    member_ordering: false
-    prefer_match_file_name: false
-    # Heuristics do not distinguish forwarding widgets from business logic.
-    feature_envy: false
-    avoid_similar_names: false
     # Nullable style fallbacks and widget variants inflate build() complexity.
     # Keep the limit of 10 for callbacks, lifecycle methods, and other logic.
     cyclomatic_complexity:
@@ -89,6 +72,19 @@ solid_lints:
       exclude:
         - class_name: _HomePageState
           method_name: build
+    # Material-compatible public constructors legitimately have many options.
+    number_of_parameters: false
+    named_parameters_ordering: false
+    # Mirroring Flutter's button variants intentionally repeats widget wiring.
+    avoid_duplicate_code: false
+    # Copyable buttons keep related private State and widgets in one cohesive
+    # file, with constructors first.
+    avoid_multiple_declarations_per_file: false
+    member_ordering: false
+    prefer_match_file_name: false
+    # Heuristics do not distinguish forwarding widgets from business logic.
+    feature_envy: false
+    avoid_similar_names: false
 
 linter:
   rules:
@@ -113,11 +109,19 @@ linter:
     # Changing its signature would break package consumers.
     avoid_positional_boolean_parameters: false
 
-# These complement Solid; overlapping rules stay owned by Solid.
+# CLI configuration for the DCL rules enabled above; Solid and VGA own the
+# overlapping checks.
 dart_code_linter:
   rules:
     - always-remove-listener
+    - avoid-collection-methods-with-unrelated-types
+    - avoid-duplicate-exports
     - avoid-redundant-async
+    - avoid-unnecessary-conditionals
+    - check-for-equals-in-render-object-setters
+    - consistent-update-render-object
     - prefer-async-await
+    - prefer-media-query-direct-access
+    - use-setstate-synchronously
     - missing-test-assertion
     - prefer-correct-test-file-name
