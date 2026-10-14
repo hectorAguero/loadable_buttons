@@ -222,6 +222,49 @@ AsyncElevatedButton(
 Setting `loading: false` does not cancel or unlock a pending callback. Likewise,
 finishing the callback does not clear external `loading: true`.
 
+### Observing loading with a controller
+
+Pass an optional `AsyncButtonController` when other widgets need to observe a
+button's work or request loading without rebuilding the button's parent:
+
+```dart
+final saveController = AsyncButtonController();
+
+AsyncFilledButton(
+  controller: saveController,
+  onPressed: saveChanges,
+  child: const Text('Save'),
+);
+
+// Elsewhere, for example to disable a Cancel action while saving:
+ListenableBuilder(
+  listenable: saveController,
+  builder: (context, _) => TextButton(
+    onPressed: saveController.isPending ? null : cancel,
+    child: const Text('Cancel'),
+  ),
+);
+```
+
+- `isPending` is true while an `onPressed` and any `onError` started with this
+  controller run, possibly from an earlier button. Only that operation clears
+  it.
+- `loading` is a manual request, like the `loading` parameter. Effective loading
+  combines the parameter, `controller.loading`, and the pending operation.
+- `isLoading` is `loading || isPending`; it excludes the widget's own `loading`
+  parameter, which your application already owns.
+- Setting `controller.loading = false`, replacing the controller, or disposing
+  the button never unlocks unfinished work. A pending operation keeps locking
+  any button that adopts the same controller until it finishes. Pending work
+  stays on the controller it started with: after switching a busy button to a
+  new controller, the new one reports idle while the button stays locked.
+- You own the controller: create it in a `State`, and dispose it in `dispose`.
+  Buttons only add and remove listeners.
+- Use one controller per logical button. It may move between widgets, for
+  example in an `AnimatedSwitcher` or across a route transition; while both
+  are shown, each reflects the same state and pending work locks both.
+  Coordinating separate buttons is not a controller feature.
+
 ### Callback errors
 
 All constructors accept an optional `onError` callback using the exported

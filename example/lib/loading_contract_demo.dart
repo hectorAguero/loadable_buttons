@@ -31,6 +31,8 @@ class _LoadingContractDemoState extends State<LoadingContractDemo> {
   bool _largeText = false;
   int _longPressCount = 0;
   String _result = 'No operation started';
+  // The demo owns this controller and disposes it; the button never does.
+  final _syncController = AsyncButtonController();
 
   Future<void> _startOperation() async {
     final operation = Completer<bool>();
@@ -79,6 +81,7 @@ class _LoadingContractDemoState extends State<LoadingContractDemo> {
     // Real operations need their own cancellation policy.
     final operation = _operation;
     if (operation != null && !operation.isCompleted) operation.complete(false);
+    _syncController.dispose();
     super.dispose();
   }
 
@@ -231,6 +234,13 @@ class _LoadingContractDemoState extends State<LoadingContractDemo> {
                     ),
                   ],
                 ),
+                _SyncControllerDemo(
+                  controller: _syncController,
+                  transitionType: widget.transitionType,
+                  onSync: timedOperation,
+                  onOpenSettings: () =>
+                      setState(() => _result = 'Sync settings opened'),
+                ),
               ],
             ),
           ),
@@ -238,4 +248,76 @@ class _LoadingContractDemoState extends State<LoadingContractDemo> {
       ),
     );
   }
+}
+
+/// Observes and requests the Sync button's loading through its controller.
+class _SyncControllerDemo extends StatelessWidget {
+  const _SyncControllerDemo({
+    required this.controller,
+    required this.transitionType,
+    required this.onSync,
+    required this.onOpenSettings,
+  });
+
+  final AsyncButtonController controller;
+  final TransitionAnimationType transitionType;
+  final Future<void> Function()? onSync;
+  final VoidCallback onOpenSettings;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    spacing: 12,
+    children: [
+      const Text(
+        'A controller lets other widgets observe the Sync button and request '
+        'loading. Clearing its loading request does not unlock a pending sync.',
+      ),
+      // Only widgets that read the controller listen to it; the Sync button
+      // already rebuilds itself from its controller.
+      ListenableBuilder(
+        listenable: controller,
+        builder: (_, _) => SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: const Text('Controller loading request'),
+          value: controller.loading,
+          onChanged: (value) => controller.loading = value,
+        ),
+      ),
+      Wrap(
+        spacing: 12,
+        runSpacing: 8,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          AsyncFilledButton.tonal(
+            controller: controller,
+            transitionType: transitionType,
+            loadingSemanticsLabel: 'Syncing',
+            onPressed: onSync,
+            child: const Text('Sync'),
+          ),
+          ListenableBuilder(
+            listenable: controller,
+            builder: (_, _) => Row(
+              mainAxisSize: MainAxisSize.min,
+              spacing: 12,
+              children: [
+                // Another widget reacts to the button's own work.
+                TextButton(
+                  onPressed: controller.isPending ? null : onOpenSettings,
+                  child: const Text('Sync settings'),
+                ),
+                Semantics(
+                  liveRegion: true,
+                  child: Text(
+                    controller.isPending ? 'Sync pending' : 'Sync idle',
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ],
+  );
 }

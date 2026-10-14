@@ -1,3 +1,14 @@
+## 2.1.0 (unreleased)
+
+* Add an optional `AsyncButtonController` to every button constructor. Observe
+  `isPending` and `isLoading`, or request manual `loading`, through a
+  caller-owned `ChangeNotifier`. Its manual request combines with `loading` and
+  the button's pending operation; setting it to false, replacing the controller,
+  or disposing the button never unlocks unfinished work. Each operation clears
+  only its own pending state, and a pending operation keeps locking any button
+  that adopts the controller, including during animated switches and route
+  transitions.
+
 ## 2.0.0
 
 * **Breaking:** require Flutter 3.44.0+ and Dart 3.12.0+.

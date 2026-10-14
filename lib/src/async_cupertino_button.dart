@@ -9,7 +9,8 @@ enum _AsyncCupertinoButtonVariant { plain, filled, tinted }
 
 /// A native [CupertinoButton] with external and async loading states.
 ///
-/// Effective loading is [loading] or a pending [onPressed] or [onError].
+/// Effective loading is [loading], a [controller] request, or a pending
+/// [onPressed] or [onError].
 /// Loading disables outer activation; built-in transitions exclude inactive
 /// content from pointer input, focus, and semantics. Unhandled errors propagate
 /// with their original stack trace. Return or await all work to be tracked.
@@ -28,6 +29,7 @@ class AsyncCupertinoButton extends StatefulWidget {
     required this.child,
     required this.onPressed,
     this.onError,
+    this.controller,
     this.loading = false,
     this.loadingChild,
     this.loadingSemanticsLabel,
@@ -70,6 +72,7 @@ class AsyncCupertinoButton extends StatefulWidget {
     required this.child,
     required this.onPressed,
     this.onError,
+    this.controller,
     this.loading = false,
     this.loadingChild,
     this.loadingSemanticsLabel,
@@ -112,6 +115,7 @@ class AsyncCupertinoButton extends StatefulWidget {
     required this.child,
     required this.onPressed,
     this.onError,
+    this.controller,
     this.loading = false,
     this.loadingChild,
     this.loadingSemanticsLabel,
@@ -165,10 +169,20 @@ class AsyncCupertinoButton extends StatefulWidget {
   /// [AsyncButtonErrorHandler] for the shared policy.
   final AsyncButtonErrorHandler? onError;
 
+  /// An optional controller that observes and requests loading.
+  ///
+  /// Its [AsyncButtonController.loading] request and pending operation both
+  /// add to effective loading. The pending operation may have started on an
+  /// earlier button that used the same controller. The caller owns and disposes
+  /// the controller.
+  final AsyncButtonController? controller;
+
   /// Whether the application requests loading, independently of pending work.
   ///
-  /// Clearing this flag does not unlock a pending callback or error handler;
-  /// completing those callbacks does not clear this flag.
+  /// Effective loading combines this flag, any [controller] request, and a
+  /// pending [onPressed] or [onError]. Clearing this flag does not unlock a
+  /// pending callback or error handler; completing those callbacks does not
+  /// clear this flag.
   final bool loading;
 
   /// Optional loading content, replacing the default
@@ -279,6 +293,9 @@ class _AsyncCupertinoButtonState extends State<AsyncCupertinoButton>
 
   @override
   AsyncButtonErrorHandler? get asyncOnError => widget.onError;
+
+  @override
+  AsyncButtonController? get asyncController => widget.controller;
 
   void _handleLongPress() {
     if (!mounted || isLoading) return;

@@ -15,7 +15,8 @@ class _DefaultHeroTag {
 
 /// A Material [FloatingActionButton] with external and async loading states.
 ///
-/// Effective loading is [loading] or a pending [onPressed] or [onError].
+/// Effective loading is [loading], a [controller] request, or a pending
+/// [onPressed] or [onError].
 /// Loading disables outer button activation; built-in transitions exclude
 /// inactive content from pointer input, focus, and semantics. Internal loading
 /// clears when both callbacks finish. [onError] explicitly consumes errors when
@@ -33,6 +34,7 @@ class AsyncFloatingActionButton extends StatefulWidget {
     required this.child,
     required this.onPressed,
     this.onError,
+    this.controller,
     this.tooltip,
     this.foregroundColor,
     this.backgroundColor,
@@ -81,6 +83,7 @@ class AsyncFloatingActionButton extends StatefulWidget {
     required this.child,
     required this.onPressed,
     this.onError,
+    this.controller,
     this.tooltip,
     this.foregroundColor,
     this.backgroundColor,
@@ -132,6 +135,7 @@ class AsyncFloatingActionButton extends StatefulWidget {
     required this.child,
     required this.onPressed,
     this.onError,
+    this.controller,
     this.tooltip,
     this.foregroundColor,
     this.backgroundColor,
@@ -183,6 +187,7 @@ class AsyncFloatingActionButton extends StatefulWidget {
     required this.onPressed,
     required Widget label,
     this.onError,
+    this.controller,
     this.tooltip,
     this.foregroundColor,
     this.backgroundColor,
@@ -269,11 +274,20 @@ class AsyncFloatingActionButton extends StatefulWidget {
   /// [AsyncButtonErrorHandler] for the shared policy across all constructors.
   final AsyncButtonErrorHandler? onError;
 
+  /// An optional controller that observes and requests loading.
+  ///
+  /// Its [AsyncButtonController.loading] request and pending operation both
+  /// add to effective loading. The pending operation may have started on an
+  /// earlier button that used the same controller. The caller owns and disposes
+  /// the controller.
+  final AsyncButtonController? controller;
+
   /// Whether the application requests external loading.
   ///
-  /// Defaults to false. Effective loading combines this flag with a pending
-  /// [onPressed] or [onError]. Setting it to false neither cancels nor unlocks
-  /// that work; completing either callback does not clear this flag.
+  /// Defaults to false. Effective loading combines this flag, any
+  /// [controller] request, and a pending [onPressed] or [onError]. Setting it
+  /// to false neither cancels nor unlocks that work; completing either callback
+  /// does not clear this flag.
   final bool loading;
 
   /// The focusNode of the button.
@@ -404,6 +418,9 @@ class _AsyncFloatingActionButtonState extends State<AsyncFloatingActionButton>
 
   @override
   AsyncButtonErrorHandler? get asyncOnError => widget.onError;
+
+  @override
+  AsyncButtonController? get asyncController => widget.controller;
 
   bool get _useFullExtendedStack =>
       widget.transitionType == TransitionAnimationType.stack &&
