@@ -16,6 +16,9 @@ const Color asyncCupertinoPlainDisabledColor =
 const Color asyncCupertinoFilledDisabledColor =
     CupertinoColors.tertiarySystemFill;
 
+/// The default pressed opacity, matching native CupertinoButton.
+const double asyncCupertinoPressedOpacity = 0.4;
+
 enum _AsyncCupertinoButtonVariant { plain, filled, tinted }
 
 /// A native [CupertinoButton] with external and async loading states.
@@ -53,7 +56,7 @@ class AsyncCupertinoButton extends StatefulWidget {
     this.foregroundColor,
     this.disabledColor = asyncCupertinoPlainDisabledColor,
     this.minimumSize,
-    this.pressedOpacity = 0.4,
+    this.pressedOpacity = asyncCupertinoPressedOpacity,
     this.borderRadius,
     this.alignment = Alignment.center,
     this.focusColor,
@@ -97,7 +100,7 @@ class AsyncCupertinoButton extends StatefulWidget {
     this.foregroundColor,
     this.disabledColor = asyncCupertinoFilledDisabledColor,
     this.minimumSize,
-    this.pressedOpacity = 0.4,
+    this.pressedOpacity = asyncCupertinoPressedOpacity,
     this.borderRadius,
     this.alignment = Alignment.center,
     this.focusColor,
@@ -141,7 +144,7 @@ class AsyncCupertinoButton extends StatefulWidget {
     this.foregroundColor,
     this.disabledColor = asyncCupertinoFilledDisabledColor,
     this.minimumSize,
-    this.pressedOpacity = 0.4,
+    this.pressedOpacity = asyncCupertinoPressedOpacity,
     this.borderRadius,
     this.alignment = Alignment.center,
     this.focusColor,
@@ -362,7 +365,13 @@ class AsyncCupertinoButton extends StatefulWidget {
           defaultValue: null,
         ),
       )
-      ..add(DoubleProperty('pressedOpacity', pressedOpacity, defaultValue: 0.4))
+      ..add(
+        DoubleProperty(
+          'pressedOpacity',
+          pressedOpacity,
+          defaultValue: asyncCupertinoPressedOpacity,
+        ),
+      )
       ..add(
         DiagnosticsProperty<BorderRadius>(
           'borderRadius',
