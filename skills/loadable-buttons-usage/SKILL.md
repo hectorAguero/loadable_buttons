@@ -1,6 +1,6 @@
 ---
 name: loadable-buttons-usage
-description: Use when writing, reviewing, or migrating Flutter code that uses the loadable_buttons package (AsyncElevatedButton, AsyncFilledButton, AsyncOutlinedButton, AsyncTextButton, AsyncIconButton, AsyncFloatingActionButton, or AsyncCupertinoButton). Covers imports, choosing constructors, returning Futures from onPressed, external loading, AsyncButtonController, AsyncButtonGroup, onError, disabled and long-press behavior, localized loading semantics, theming, sizing, and custom loading content.
+description: Use when writing, reviewing, or migrating Flutter code that uses the loadable_buttons package (AsyncElevatedButton, AsyncFilledButton, AsyncOutlinedButton, AsyncTextButton, AsyncIconButton, AsyncFloatingActionButton, AsyncCupertinoButton, or AsyncAdaptiveButton). Covers imports, choosing constructors, returning Futures from onPressed, external loading, AsyncButtonController, AsyncButtonGroup, onError, disabled and long-press behavior, localized loading semantics, theming, sizing, and custom loading content.
 ---
 
 # Using loadable_buttons
@@ -30,7 +30,7 @@ flutter pub add loadable_buttons cupertino_ui
 | --- | --- |
 | `package:loadable_buttons/material.dart` | Material buttons, `AsyncButtonController`, `AsyncButtonErrorHandler`, `AsyncButtonGroup`, `TransitionAnimationType` |
 | `package:loadable_buttons/cupertino.dart` | `AsyncCupertinoButton`, `AsyncButtonController`, `AsyncButtonErrorHandler`, `AsyncButtonGroup`, `TransitionAnimationType` |
-| `package:loadable_buttons/loadable_buttons.dart` | Both families |
+| `package:loadable_buttons/loadable_buttons.dart` | Both families and `AsyncAdaptiveButton` |
 
 - Import `package:material_ui/material_ui.dart` (not
   `package:flutter/material.dart`) for `MaterialApp`, `ThemeData`,
@@ -57,6 +57,7 @@ flutter pub add loadable_buttons cupertino_ui
 | `AsyncIconButton` | default, `.filled`, `.filledTonal`, `.outlined` | `icon`, optional `selectedIcon` |
 | `AsyncFloatingActionButton` | default, `.small`, `.large`, `.extended` | `child`; `.extended`: `label`, optional `icon` |
 | `AsyncCupertinoButton` | default, `.filled`, `.tinted` | `child` |
+| `AsyncAdaptiveButton` | default, `.filled`, `.tinted` | `child`; renders Material or Cupertino per platform |
 
 Every constructor requires `onPressed` (nullable) and accepts `loading`,
 `controller`, `excludeFromGroup`, `onError`, `loadingChild`, `loadingSemanticsLabel`, `transitionType`,
@@ -89,6 +90,33 @@ AsyncCupertinoButton.filled(
 
 `l10n`, `saveChanges`, and similar names stand for the application's own
 localizations and operations.
+
+### Adaptive buttons
+
+Requires loadable_buttons 2.1.0 or newer. Use `AsyncAdaptiveButton` only when
+one call site must render natively on both design systems; otherwise prefer
+the concrete widget.
+
+```dart
+import 'package:loadable_buttons/loadable_buttons.dart';
+
+AsyncAdaptiveButton.filled(
+  onPressed: saveChanges,
+  child: Text(l10n.save),
+);
+```
+
+- Default → `AsyncTextButton` / `AsyncCupertinoButton`; `.filled` →
+  `AsyncFilledButton` / `.filled`; `.tinted` → `AsyncFilledButton.tonal` /
+  `.tinted`.
+- iOS and macOS render Cupertino; other platforms render Material. The
+  platform follows `Theme.of(context).platform` or the `platform` parameter.
+- Material output needs a Material ancestor such as `Scaffold`.
+- Use shared parameters (`padding`, `minimumSize`, `alignment`,
+  `backgroundColor`, `foregroundColor`). Platform-only options are
+  `materialStyle` and `cupertinoSizeStyle`; there is no `style` or `sizeStyle`.
+- A platform or theme change mid-operation keeps the new button locked until
+  the original operation finishes.
 
 ## Return or await the work
 

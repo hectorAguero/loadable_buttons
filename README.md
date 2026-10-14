@@ -152,6 +152,42 @@ Use native Material options such as `style`, or Cupertino options such as
 For each widget's supported properties, see the
 [API reference](https://pub.dev/documentation/loadable_buttons/latest/).
 
+### Adaptive buttons
+
+`AsyncAdaptiveButton` renders a native Material or Cupertino button for the
+platform. Import `package:loadable_buttons/loadable_buttons.dart`.
+
+| Constructor | Material | Cupertino |
+| --- | --- | --- |
+| Default | `AsyncTextButton` | `AsyncCupertinoButton` |
+| `.filled` | `AsyncFilledButton` | `AsyncCupertinoButton.filled` |
+| `.tinted` | `AsyncFilledButton.tonal` | `AsyncCupertinoButton.tinted` |
+
+```dart
+AsyncAdaptiveButton.filled(
+  onPressed: saveChanges,
+  child: const Text('Save'),
+);
+```
+
+- Like Flutter's `.adaptive` constructors, iOS and macOS render Cupertino;
+  Android, Fuchsia, Linux, and Windows render Material. The platform comes from
+  `Theme.of(context).platform` (set `ThemeData.platform` to override app-wide),
+  or from the `platform` parameter. On the web it follows the browser's
+  reported platform.
+- Material output needs a Material ancestor such as `Scaffold`. Cupertino output
+  works without one, including under `CupertinoApp`.
+- Shared parameters (`padding`, `minimumSize`, `alignment`, `backgroundColor`,
+  `foregroundColor`, focus, cursor, and loading options) apply on both
+  platforms. Options without an equivalent are named for their design system:
+  `materialStyle` and `cupertinoSizeStyle`.
+- Loading, errors, controllers, and groups work as on the concrete buttons. If
+  the platform or theme changes during an operation, the newly rendered button
+  stays loading and locked until that operation finishes; the work is neither
+  repeated nor cancelled.
+- Elevated, outlined, icon, and floating action buttons have no Cupertino
+  equivalent; use those widgets directly.
+
 For a button with an icon, use `label` instead of `child`:
 
 ```dart
@@ -575,8 +611,9 @@ Include any companion `part` files, `async_button_helpers.dart` for shared loadi
 state and error handling, and `loading_transition.dart` for the enum and widgets.
 Material buttons also need `async_material_button_helpers.dart` for style
 shortcuts, native layers, and indicators; Cupertino buttons keep their indicator
-and semantics adapter in `async_cupertino_button.dart`. Update package imports
-to match your project.
+and semantics adapter in `async_cupertino_button.dart`. `async_adaptive_button.dart`
+also needs the Text, Filled, and Cupertino button files it renders. Update
+package imports to match your project.
 
 For a single-file copy, inline the shared loading helper declarations, move the
 enum into your button file, and inline the transition bodies. This outline shows the ternary and switch structure:

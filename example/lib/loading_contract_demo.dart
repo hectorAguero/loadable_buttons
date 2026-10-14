@@ -246,6 +246,10 @@ class _LoadingContractDemoState extends State<LoadingContractDemo> {
                   onRun: timedOperation,
                   onCancel: () => setState(() => _result = 'Cancel pressed'),
                 ),
+                _AdaptiveDemo(
+                  transitionType: widget.transitionType,
+                  onRun: timedOperation,
+                ),
               ],
             ),
           ),
@@ -387,5 +391,66 @@ class _GroupDemo extends StatelessWidget {
         ),
       ],
     ),
+  );
+}
+
+/// Renders adaptive buttons for a selectable platform.
+class _AdaptiveDemo extends StatefulWidget {
+  const _AdaptiveDemo({required this.transitionType, required this.onRun});
+
+  final TransitionAnimationType transitionType;
+  final Future<void> Function()? onRun;
+
+  @override
+  State<_AdaptiveDemo> createState() => _AdaptiveDemoState();
+}
+
+class _AdaptiveDemoState extends State<_AdaptiveDemo> {
+  TargetPlatform _platform = TargetPlatform.android;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    spacing: 12,
+    children: [
+      const Text(
+        'Adaptive buttons render Material or Cupertino for the platform. '
+        'Switch platforms while one is loading: it stays loading and locked.',
+      ),
+      SegmentedButton<TargetPlatform>(
+        segments: const [
+          ButtonSegment(value: TargetPlatform.android, label: Text('Material')),
+          ButtonSegment(value: TargetPlatform.iOS, label: Text('Cupertino')),
+        ],
+        selected: {_platform},
+        onSelectionChanged: (selection) =>
+            setState(() => _platform = selection.single),
+      ),
+      Wrap(
+        spacing: 12,
+        runSpacing: 8,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          AsyncAdaptiveButton(
+            platform: _platform,
+            transitionType: widget.transitionType,
+            onPressed: widget.onRun,
+            child: const Text('Default'),
+          ),
+          AsyncAdaptiveButton.filled(
+            platform: _platform,
+            transitionType: widget.transitionType,
+            onPressed: widget.onRun,
+            child: const Text('Filled'),
+          ),
+          AsyncAdaptiveButton.tinted(
+            platform: _platform,
+            transitionType: widget.transitionType,
+            onPressed: widget.onRun,
+            child: const Text('Tinted'),
+          ),
+        ],
+      ),
+    ],
   );
 }
