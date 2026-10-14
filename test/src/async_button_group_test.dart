@@ -111,6 +111,52 @@ void main() {
     });
   }
 
+  // Every constructor must forward excludeFromGroup to the shared state.
+  for (final entry in asyncButtonConstructorBuilders.entries) {
+    testWidgets('${entry.key} stays available when excluded from the group', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      final operation = Completer<void>();
+      final calls = <String>[];
+      final save = entry.value(
+        child: const Text('Save'),
+        loadingChild: const Text('Save busy'),
+        onPressed: () {
+          calls.add('Save');
+
+          return operation.future;
+        },
+      );
+      final cancel = entry.value(
+        child: const Text('Cancel'),
+        excludeFromGroup: true,
+        onPressed: () => calls.add('Cancel'),
+      );
+      final buttons = AsyncButtonGroup(
+        child: Column(mainAxisSize: MainAxisSize.min, children: [save, cancel]),
+      );
+      await tester.pumpWidget(
+        buttonHost(save) is cupertino.CupertinoApp
+            ? cupertino.CupertinoApp(home: Center(child: buttons))
+            : MaterialApp(
+                home: Scaffold(body: Center(child: buttons)),
+              ),
+      );
+
+      await tester.tap(_nativeButtonOf('Save'));
+      await tester.pump();
+      expect(_isEnabled(tester, 'Cancel'), isTrue);
+      await tester.tap(_nativeButtonOf('Cancel'));
+      await tester.pump();
+      expect(calls, ['Save', 'Cancel']);
+
+      operation.complete();
+      await tester.pumpAndSettle();
+      handle.dispose();
+    });
+  }
+
   Widget group(List<Widget> children) => MaterialApp(
     home: Scaffold(
       body: Center(

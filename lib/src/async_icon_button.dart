@@ -11,6 +11,8 @@ enum _IconButtonVariant { standard, filled, filledTonal, outlined }
 ///
 /// Effective loading is [loading], a [controller] request, or a pending
 /// [onPressed] or [onError].
+/// A pending peer in the nearest [AsyncButtonGroup] also disables it without
+/// loading content, unless [excludeFromGroup] is true.
 /// Loading disables outer button activation; built-in transitions exclude
 /// inactive content from pointer input, focus, and semantics. Internal loading
 /// clears when both callbacks finish. [onError] explicitly consumes errors when
