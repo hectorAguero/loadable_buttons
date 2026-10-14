@@ -19,10 +19,12 @@
   `AsyncTextButton`, `AsyncFilledButton`, or `AsyncFilledButton.tonal` on
   Android, Fuchsia, Linux, and Windows, and the matching `AsyncCupertinoButton`
   variant on iOS and macOS. The platform follows `Theme.of(context).platform`
-  or an explicit `platform`. Shared properties apply on both platforms;
-  `materialStyle` and `cupertinoSizeStyle` are scoped. A platform or theme
-  change during an operation keeps the newly rendered button loading and
-  locked without repeating or cancelling the work.
+  or an explicit `platform`. Shared properties, including
+  `disabledBackgroundColor`, apply on both platforms; `materialStyle` and
+  `cupertinoSizeStyle` are scoped. A platform or theme change during an
+  operation keeps the newly rendered button loading and locked without
+  repeating or cancelling the work, even if the controller changes too, and a
+  focused button keeps keyboard focus.
 
 ## 2.0.0
 

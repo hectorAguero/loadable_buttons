@@ -5,6 +5,17 @@ import 'package:flutter/rendering.dart';
 import 'package:loadable_buttons/src/async_button_helpers.dart';
 import 'package:loadable_buttons/src/loading_transition.dart';
 
+/// The default loading transition duration, shared with the adaptive button.
+const asyncCupertinoAnimationDuration = Duration(milliseconds: 200);
+
+/// The default disabled background of the plain variant.
+const Color asyncCupertinoPlainDisabledColor =
+    CupertinoColors.quaternarySystemFill;
+
+/// The default disabled background of the filled and tinted variants.
+const Color asyncCupertinoFilledDisabledColor =
+    CupertinoColors.tertiarySystemFill;
+
 enum _AsyncCupertinoButtonVariant { plain, filled, tinted }
 
 /// A native [CupertinoButton] with external and async loading states.
@@ -40,7 +51,7 @@ class AsyncCupertinoButton extends StatefulWidget {
     this.padding,
     this.color,
     this.foregroundColor,
-    this.disabledColor = CupertinoColors.quaternarySystemFill,
+    this.disabledColor = asyncCupertinoPlainDisabledColor,
     this.minimumSize,
     this.pressedOpacity = 0.4,
     this.borderRadius,
@@ -51,7 +62,7 @@ class AsyncCupertinoButton extends StatefulWidget {
     this.autofocus = false,
     this.mouseCursor,
     this.onLongPress,
-    this.animationDuration = const Duration(milliseconds: 200),
+    this.animationDuration = asyncCupertinoAnimationDuration,
     this.minimumChildOpacity = 0.0,
     this.transitionType = TransitionAnimationType.stack,
     this.customBuilder,
@@ -84,7 +95,7 @@ class AsyncCupertinoButton extends StatefulWidget {
     this.padding,
     this.color,
     this.foregroundColor,
-    this.disabledColor = CupertinoColors.tertiarySystemFill,
+    this.disabledColor = asyncCupertinoFilledDisabledColor,
     this.minimumSize,
     this.pressedOpacity = 0.4,
     this.borderRadius,
@@ -95,7 +106,7 @@ class AsyncCupertinoButton extends StatefulWidget {
     this.autofocus = false,
     this.mouseCursor,
     this.onLongPress,
-    this.animationDuration = const Duration(milliseconds: 200),
+    this.animationDuration = asyncCupertinoAnimationDuration,
     this.minimumChildOpacity = 0.0,
     this.transitionType = TransitionAnimationType.stack,
     this.customBuilder,
@@ -128,7 +139,7 @@ class AsyncCupertinoButton extends StatefulWidget {
     this.padding,
     this.color,
     this.foregroundColor,
-    this.disabledColor = CupertinoColors.tertiarySystemFill,
+    this.disabledColor = asyncCupertinoFilledDisabledColor,
     this.minimumSize,
     this.pressedOpacity = 0.4,
     this.borderRadius,
@@ -139,7 +150,7 @@ class AsyncCupertinoButton extends StatefulWidget {
     this.autofocus = false,
     this.mouseCursor,
     this.onLongPress,
-    this.animationDuration = const Duration(milliseconds: 200),
+    this.animationDuration = asyncCupertinoAnimationDuration,
     this.minimumChildOpacity = 0.0,
     this.transitionType = TransitionAnimationType.stack,
     this.customBuilder,

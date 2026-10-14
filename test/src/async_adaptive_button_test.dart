@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cupertino_ui/cupertino_ui.dart' as cupertino;
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:loadable_buttons/loadable_buttons.dart';
 import 'package:material_ui/material_ui.dart';
@@ -326,5 +327,217 @@ void main() {
     operation.complete();
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+    'replacing the controller with a platform change keeps the lock',
+    (
+      tester,
+    ) async {
+      final controller = AsyncButtonController();
+      addTearDown(controller.dispose);
+      final operation = Completer<void>();
+      var calls = 0;
+      Widget build({
+        required TargetPlatform platform,
+        AsyncButtonController? buttonController,
+      }) => _host(
+        AsyncAdaptiveButton(
+          platform: platform,
+          controller: buttonController,
+          loadingChild: const Text('Busy'),
+          onPressed: () {
+            calls++;
+
+            return operation.future;
+          },
+          child: const Text('Run'),
+        ),
+      );
+
+      await tester.pumpWidget(
+        build(platform: TargetPlatform.android, buttonController: controller),
+      );
+      await tester.tap(_native);
+      await tester.pump();
+      await tester.pumpWidget(build(platform: TargetPlatform.iOS));
+      expect(find.text('Busy'), findsOneWidget);
+      await tester.tap(_native, warnIfMissed: false);
+      expect(calls, 1);
+
+      operation.complete();
+      await tester.pumpAndSettle();
+      expect(find.text('Busy'), findsNothing);
+      await tester.tap(_native);
+      expect(calls, 2);
+    },
+  );
+
+  for (final supplied in [true, false]) {
+    testWidgets(
+      'keeps keyboard focus across a platform change '
+      '(${supplied ? 'supplied' : 'owned'} focus node)',
+      (tester) async {
+        final focusNode = FocusNode();
+        addTearDown(focusNode.dispose);
+        var calls = 0;
+        Widget build(TargetPlatform platform) => _host(
+          AsyncAdaptiveButton(
+            platform: platform,
+            focusNode: supplied ? focusNode : null,
+            autofocus: true,
+            onPressed: () => calls++,
+            child: const Text('Run'),
+          ),
+        );
+
+        await tester.pumpWidget(build(TargetPlatform.android));
+        await tester.pump();
+        final focused = FocusManager.instance.primaryFocus;
+        expect(focused, isNotNull);
+        if (supplied) expect(focusNode.hasPrimaryFocus, isTrue);
+
+        await tester.pumpWidget(build(TargetPlatform.iOS));
+        await tester.pump();
+        expect(find.byType(AsyncCupertinoButton), findsOneWidget);
+        expect(FocusManager.instance.primaryFocus, same(focused));
+        await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+        await tester.pump();
+        expect(calls, 1);
+      },
+    );
+  }
+
+  testWidgets('forwards every shared parameter on both platforms', (
+    tester,
+  ) async {
+    final controller = AsyncButtonController();
+    final focusNode = FocusNode();
+    addTearDown(controller.dispose);
+    addTearDown(focusNode.dispose);
+    const padding = EdgeInsets.all(7);
+    const minimumSize = Size(91, 37);
+    const alignment = Alignment.centerLeft;
+    const background = Color(0xFF123456);
+    const disabledBackground = Color(0xFF654321);
+    const foreground = Color(0xFFABCDEF);
+    const cursor = SystemMouseCursors.help;
+    const duration = Duration(milliseconds: 321);
+    void onFocusChange(bool _) {}
+    void onLongPress() {}
+
+    for (final variant in _variants.entries) {
+      for (final platform in [TargetPlatform.android, TargetPlatform.iOS]) {
+        final adaptive = switch (variant.key) {
+          'filled' => AsyncAdaptiveButton.filled,
+          'tinted' => AsyncAdaptiveButton.tinted,
+          _ => AsyncAdaptiveButton.new,
+        };
+        await tester.pumpWidget(
+          _host(
+            adaptive(
+              platform: platform,
+              controller: controller,
+              excludeFromGroup: true,
+              loadingSemanticsLabel: 'Saving',
+              onLongPress: onLongPress,
+              focusNode: focusNode,
+              onFocusChange: onFocusChange,
+              mouseCursor: cursor,
+              padding: padding,
+              minimumSize: minimumSize,
+              alignment: alignment,
+              backgroundColor: background,
+              disabledBackgroundColor: disabledBackground,
+              foregroundColor: foreground,
+              animationDuration: duration,
+              minimumChildOpacity: 0.5,
+              onPressed: () {},
+              child: const Text('Run'),
+            ),
+          ),
+        );
+        final reason = '${variant.key} on ${platform.name}';
+        final concrete = tester.widget(
+          find.byWidgetPredicate(
+            (widget) =>
+                widget is AsyncCupertinoButton ||
+                widget is AsyncTextButton ||
+                widget is AsyncFilledButton,
+          ),
+        );
+        final shared = switch (concrete) {
+          AsyncCupertinoButton() => (
+            concrete.controller,
+            concrete.excludeFromGroup,
+            concrete.loadingSemanticsLabel,
+            concrete.onLongPress,
+            concrete.focusNode,
+            concrete.onFocusChange,
+            concrete.mouseCursor,
+            concrete.padding,
+            concrete.minimumSize,
+            concrete.alignment,
+            concrete.color,
+            concrete.disabledColor,
+            concrete.foregroundColor,
+            concrete.animationDuration,
+            concrete.minimumChildOpacity,
+          ),
+          AsyncTextButton() => (
+            concrete.controller,
+            concrete.excludeFromGroup,
+            concrete.loadingSemanticsLabel,
+            concrete.onLongPress,
+            concrete.focusNode,
+            concrete.onFocusChange,
+            concrete.mouseCursor,
+            concrete.padding,
+            concrete.minimumSize,
+            concrete.alignment,
+            concrete.backgroundColor,
+            concrete.disabledBackgroundColor,
+            concrete.foregroundColor,
+            concrete.animationDuration,
+            concrete.minimumChildOpacity,
+          ),
+          AsyncFilledButton() => (
+            concrete.controller,
+            concrete.excludeFromGroup,
+            concrete.loadingSemanticsLabel,
+            concrete.onLongPress,
+            concrete.focusNode,
+            concrete.onFocusChange,
+            concrete.mouseCursor,
+            concrete.padding,
+            concrete.minimumSize,
+            concrete.alignment,
+            concrete.backgroundColor,
+            concrete.disabledBackgroundColor,
+            concrete.foregroundColor,
+            concrete.animationDuration,
+            concrete.minimumChildOpacity,
+          ),
+          _ => throw StateError('Unexpected ${concrete.runtimeType}'),
+        };
+        expect(shared, (
+          controller,
+          true,
+          'Saving',
+          onLongPress,
+          focusNode,
+          onFocusChange,
+          cursor,
+          padding,
+          minimumSize,
+          alignment,
+          background,
+          disabledBackground,
+          foreground,
+          duration,
+          0.5,
+        ), reason: reason);
+      }
+    }
   });
 }

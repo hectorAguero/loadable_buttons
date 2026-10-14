@@ -32,10 +32,11 @@ enum _AsyncAdaptiveButtonVariant { plain, filled, tinted }
 ///
 /// Loading, error, semantics, [controller], and [AsyncButtonGroup] behavior
 /// are those of the rendered button. A pending operation keeps the button
-/// loading and locked when the platform or theme changes mid-operation: the
-/// operation stays on [controller], or on a controller this widget owns when
-/// none is supplied, and the newly rendered button adopts it. The work is
-/// neither repeated nor cancelled.
+/// loading and locked when the platform or theme changes mid-operation: this
+/// widget tracks the `onPressed` and `onError` work it starts, independent of
+/// [controller], so a newly rendered button stays locked until that work
+/// finishes. The work is neither repeated nor cancelled. A focused button
+/// keeps keyboard focus across the change.
 ///
 /// Shared properties apply on both platforms. Properties without an
 /// equivalent are scoped by name: [materialStyle] and [cupertinoSizeStyle].
@@ -59,6 +60,7 @@ class AsyncAdaptiveButton extends StatefulWidget {
     this.minimumSize,
     this.alignment,
     this.backgroundColor,
+    this.disabledBackgroundColor,
     this.foregroundColor,
     this.animationDuration,
     this.minimumChildOpacity = 0.0,
@@ -90,6 +92,7 @@ class AsyncAdaptiveButton extends StatefulWidget {
     this.minimumSize,
     this.alignment,
     this.backgroundColor,
+    this.disabledBackgroundColor,
     this.foregroundColor,
     this.animationDuration,
     this.minimumChildOpacity = 0.0,
@@ -121,6 +124,7 @@ class AsyncAdaptiveButton extends StatefulWidget {
     this.minimumSize,
     this.alignment,
     this.backgroundColor,
+    this.disabledBackgroundColor,
     this.foregroundColor,
     this.animationDuration,
     this.minimumChildOpacity = 0.0,
@@ -148,8 +152,9 @@ class AsyncAdaptiveButton extends StatefulWidget {
 
   /// An optional controller that observes and requests loading.
   ///
-  /// Without one, this widget owns a controller so a pending operation survives
-  /// a platform change. The caller owns and disposes a supplied controller.
+  /// Passed to the rendered button. The caller owns and disposes it. Pending
+  /// work stays locked across platform changes with or without a controller,
+  /// including when it is replaced mid-operation.
   final AsyncButtonController? controller;
 
   /// Whether this button ignores the nearest [AsyncButtonGroup].
@@ -195,6 +200,12 @@ class AsyncAdaptiveButton extends StatefulWidget {
   /// `color`.
   final Color? backgroundColor;
 
+  /// The disabled background color: Material `disabledBackgroundColor` or
+  /// Cupertino `disabledColor`, defaulting to each platform's value.
+  ///
+  /// Applies while the button is disabled, loading, or blocked by a group peer.
+  final Color? disabledBackgroundColor;
+
   /// The enabled foreground color for text and icons.
   final Color? foregroundColor;
 
@@ -230,26 +241,99 @@ class AsyncAdaptiveButton extends StatefulWidget {
 }
 
 class _AsyncAdaptiveButtonState extends State<AsyncAdaptiveButton> {
-  // Holds a pending operation while the rendered button type changes.
-  AsyncButtonController? _ownedController;
+  // Operations started by any rendered button, including onError. A button
+  // rendered after a platform change shows loading until they finish,
+  // independent of which controller, if any, is supplied.
+  int _pendingOperations = 0;
+  FocusNode? _ownedFocusNode;
 
-  AsyncButtonController get _controller =>
-      widget.controller ?? (_ownedController ??= AsyncButtonController());
+  // A stable node keeps primary focus when a platform change swaps the
+  // rendered button, since the new Focus adopts it in the same frame.
+  FocusNode get _focusNode =>
+      widget.focusNode ??
+      (_ownedFocusNode ??= FocusNode(debugLabel: 'AsyncAdaptiveButton'));
+
+  FutureOr<void> Function()? get _onPressed {
+    final onPressed = widget.onPressed;
+
+    return onPressed == null ? null : () => _track(onPressed);
+  }
+
+  AsyncButtonErrorHandler? get _onError {
+    final onError = widget.onError;
+
+    return onError == null
+        ? null
+        : (error, stackTrace) => _track(() => onError(error, stackTrace));
+  }
 
   @override
   void dispose() {
-    // A pending operation may still finish; the controller ignores it.
-    _ownedController?.dispose();
+    _ownedFocusNode?.dispose();
     super.dispose();
+  }
+
+  FutureOr<void> _track(FutureOr<void> Function() work) {
+    _pendingOperations++;
+    final FutureOr<void> result;
+    try {
+      result = work();
+    } on Object {
+      _finish();
+      rethrow;
+    }
+    if (result is Future<void>) {
+      unawaited(_finishAfter(result));
+    } else {
+      _finish();
+    }
+
+    return result;
+  }
+
+  // Observes completion on a side chain; the rendered button still receives
+  // the original Future and owns its error handling.
+  Future<void> _finishAfter(Future<void> work) async {
+    try {
+      await work;
+    } on Object {
+      // The rendered button handles or propagates this error.
+    } finally {
+      _finish();
+    }
+  }
+
+  void _finish() {
+    if (!mounted) {
+      _pendingOperations--;
+
+      return;
+    }
+    setState(() => _pendingOperations--);
   }
 
   @override
   Widget build(BuildContext context) {
     final platform = widget.platform ?? Theme.of(context).platform;
+    final cupertino =
+        platform == TargetPlatform.iOS || platform == TargetPlatform.macOS;
+    final loading = widget.loading || _pendingOperations > 0;
 
-    return platform == TargetPlatform.iOS || platform == TargetPlatform.macOS
-        ? _AdaptiveCupertinoButton(button: widget, controller: _controller)
-        : _AdaptiveMaterialButton(button: widget, controller: _controller);
+    return cupertino
+        ? _AdaptiveCupertinoButton(
+            button: widget,
+            onPressed: _onPressed,
+            onError: _onError,
+            loading: loading,
+            focusNode: _focusNode,
+          )
+        : _AdaptiveMaterialButton(
+            button: widget,
+            onPressed: _onPressed,
+            onError: _onError,
+            loading: loading,
+            focusNode: _focusNode,
+          );
   }
 }
 
@@ -257,42 +341,57 @@ class _AsyncAdaptiveButtonState extends State<AsyncAdaptiveButton> {
 class _AdaptiveCupertinoButton extends StatelessWidget {
   const _AdaptiveCupertinoButton({
     required this.button,
-    required this.controller,
+    required this.onPressed,
+    required this.onError,
+    required this.loading,
+    required this.focusNode,
   });
 
-  static const _animationDuration = Duration(milliseconds: 200);
-
   final AsyncAdaptiveButton button;
-  final AsyncButtonController controller;
+  final FutureOr<void> Function()? onPressed;
+  final AsyncButtonErrorHandler? onError;
+  final bool loading;
+  final FocusNode focusNode;
 
   @override
   Widget build(BuildContext context) {
-    final buttonBuilder = switch (button._variant) {
-      _AsyncAdaptiveButtonVariant.plain => AsyncCupertinoButton.new,
-      _AsyncAdaptiveButtonVariant.filled => AsyncCupertinoButton.filled,
-      _AsyncAdaptiveButtonVariant.tinted => AsyncCupertinoButton.tinted,
+    final (buttonBuilder, defaultDisabledColor) = switch (button._variant) {
+      _AsyncAdaptiveButtonVariant.plain => (
+        AsyncCupertinoButton.new,
+        asyncCupertinoPlainDisabledColor,
+      ),
+      _AsyncAdaptiveButtonVariant.filled => (
+        AsyncCupertinoButton.filled,
+        asyncCupertinoFilledDisabledColor,
+      ),
+      _AsyncAdaptiveButtonVariant.tinted => (
+        AsyncCupertinoButton.tinted,
+        asyncCupertinoFilledDisabledColor,
+      ),
     };
 
     return buttonBuilder(
-      onPressed: button.onPressed,
-      onError: button.onError,
-      controller: controller,
+      onPressed: onPressed,
+      onError: onError,
+      controller: button.controller,
       excludeFromGroup: button.excludeFromGroup,
-      loading: button.loading,
+      loading: loading,
       loadingChild: button.loadingChild,
       loadingSemanticsLabel: button.loadingSemanticsLabel,
       sizeStyle: button.cupertinoSizeStyle,
       padding: button.padding,
       color: button.backgroundColor,
       foregroundColor: button.foregroundColor,
+      disabledColor: button.disabledBackgroundColor ?? defaultDisabledColor,
       minimumSize: button.minimumSize,
       alignment: button.alignment ?? Alignment.center,
-      focusNode: button.focusNode,
+      focusNode: focusNode,
       onFocusChange: button.onFocusChange,
       autofocus: button.autofocus,
       mouseCursor: button.mouseCursor,
       onLongPress: button.onLongPress,
-      animationDuration: button.animationDuration ?? _animationDuration,
+      animationDuration:
+          button.animationDuration ?? asyncCupertinoAnimationDuration,
       minimumChildOpacity: button.minimumChildOpacity,
       transitionType: button.transitionType,
       customBuilder: button.customBuilder,
@@ -305,54 +404,61 @@ class _AdaptiveCupertinoButton extends StatelessWidget {
 class _AdaptiveMaterialButton extends StatelessWidget {
   const _AdaptiveMaterialButton({
     required this.button,
-    required this.controller,
+    required this.onPressed,
+    required this.onError,
+    required this.loading,
+    required this.focusNode,
   });
 
   final AsyncAdaptiveButton button;
-  final AsyncButtonController controller;
+  final FutureOr<void> Function()? onPressed;
+  final AsyncButtonErrorHandler? onError;
+  final bool loading;
+  final FocusNode focusNode;
 
   @override
   Widget build(BuildContext context) {
-    final animationDuration = button.animationDuration ?? Durations.medium1;
-    if (button._variant == _AsyncAdaptiveButtonVariant.plain) {
-      return AsyncTextButton(
-        onPressed: button.onPressed,
-        onError: button.onError,
-        controller: controller,
-        excludeFromGroup: button.excludeFromGroup,
-        loading: button.loading,
-        loadingChild: button.loadingChild,
-        loadingSemanticsLabel: button.loadingSemanticsLabel,
-        style: button.materialStyle,
-        padding: button.padding,
-        minimumSize: button.minimumSize,
-        alignment: button.alignment,
-        backgroundColor: button.backgroundColor,
-        foregroundColor: button.foregroundColor,
-        mouseCursor: button.mouseCursor,
-        focusNode: button.focusNode,
-        onFocusChange: button.onFocusChange,
-        autofocus: button.autofocus,
-        onLongPress: button.onLongPress,
-        animationDuration: animationDuration,
-        minimumChildOpacity: button.minimumChildOpacity,
-        transitionType: button.transitionType,
-        customBuilder: button.customBuilder,
-        child: button.child,
-      );
-    }
-
-    // Filled regular and tonal share one constructor signature.
-    final buttonBuilder = button._variant == _AsyncAdaptiveButtonVariant.filled
-        ? AsyncFilledButton.new
-        : AsyncFilledButton.tonal;
+    // The shared parameters of AsyncTextButton, AsyncFilledButton, and
+    // AsyncFilledButton.tonal, so one call forwards them to any of the three.
+    final Widget Function({
+      required Widget child,
+      required FutureOr<void> Function()? onPressed,
+      AsyncButtonErrorHandler? onError,
+      AsyncButtonController? controller,
+      bool excludeFromGroup,
+      bool loading,
+      Widget? loadingChild,
+      String? loadingSemanticsLabel,
+      ButtonStyle? style,
+      EdgeInsetsGeometry? padding,
+      Size? minimumSize,
+      AlignmentGeometry? alignment,
+      Color? backgroundColor,
+      Color? foregroundColor,
+      Color? disabledBackgroundColor,
+      MouseCursor? mouseCursor,
+      FocusNode? focusNode,
+      ValueChanged<bool>? onFocusChange,
+      bool autofocus,
+      VoidCallback? onLongPress,
+      Duration animationDuration,
+      double minimumChildOpacity,
+      TransitionAnimationType transitionType,
+      Widget Function(bool loading, Widget child, Widget? loadingChild)?
+      customBuilder,
+    })
+    buttonBuilder = switch (button._variant) {
+      _AsyncAdaptiveButtonVariant.plain => AsyncTextButton.new,
+      _AsyncAdaptiveButtonVariant.filled => AsyncFilledButton.new,
+      _AsyncAdaptiveButtonVariant.tinted => AsyncFilledButton.tonal,
+    };
 
     return buttonBuilder(
-      onPressed: button.onPressed,
-      onError: button.onError,
-      controller: controller,
+      onPressed: onPressed,
+      onError: onError,
+      controller: button.controller,
       excludeFromGroup: button.excludeFromGroup,
-      loading: button.loading,
+      loading: loading,
       loadingChild: button.loadingChild,
       loadingSemanticsLabel: button.loadingSemanticsLabel,
       style: button.materialStyle,
@@ -361,12 +467,13 @@ class _AdaptiveMaterialButton extends StatelessWidget {
       alignment: button.alignment,
       backgroundColor: button.backgroundColor,
       foregroundColor: button.foregroundColor,
+      disabledBackgroundColor: button.disabledBackgroundColor,
       mouseCursor: button.mouseCursor,
-      focusNode: button.focusNode,
+      focusNode: focusNode,
       onFocusChange: button.onFocusChange,
       autofocus: button.autofocus,
       onLongPress: button.onLongPress,
-      animationDuration: animationDuration,
+      animationDuration: button.animationDuration ?? Durations.medium1,
       minimumChildOpacity: button.minimumChildOpacity,
       transitionType: button.transitionType,
       customBuilder: button.customBuilder,

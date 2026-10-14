@@ -178,13 +178,15 @@ AsyncAdaptiveButton.filled(
 - Material output needs a Material ancestor such as `Scaffold`. Cupertino output
   works without one, including under `CupertinoApp`.
 - Shared parameters (`padding`, `minimumSize`, `alignment`, `backgroundColor`,
-  `foregroundColor`, focus, cursor, and loading options) apply on both
+  `disabledBackgroundColor`, `foregroundColor`, focus, cursor, and loading
+  options) apply on both
   platforms. Options without an equivalent are named for their design system:
   `materialStyle` and `cupertinoSizeStyle`.
 - Loading, errors, controllers, and groups work as on the concrete buttons. If
   the platform or theme changes during an operation, the newly rendered button
-  stays loading and locked until that operation finishes; the work is neither
-  repeated nor cancelled.
+  stays loading and locked until that operation finishes, even if the
+  controller is replaced too; the work is neither repeated nor cancelled. A
+  focused button keeps keyboard focus across the change.
 - Elevated, outlined, icon, and floating action buttons have no Cupertino
   equivalent; use those widgets directly.
 

@@ -113,10 +113,11 @@ AsyncAdaptiveButton.filled(
   platform follows `Theme.of(context).platform` or the `platform` parameter.
 - Material output needs a Material ancestor such as `Scaffold`.
 - Use shared parameters (`padding`, `minimumSize`, `alignment`,
-  `backgroundColor`, `foregroundColor`). Platform-only options are
+  `backgroundColor`, `disabledBackgroundColor`, `foregroundColor`).
+  Platform-only options are
   `materialStyle` and `cupertinoSizeStyle`; there is no `style` or `sizeStyle`.
 - A platform or theme change mid-operation keeps the new button locked until
-  the original operation finishes.
+  the original operation finishes, and keeps keyboard focus.
 
 ## Return or await the work
 
