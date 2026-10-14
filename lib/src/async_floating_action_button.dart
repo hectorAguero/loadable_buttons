@@ -660,7 +660,7 @@ class _AsyncFloatingActionButtonChild extends StatelessWidget {
       return customBuilder?.call(isLoading, child, loadingChild) ?? child;
     }
 
-    final icon = leadingIcon;
+    final Widget? icon = leadingIcon;
 
     return LoadingTransition(
       child: Padding(

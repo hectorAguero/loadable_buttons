@@ -126,6 +126,7 @@ linter:
     prefer_iterable_wheretype: true
     prefer_void_to_null: true
     use_decorated_box: true
+    specify_nonobvious_local_variable_types: true
 
 # CLI configuration for the DCL rules enabled above; Solid and VGA own the
 # overlapping checks.

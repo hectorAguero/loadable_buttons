@@ -54,11 +54,14 @@ conflicting with its conventions: `avoid_annotating_with_dynamic`,
 `avoid_classes_with_only_static_members`, `avoid_implementing_value_types`,
 `close_sinks`, `do_not_use_environment`, `library_names`,
 `no_runtimetype_tostring`, `prefer_for_elements_to_map_fromiterable`,
-`prefer_iterable_wheretype`, `prefer_void_to_null`, and `use_decorated_box`.
+`prefer_iterable_wheretype`, `prefer_void_to_null`, `use_decorated_box`, and
+`specify_nonobvious_local_variable_types`, which extends the preset's
+`specify_nonobvious_property_types` to locals in package and example code. Tests
+relax it to keep finder and fixture code readable. Where a constructor tear-off
+switch would spell out every parameter, a documented ignore keeps it inferred.
 Other available lints conflict with the preset or the package style (for
 example `prefer_double_quotes`, `prefer_relative_imports`, `always_specify_types`,
-and `unnecessary_final`) or require typing every local
-(`specify_nonobvious_local_variable_types`). `diagnostic_describe_all_properties`
+and `unnecessary_final`). `diagnostic_describe_all_properties`
 is desirable for DevTools but needs `debugFillProperties` on every widget first.
 
 VGA supplies checks such as `unawaited_futures`, `discarded_futures`,

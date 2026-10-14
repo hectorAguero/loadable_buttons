@@ -543,7 +543,7 @@ class _AsyncFilledButtonState extends State<AsyncFilledButton>
 
   @override
   Widget build(BuildContext context) {
-    final style = resolveMaterialButtonStyle(
+    final ButtonStyle style = resolveMaterialButtonStyle(
       style: widget.style,
       padding: widget.padding,
       minimumSize: widget.minimumSize,
@@ -556,7 +556,8 @@ class _AsyncFilledButtonState extends State<AsyncFilledButton>
       splashFactory: widget.splashFactory,
     );
 
-    final child = widget.transitionType == TransitionAnimationType.customBuilder
+    final Widget child =
+        widget.transitionType == TransitionAnimationType.customBuilder
         ? widget.customBuilder?.call(
                 isLoading,
                 widget.child,
@@ -580,9 +581,15 @@ class _AsyncFilledButtonState extends State<AsyncFilledButton>
           );
 
     final hasIcon = widget is _AsyncFilledButtonWithIcon;
-    final onPressed = unlockedHandler(widget.onPressed, handlePressed);
-    final onLongPress = unlockedHandler(widget.onLongPress, _handleLongPress);
-    final clipBehavior = resolveButtonClipBehavior(
+    final VoidCallback? onPressed = unlockedHandler(
+      widget.onPressed,
+      handlePressed,
+    );
+    final VoidCallback? onLongPress = unlockedHandler(
+      widget.onLongPress,
+      _handleLongPress,
+    );
+    final Clip clipBehavior = resolveButtonClipBehavior(
       clipBehavior: widget.clipBehavior,
       style: style,
       themeStyle: FilledButtonTheme.of(context).style,
