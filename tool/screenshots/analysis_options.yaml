@@ -1,0 +1,2 @@
+# The README animation generator follows the test policy.
+include: ../../analysis_options_test.yaml
