@@ -3,7 +3,8 @@
 /// Import `package:material_ui/material_ui.dart` for Material widgets and types.
 library;
 
-export 'src/async_button_helpers.dart' show AsyncButtonErrorHandler;
+export 'src/async_button_helpers.dart'
+    show AsyncButtonController, AsyncButtonErrorHandler;
 export 'src/async_elevated_button.dart';
 export 'src/async_filled_button.dart';
 export 'src/async_floating_action_button.dart';

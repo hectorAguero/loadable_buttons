@@ -1,6 +1,6 @@
 ---
 name: loadable-buttons-usage
-description: Use when writing, reviewing, or migrating Flutter code that uses the loadable_buttons package (AsyncElevatedButton, AsyncFilledButton, AsyncOutlinedButton, AsyncTextButton, AsyncIconButton, AsyncFloatingActionButton, or AsyncCupertinoButton). Covers imports, choosing constructors, returning Futures from onPressed, external loading, onError, disabled and long-press behavior, localized loading semantics, theming, sizing, and custom loading content.
+description: Use when writing, reviewing, or migrating Flutter code that uses the loadable_buttons package (AsyncElevatedButton, AsyncFilledButton, AsyncOutlinedButton, AsyncTextButton, AsyncIconButton, AsyncFloatingActionButton, or AsyncCupertinoButton). Covers imports, choosing constructors, returning Futures from onPressed, external loading and AsyncButtonController, onError, disabled and long-press behavior, localized loading semantics, theming, sizing, and custom loading content.
 ---
 
 # Using loadable_buttons
@@ -28,8 +28,8 @@ flutter pub add loadable_buttons cupertino_ui
 
 | Import | Exports |
 | --- | --- |
-| `package:loadable_buttons/material.dart` | Material buttons, `AsyncButtonErrorHandler`, `TransitionAnimationType` |
-| `package:loadable_buttons/cupertino.dart` | `AsyncCupertinoButton`, `AsyncButtonErrorHandler`, `TransitionAnimationType` |
+| `package:loadable_buttons/material.dart` | Material buttons, `AsyncButtonController`, `AsyncButtonErrorHandler`, `TransitionAnimationType` |
+| `package:loadable_buttons/cupertino.dart` | `AsyncCupertinoButton`, `AsyncButtonController`, `AsyncButtonErrorHandler`, `TransitionAnimationType` |
 | `package:loadable_buttons/loadable_buttons.dart` | Both families |
 
 - Import `package:material_ui/material_ui.dart` (not
@@ -59,7 +59,7 @@ flutter pub add loadable_buttons cupertino_ui
 | `AsyncCupertinoButton` | default, `.filled`, `.tinted` | `child` |
 
 Every constructor requires `onPressed` (nullable) and accepts `loading`,
-`onError`, `loadingChild`, `loadingSemanticsLabel`, `transitionType`,
+`controller`, `onError`, `loadingChild`, `loadingSemanticsLabel`, `transitionType`,
 `customBuilder`, `animationDuration`, and `minimumChildOpacity`. Other
 parameters mirror the native widget, such as `style`, `focusNode`,
 `statesController`, `tooltip`, `heroTag`, `sizeStyle`, or `minimumSize`.
@@ -138,6 +138,40 @@ AsyncElevatedButton(
 Do not duplicate the package's lock with extra `isLoading` flags just to
 prevent double taps. Use `loading` only for state that the application already
 owns, such as work started elsewhere.
+
+### Observing with a controller
+
+Requires loadable_buttons 2.1.0 or newer. When other widgets must react to a
+button's work, pass an `AsyncButtonController` instead of mirroring the
+operation in application state:
+
+```dart
+// In a State: create once, dispose in dispose().
+final saveController = AsyncButtonController();
+
+AsyncFilledButton(
+  controller: saveController,
+  onPressed: saveChanges,
+  child: const Text('Save'),
+);
+
+ListenableBuilder(
+  listenable: saveController,
+  builder: (context, _) => TextButton(
+    onPressed: saveController.isPending ? null : cancel,
+    child: const Text('Cancel'),
+  ),
+);
+```
+
+- `isPending`: this button's `onPressed`/`onError` is running. Read-only;
+  only that operation clears it, even after controller replacement or disposal.
+- `loading`: a manual request equivalent to the `loading` parameter. Setting it
+  to false never unlocks pending work.
+- `isLoading`: `loading || isPending`, excluding the widget's `loading` parameter.
+- The caller owns and disposes the controller; buttons never dispose it.
+- Attach one controller to one button at a time. Debug builds report sharing;
+  it is not a group or mutual-exclusion mechanism.
 
 ## Errors
 
@@ -247,6 +281,8 @@ spinner. It defaults to `null`; the package provides no English fallback.
   `package:flutter/material.dart` types in button arguments.
 - Every async `onPressed` returns or awaits its Future.
 - `loading` is used only for application-owned state and is cleared by its owner.
+- Any `AsyncButtonController` is created once, disposed by its owner, and
+  attached to a single button.
 - `onError` is either omitted, letting errors propagate, or deliberately
   consumes errors and checks `mounted` before using state or context.
 - Default spinners have a localized `loadingSemanticsLabel`; custom loading

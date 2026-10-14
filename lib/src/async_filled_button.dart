@@ -14,7 +14,8 @@ enum _AsyncFilledButtonVariant { filled, tonal }
 
 /// A Material [FilledButton] with external and async loading states.
 ///
-/// Effective loading is [loading] or a pending [onPressed] or [onError].
+/// Effective loading is [loading], a [controller] request, or a pending
+/// [onPressed] or [onError].
 /// Loading disables outer button activation; built-in transitions exclude
 /// inactive content from pointer input, focus, and semantics. Internal loading
 /// clears when both callbacks finish. [onError] explicitly consumes errors when
@@ -47,6 +48,7 @@ class AsyncFilledButton extends StatefulWidget {
     required this.child,
     required this.onPressed,
     this.onError,
+    this.controller,
     this.loadingChild,
     this.loadingSemanticsLabel,
     this.loading = false,
@@ -96,6 +98,7 @@ class AsyncFilledButton extends StatefulWidget {
     required FutureOr<void> Function()? onPressed,
     required Widget label,
     AsyncButtonErrorHandler? onError,
+    AsyncButtonController? controller,
     Key? key,
     VoidCallback? onLongPress,
     ValueChanged<bool>? onHover,
@@ -130,6 +133,7 @@ class AsyncFilledButton extends StatefulWidget {
         child: label,
         onPressed: onPressed,
         onError: onError,
+        controller: controller,
         loadingChild: loadingChild,
         loadingSemanticsLabel: loadingSemanticsLabel,
         loading: loading,
@@ -163,6 +167,7 @@ class AsyncFilledButton extends StatefulWidget {
       icon: icon,
       onPressed: onPressed,
       onError: onError,
+      controller: controller,
       loading: loading,
       loadingChild: loadingChild,
       loadingSemanticsLabel: loadingSemanticsLabel,
@@ -202,6 +207,7 @@ class AsyncFilledButton extends StatefulWidget {
     required this.child,
     required this.onPressed,
     this.onError,
+    this.controller,
     this.loadingChild,
     this.loadingSemanticsLabel,
     this.loading = false,
@@ -244,6 +250,7 @@ class AsyncFilledButton extends StatefulWidget {
     required FutureOr<void> Function()? onPressed,
     required Widget label,
     AsyncButtonErrorHandler? onError,
+    AsyncButtonController? controller,
     Key? key,
     VoidCallback? onLongPress,
     ValueChanged<bool>? onHover,
@@ -278,6 +285,7 @@ class AsyncFilledButton extends StatefulWidget {
         child: label,
         onPressed: onPressed,
         onError: onError,
+        controller: controller,
         loadingChild: loadingChild,
         loadingSemanticsLabel: loadingSemanticsLabel,
         loading: loading,
@@ -309,6 +317,7 @@ class AsyncFilledButton extends StatefulWidget {
     return _AsyncFilledButtonWithIcon.tonal(
       onPressed: onPressed,
       onError: onError,
+      controller: controller,
       icon: icon,
       label: label,
       key: key,
@@ -378,11 +387,20 @@ class AsyncFilledButton extends StatefulWidget {
   /// [AsyncButtonErrorHandler] for the shared policy across all constructors.
   final AsyncButtonErrorHandler? onError;
 
+  /// An optional controller that observes and requests loading.
+  ///
+  /// Its [AsyncButtonController.loading] request adds to effective loading,
+  /// and [AsyncButtonController.isPending] reports this button's operation.
+  /// The caller owns and disposes the controller. Attach it to one button at a
+  /// time.
+  final AsyncButtonController? controller;
+
   /// Whether the application requests external loading.
   ///
-  /// Defaults to false. Effective loading combines this flag with a pending
-  /// [onPressed] or [onError]. Setting it to false neither cancels nor unlocks
-  /// that work; completing either callback does not clear this flag.
+  /// Defaults to false. Effective loading combines this flag, any
+  /// [controller] request, and a pending [onPressed] or [onError]. Setting it
+  /// to false neither cancels nor unlocks that work; completing either callback
+  /// does not clear this flag.
   final bool loading;
 
   /// The synchronous long-press callback, blocked while loading.
@@ -495,6 +513,9 @@ class _AsyncFilledButtonState extends State<AsyncFilledButton>
 
   @override
   AsyncButtonErrorHandler? get asyncOnError => widget.onError;
+
+  @override
+  AsyncButtonController? get asyncController => widget.controller;
 
   void _handleLongPress() {
     if (isLoading) return;

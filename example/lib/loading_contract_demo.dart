@@ -31,6 +31,8 @@ class _LoadingContractDemoState extends State<LoadingContractDemo> {
   bool _largeText = false;
   int _longPressCount = 0;
   String _result = 'No operation started';
+  // The demo owns this controller and disposes it; the button never does.
+  final _syncController = AsyncButtonController();
 
   Future<void> _startOperation() async {
     final operation = Completer<bool>();
@@ -79,6 +81,7 @@ class _LoadingContractDemoState extends State<LoadingContractDemo> {
     // Real operations need their own cancellation policy.
     final operation = _operation;
     if (operation != null && !operation.isCompleted) operation.complete(false);
+    _syncController.dispose();
     super.dispose();
   }
 
@@ -230,6 +233,57 @@ class _LoadingContractDemoState extends State<LoadingContractDemo> {
                       child: const Text('Custom builder'),
                     ),
                   ],
+                ),
+                const Text(
+                  'A controller lets other widgets observe the Sync button '
+                  'and request loading. Clearing its loading request does not '
+                  'unlock a pending sync.',
+                ),
+                ListenableBuilder(
+                  listenable: _syncController,
+                  builder: (_, _) => Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    spacing: 8,
+                    children: [
+                      SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: const Text('Controller loading request'),
+                        value: _syncController.loading,
+                        onChanged: (value) => _syncController.loading = value,
+                      ),
+                      Wrap(
+                        spacing: 12,
+                        runSpacing: 8,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          AsyncFilledButton.tonal(
+                            controller: _syncController,
+                            transitionType: widget.transitionType,
+                            loadingSemanticsLabel: 'Syncing',
+                            onPressed: timedOperation,
+                            child: const Text('Sync'),
+                          ),
+                          // Another widget reacts to the button's own work.
+                          TextButton(
+                            onPressed: _syncController.isPending
+                                ? null
+                                : () => setState(
+                                    () => _result = 'Sync settings opened',
+                                  ),
+                            child: const Text('Sync settings'),
+                          ),
+                          Semantics(
+                            liveRegion: true,
+                            child: Text(
+                              _syncController.isPending
+                                  ? 'Sync pending'
+                                  : 'Sync idle',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

@@ -9,7 +9,8 @@ enum _AsyncCupertinoButtonVariant { plain, filled, tinted }
 
 /// A native [CupertinoButton] with external and async loading states.
 ///
-/// Effective loading is [loading] or a pending [onPressed] or [onError].
+/// Effective loading is [loading], a [controller] request, or a pending
+/// [onPressed] or [onError].
 /// Loading disables outer activation; built-in transitions exclude inactive
 /// content from pointer input, focus, and semantics. Unhandled errors propagate
 /// with their original stack trace. Return or await all work to be tracked.
@@ -28,6 +29,7 @@ class AsyncCupertinoButton extends StatefulWidget {
     required this.child,
     required this.onPressed,
     this.onError,
+    this.controller,
     this.loading = false,
     this.loadingChild,
     this.loadingSemanticsLabel,
@@ -70,6 +72,7 @@ class AsyncCupertinoButton extends StatefulWidget {
     required this.child,
     required this.onPressed,
     this.onError,
+    this.controller,
     this.loading = false,
     this.loadingChild,
     this.loadingSemanticsLabel,
@@ -112,6 +115,7 @@ class AsyncCupertinoButton extends StatefulWidget {
     required this.child,
     required this.onPressed,
     this.onError,
+    this.controller,
     this.loading = false,
     this.loadingChild,
     this.loadingSemanticsLabel,
@@ -164,6 +168,14 @@ class AsyncCupertinoButton extends StatefulWidget {
   /// check your own lifecycle before using captured state or context. See
   /// [AsyncButtonErrorHandler] for the shared policy.
   final AsyncButtonErrorHandler? onError;
+
+  /// An optional controller that observes and requests loading.
+  ///
+  /// Its [AsyncButtonController.loading] request adds to effective loading,
+  /// and [AsyncButtonController.isPending] reports this button's operation.
+  /// The caller owns and disposes the controller. Attach it to one button at a
+  /// time.
+  final AsyncButtonController? controller;
 
   /// Whether the application requests loading, independently of pending work.
   ///
@@ -279,6 +291,9 @@ class _AsyncCupertinoButtonState extends State<AsyncCupertinoButton>
 
   @override
   AsyncButtonErrorHandler? get asyncOnError => widget.onError;
+
+  @override
+  AsyncButtonController? get asyncController => widget.controller;
 
   void _handleLongPress() {
     if (!mounted || isLoading) return;

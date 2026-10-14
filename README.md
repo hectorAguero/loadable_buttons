@@ -222,6 +222,43 @@ AsyncElevatedButton(
 Setting `loading: false` does not cancel or unlock a pending callback. Likewise,
 finishing the callback does not clear external `loading: true`.
 
+### Observing loading with a controller
+
+Pass an optional `AsyncButtonController` when other widgets need to observe a
+button's work or request loading without rebuilding the button's parent:
+
+```dart
+final saveController = AsyncButtonController();
+
+AsyncFilledButton(
+  controller: saveController,
+  onPressed: saveChanges,
+  child: const Text('Save'),
+);
+
+// Elsewhere, for example to disable a Cancel action while saving:
+ListenableBuilder(
+  listenable: saveController,
+  builder: (context, _) => TextButton(
+    onPressed: saveController.isPending ? null : cancel,
+    child: const Text('Cancel'),
+  ),
+);
+```
+
+- `isPending` is true while this button's `onPressed` and any `onError` run.
+  Only that operation clears it.
+- `loading` is a manual request, like the `loading` parameter. Effective loading
+  combines the parameter, `controller.loading`, and the pending operation.
+- `isLoading` is `loading || isPending`; it excludes the widget's own `loading`
+  parameter, which your application already owns.
+- Setting `controller.loading = false`, replacing the controller, or disposing
+  the button never unlocks unfinished work. A pending operation keeps locking
+  any button that adopts the same controller until it finishes.
+- You own the controller: create it in a `State`, and dispose it in `dispose`.
+  Buttons only add and remove listeners. Attach it to one button at a time;
+  debug builds report a controller attached to two buttons.
+
 ### Callback errors
 
 All constructors accept an optional `onError` callback using the exported
