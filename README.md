@@ -1,7 +1,8 @@
 # loadable_buttons
 
-Material and Cupertino buttons that show a loading state while their async
-`onPressed` runs, and block repeated taps until it finishes.
+Async loading for Flutter's own buttons. Each widget wraps the native
+`material_ui` or `cupertino_ui` button, keeping its theme, sizing, and behavior,
+and adds a loading state that blocks repeated taps while `onPressed` runs.
 
 | Material | Cupertino |
 | --- | --- |
@@ -9,7 +10,7 @@ Material and Cupertino buttons that show a loading state while their async
 | **Adaptive** | **Group** |
 | ![Adaptive buttons rendering Material and Cupertino](screenshots/adaptive.gif) | ![A button group blocking peers](screenshots/group.gif) |
 
-- Native Material and Cupertino buttons, keeping their themes, sizes, and focus.
+- Works with your existing `ThemeData`, `ButtonStyle`, and `CupertinoTheme`.
 - Loading from your Future, from a `loading` flag, or from a controller.
 - Adaptive buttons that render Material or Cupertino per platform.
 - Groups that let only one related action run at a time.

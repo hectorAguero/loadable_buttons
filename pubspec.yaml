@@ -1,5 +1,5 @@
 name: loadable_buttons
-description: "Provides enhanced buttons with built-in loading states, async functionality and customizable transitions."
+description: "Async loading states for Flutter's native Material and Cupertino buttons."
 version: 2.1.0
 homepage: https://hectoraguero.dev/
 repository: https://github.com/hectorAguero/loadable_buttons
