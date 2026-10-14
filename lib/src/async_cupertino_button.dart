@@ -329,6 +329,8 @@ class _AsyncCupertinoButtonState extends State<AsyncCupertinoButton>
 
   @override
   Widget build(BuildContext context) {
+    // A constructor tear-off type would spell out every native parameter.
+    // ignore: specify_nonobvious_local_variable_types
     final buttonBuilder = switch (widget._variant) {
       _AsyncCupertinoButtonVariant.plain => CupertinoButton.new,
       _AsyncCupertinoButtonVariant.filled => CupertinoButton.filled,
@@ -408,11 +410,12 @@ class _CupertinoLoadingIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     // Loading disables the native button, so filled and tinted backgrounds use
     // disabledColor. The contrasting color can disappear on that light fill.
-    final color = foregroundColor ?? CupertinoTheme.of(context).primaryColor;
+    final Color color =
+        foregroundColor ?? CupertinoTheme.of(context).primaryColor;
     // Match the native text size so stack loading keeps the idle text layout.
     // The indicator requires a positive radius, which zero scaling would break.
-    final fontSize = DefaultTextStyle.of(context).style.fontSize;
-    final diameter = fontSize == null
+    final double? fontSize = DefaultTextStyle.of(context).style.fontSize;
+    final double diameter = fontSize == null
         ? 0.0
         : MediaQuery.textScalerOf(context).scale(fontSize);
 

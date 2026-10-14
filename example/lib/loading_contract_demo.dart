@@ -41,7 +41,7 @@ class _LoadingContractDemoState extends State<LoadingContractDemo> {
       _result = 'Operation pending';
     });
     try {
-      final completed = await operation.future;
+      final bool completed = await operation.future;
       if (mounted) {
         setState(
           () => _result = completed
@@ -61,7 +61,7 @@ class _LoadingContractDemoState extends State<LoadingContractDemo> {
   }
 
   void _finishOperation({bool fail = false, bool cancel = false}) {
-    final operation = _operation;
+    final Completer<bool>? operation = _operation;
     if (operation == null || operation.isCompleted) return;
     if (fail) {
       operation.completeError(Exception('Simulated save failure'));
@@ -79,7 +79,7 @@ class _LoadingContractDemoState extends State<LoadingContractDemo> {
   void dispose() {
     // Release this demo's controlled Future when leaving the page.
     // Real operations need their own cancellation policy.
-    final operation = _operation;
+    final Completer<bool>? operation = _operation;
     if (operation != null && !operation.isCompleted) operation.complete(false);
     _syncController.dispose();
     super.dispose();
@@ -87,7 +87,9 @@ class _LoadingContractDemoState extends State<LoadingContractDemo> {
 
   @override
   Widget build(BuildContext context) {
-    final timedOperation = _disabled ? null : widget.onRunTimedOperation;
+    final Future<void> Function()? timedOperation = _disabled
+        ? null
+        : widget.onRunTimedOperation;
     final loadingContent = Semantics(
       label: 'Saving changes',
       excludeSemantics: true,

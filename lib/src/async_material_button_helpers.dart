@@ -18,7 +18,7 @@ ButtonStyle resolveMaterialButtonStyle({
   MouseCursor? mouseCursor,
   InteractiveInkFeatureFactory? splashFactory,
 }) {
-  final base = style ?? ButtonStyle(splashFactory: splashFactory);
+  final ButtonStyle base = style ?? ButtonStyle(splashFactory: splashFactory);
   if (padding == null &&
       minimumSize == null &&
       alignment == null &&
@@ -83,7 +83,7 @@ WidgetStateProperty<MouseCursor?>? _overrideButtonCursor(
 mixin StackLoadingButton on ButtonStyleButton {
   @override
   Widget? get child {
-    final content = super.child;
+    final Widget? content = super.child;
 
     return content is LoadingTransition &&
             content.transitionType == TransitionAnimationType.stack
@@ -93,8 +93,8 @@ mixin StackLoadingButton on ButtonStyleButton {
 
   @override
   ButtonStyle? get style {
-    final originalStyle = super.style;
-    final content = super.child;
+    final ButtonStyle? originalStyle = super.style;
+    final Widget? content = super.child;
     if (content is! LoadingTransition ||
         content.transitionType != TransitionAnimationType.stack) {
       return originalStyle;
@@ -102,7 +102,12 @@ mixin StackLoadingButton on ButtonStyleButton {
 
     return (originalStyle ?? const ButtonStyle()).copyWith(
       backgroundBuilder: (context, states, child) {
-        final backgroundBuilder =
+        final Widget Function(
+          BuildContext context,
+          Set<WidgetState> states,
+          Widget? child,
+        )?
+        backgroundBuilder =
             originalStyle?.backgroundBuilder ??
             themeStyleOf(context)?.backgroundBuilder ??
             defaultStyleOf(context).backgroundBuilder;

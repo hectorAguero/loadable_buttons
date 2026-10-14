@@ -411,7 +411,7 @@ class _AsyncIconButtonState extends State<AsyncIconButton>
 
   @override
   Widget build(BuildContext context) {
-    final isSelected = widget.isSelected?.resolve({
+    final bool? isSelected = widget.isSelected?.resolve({
       if (isLocked || widget.onPressed == null) WidgetState.disabled,
     });
     final icon = _AsyncIconButtonChild(
@@ -425,8 +425,8 @@ class _AsyncIconButtonState extends State<AsyncIconButton>
       style: widget.style,
       customBuilder: widget.customBuilder,
     );
-    final selectedIcon = widget.selectedIcon;
-    final selectedChild = selectedIcon == null
+    final Widget? selectedIcon = widget.selectedIcon;
+    final _AsyncIconButtonChild? selectedChild = selectedIcon == null
         ? null
         : _AsyncIconButtonChild(
             icon: selectedIcon,
@@ -442,7 +442,7 @@ class _AsyncIconButtonState extends State<AsyncIconButton>
 
     // Flutter 3.29 styleFrom supplies a default cursor that would otherwise
     // override IconButton's forwarded mouseCursor when these styles merge.
-    final style =
+    final ButtonStyle style =
         widget.style ??
         IconButton.styleFrom(
           splashFactory: widget.splashFactory,

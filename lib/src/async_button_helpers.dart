@@ -135,7 +135,7 @@ mixin AsyncButtonState<ButtonWidget extends StatefulWidget>
   }
 
   void _attachController() {
-    final controller = asyncController;
+    final AsyncButtonController? controller = asyncController;
     controller?.addListener(_handleControllerChanged);
     _controller = controller;
     _controllerLoading = controller?.isLoading ?? false;
@@ -149,7 +149,7 @@ mixin AsyncButtonState<ButtonWidget extends StatefulWidget>
 
   // Rebuild only when the controller changes this button's effective state.
   void _handleControllerChanged() {
-    final controllerLoading = _controller?.isLoading ?? false;
+    final bool controllerLoading = _controller?.isLoading ?? false;
     if (controllerLoading == _controllerLoading) return;
     setState(() => _controllerLoading = controllerLoading);
   }
@@ -186,7 +186,7 @@ mixin AsyncButtonState<ButtonWidget extends StatefulWidget>
 
   /// Locks synchronously and releases only the operation's own loading state.
   Future<void> handlePressed() async {
-    final callback = asyncOnPressed;
+    final FutureOr<void> Function()? callback = asyncOnPressed;
     // isLocked reads the group live, so a peer activated earlier in the same
     // frame has already claimed it and this activation is refused here.
     if (!mounted || callback == null || isLocked) return;
@@ -199,10 +199,10 @@ mixin AsyncButtonState<ButtonWidget extends StatefulWidget>
     FutureOr<void> Function() callback,
     _AsyncButtonGroupCoordinator? group,
   ) async {
-    final errorHandler = asyncOnError;
+    final AsyncButtonErrorHandler? errorHandler = asyncOnError;
     // The operation releases the controller it started with, even if the
     // button switches controllers or is disposed before it finishes.
-    final controller = _controller;
+    final AsyncButtonController? controller = _controller;
     try {
       // Begin before locking so a disposed controller cannot strand the lock.
       controller?._beginOperation();

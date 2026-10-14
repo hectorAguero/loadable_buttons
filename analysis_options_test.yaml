@@ -17,6 +17,9 @@ linter:
     avoid_redundant_argument_values: false
     # Named callback signatures keep parameterized fixtures readable.
     avoid_private_typedef_functions: false
+    # Inferred locals keep finder and fixture code readable; package and
+    # example code still annotate non-obvious locals.
+    specify_nonobvious_local_variable_types: false
     # Test diagnostics may print; production code still uses logging.
     avoid_print: false
 

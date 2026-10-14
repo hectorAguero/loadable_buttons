@@ -254,13 +254,13 @@ class _AsyncAdaptiveButtonState extends State<AsyncAdaptiveButton> {
       (_ownedFocusNode ??= FocusNode(debugLabel: 'AsyncAdaptiveButton'));
 
   FutureOr<void> Function()? get _onPressed {
-    final onPressed = widget.onPressed;
+    final FutureOr<void> Function()? onPressed = widget.onPressed;
 
     return onPressed == null ? null : () => _track(onPressed);
   }
 
   AsyncButtonErrorHandler? get _onError {
-    final onError = widget.onError;
+    final AsyncButtonErrorHandler? onError = widget.onError;
 
     return onError == null
         ? null
@@ -314,10 +314,11 @@ class _AsyncAdaptiveButtonState extends State<AsyncAdaptiveButton> {
 
   @override
   Widget build(BuildContext context) {
-    final platform = widget.platform ?? Theme.of(context).platform;
-    final cupertino =
+    final TargetPlatform platform =
+        widget.platform ?? Theme.of(context).platform;
+    final bool cupertino =
         platform == TargetPlatform.iOS || platform == TargetPlatform.macOS;
-    final loading = widget.loading || _pendingOperations > 0;
+    final bool loading = widget.loading || _pendingOperations > 0;
 
     return cupertino
         ? _AdaptiveCupertinoButton(
@@ -355,6 +356,8 @@ class _AdaptiveCupertinoButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // A constructor tear-off type would spell out every Cupertino parameter.
+    // ignore: specify_nonobvious_local_variable_types
     final (buttonBuilder, defaultDisabledColor) = switch (button._variant) {
       _AsyncAdaptiveButtonVariant.plain => (
         AsyncCupertinoButton.new,

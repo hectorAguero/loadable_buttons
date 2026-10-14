@@ -373,7 +373,7 @@ class _AsyncElevatedButtonState extends State<AsyncElevatedButton>
 
   @override
   Widget build(BuildContext context) {
-    final style = resolveMaterialButtonStyle(
+    final ButtonStyle style = resolveMaterialButtonStyle(
       style: widget.style,
       padding: widget.padding,
       minimumSize: widget.minimumSize,

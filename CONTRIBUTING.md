@@ -16,13 +16,15 @@ the latest-compatible design-library jobs; plugin checks run in all four jobs.
 | Tool | Role in this package |
 | --- | --- |
 | [Very Good Analysis](https://pub.dev/packages/very_good_analysis) | The versioned 10.3.0 preset provides the same built-in rules on both SDKs, including public API documentation and strict types. |
-| [Solid Lints 1.0.0](https://pub.dev/packages/solid_lints) | Custom checks for null safety, context usage, code complexity, and widget/lifecycle conventions. |
-| [Dart Code Linter 4.4.0](https://pub.dev/packages/dart_code_linter) | Complementary checks for listener cleanup, redundant `async`, `async`/`await` style, test assertions, and test filenames. |
+| [Solid Lints 2.0.0](https://pub.dev/packages/solid_lints) | Custom checks for null safety, context usage, code complexity, and widget/lifecycle conventions. |
+| [Dart Code Linter 4.4.2](https://pub.dev/packages/dart_code_linter) | Complementary checks for listener cleanup, `setState` after `await`, render-object updates, whole-`MediaQuery` dependencies, redundant `async`, `async`/`await` style, collection and export mistakes, test assertions, and test filenames. |
 
 The package and example allow VGA 10.3.0+ so Pub can select a release
 compatible with each SDK, while the included preset stays fixed at 10.3.0.
 VGA 10.3.0 supports the consumer Dart 3.12 floor; VGA 11.0.0 requires Dart
-3.13 and resolves on stable. Solid Lints 1.0.0 and DCL 4.4.0 are already current.
+3.13 and resolves on stable. Every rule VGA 11.0.0 adds first shipped in Dart 3.13,
+so none can be enabled while the floor is 3.12; an unknown lint name fails the
+minimum job. Solid Lints 2.0.0 and DCL 4.4.2 support Dart 3.12 and are current.
 The root analyzer configuration enables the modern plugins directly by version;
 they resolve their own dependencies and do not need root development dependencies.
 The DCL CLI has a separate dependency graph in `tool/dcl/pubspec.yaml` so it cannot
@@ -32,8 +34,11 @@ the Dart Analysis Server after changing plugin configuration.
 
 DCL's `all` preset is intentionally replaced by an explicit rule list. VGA owns
 built-in rules, Solid owns its custom checks, and DCL adds selected complementary
-checks. We include VGA's preset and explicitly configure Solid's diagnostics,
-so switching the base preset preserves Solid's rule settings. CI also runs
+checks. We include VGA's preset but not Solid's. Solid enables each of its rules
+unless `analysis_options.yaml` sets it to `false`, so that file lists only rule
+options and deliberate opt-outs. New Solid rules arrive enabled; review them
+when upgrading. DCL rules are opt-in and must appear both under
+`plugins.dart_code_linter.diagnostics` (IDE) and `dart_code_linter.rules` (CLI). CI also runs
 the DCL CLI to check its configuration directly. Test-rule include patterns are
 relative to `test/analysis_options.yaml`, so the test policy uses `**/*.dart`
 instead of the default `test/**` pattern.
@@ -43,6 +48,21 @@ instead of the default `test/**` pattern.
 `analysis_options.yaml` includes VGA's versioned 10.3.0 preset and enables strict
 casts, strict inference, and strict raw types. Public API documentation and public type
 annotations remain enabled because this is a reusable package.
+
+Beyond the preset, the package enables Dart 3.12 lints that guard it without
+conflicting with its conventions: `avoid_annotating_with_dynamic`,
+`avoid_classes_with_only_static_members`, `avoid_implementing_value_types`,
+`close_sinks`, `do_not_use_environment`, `library_names`,
+`no_runtimetype_tostring`, `prefer_for_elements_to_map_fromiterable`,
+`prefer_iterable_wheretype`, `prefer_void_to_null`, `use_decorated_box`, and
+`specify_nonobvious_local_variable_types`, which extends the preset's
+`specify_nonobvious_property_types` to locals in package and example code. Tests
+relax it to keep finder and fixture code readable. Where a constructor tear-off
+switch would spell out every parameter, a documented ignore keeps it inferred.
+Other available lints conflict with the preset or the package style (for
+example `prefer_double_quotes`, `prefer_relative_imports`, `always_specify_types`,
+and `unnecessary_final`). `diagnostic_describe_all_properties`
+is desirable for DevTools but needs `debugFillProperties` on every widget first.
 
 VGA supplies checks such as `unawaited_futures`, `discarded_futures`,
 `use_build_context_synchronously`, `cancel_subscriptions`,
@@ -89,9 +109,24 @@ The package overrides policies that conflict with its API or structure:
 All CI jobs check formatting using the package's declared Dart 3.12 language
 version, so the minimum and stable formatters share the same baseline.
 
-DCL enables `always-remove-listener`, `avoid-redundant-async`,
-`prefer-async-await`, `missing-test-assertion`, and
-`prefer-correct-test-file-name`. Test rules recognize `testWidgets` as well as
+DCL enables `avoid-banned-imports` to reject legacy `package:flutter/material.dart`
+and `package:flutter/cupertino.dart` imports, plus `always-remove-listener`,
+`use-setstate-synchronously`, `avoid-throw-in-catch-block`,
+`check-for-equals-in-render-object-setters`, `consistent-update-render-object`,
+`prefer-media-query-direct-access`, `avoid-wrapping-in-padding`,
+`avoid-border-all`, `prefer-correct-edge-insets-constructor`,
+`avoid-collection-methods-with-unrelated-types`, `prefer-iterable-of`,
+`avoid-unnecessary-conditionals`, `avoid-duplicate-exports`,
+`avoid-redundant-async`, `prefer-async-await`, `missing-test-assertion`, and
+`prefer-correct-test-file-name`. The CLI (`tool/check_dcl.sh`) is the enforcing
+check: `dart analyze` does not print DCL plugin diagnostics.
+
+Evaluated and left off: `no-equal-arguments`, `avoid-missing-enum-constant-in-map`,
+`no-object-declaration`, and `prefer-first-or-null` flag intentional code such as
+same-value arguments, partial state maps, Flutter's `Object?` hero tag, and tests
+that expect `.first` to throw.
+
+Test rules recognize `testWidgets` as well as
 `test`. Plugin diagnostics are enabled at the package root; directory-specific
 policies are set through the included options and Solid's configuration.
 

@@ -85,7 +85,7 @@ class _HomePageState extends State<_HomePage> {
       : clickMeText;
 
   Future<void> _runDemo() async {
-    final duration = _loadingDuration;
+    final Duration? duration = _loadingDuration;
     if (duration == null) return;
     await Future<void>.delayed(duration);
     if (mounted && transitionType == TransitionAnimationType.animatedSwitcher) {
@@ -94,8 +94,8 @@ class _HomePageState extends State<_HomePage> {
   }
 
   void _setDuration(String value) {
-    final seconds = double.tryParse(value);
-    final valid =
+    final double? seconds = double.tryParse(value);
+    final bool valid =
         seconds != null &&
         seconds.isFinite &&
         seconds >= 0 &&
@@ -112,7 +112,9 @@ class _HomePageState extends State<_HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final onPressed = _loadingDuration == null ? null : _runDemo;
+    final Future<void> Function()? onPressed = _loadingDuration == null
+        ? null
+        : _runDemo;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -356,7 +358,7 @@ class _ExampleControls extends StatelessWidget {
   @override
   Widget build(BuildContext context) => LayoutBuilder(
     builder: (_, constraints) {
-      final width = constraints.maxWidth < _controlWidth
+      final double width = constraints.maxWidth < _controlWidth
           ? constraints.maxWidth
           : _controlWidth;
 

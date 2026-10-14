@@ -110,10 +110,10 @@ class _FilledButtonWithIconChild extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final defaultFontSize =
+    final double defaultFontSize =
         buttonStyle?.textStyle?.resolve(const <WidgetState>{})?.fontSize ??
         _defaultFontSize;
-    final scale =
+    final double scale =
         clampDouble(
           MediaQuery.textScalerOf(context).scale(defaultFontSize) /
               _defaultFontSize,
@@ -121,12 +121,14 @@ class _FilledButtonWithIconChild extends StatelessWidget {
           _maximumTextScale,
         ) -
         1.0;
-    final gap =
+    final double gap =
         lerpDouble(_unscaledIconGap, _scaledIconGap, scale) ?? _fallbackIconGap;
-    final elevatedButtonTheme = FilledButtonTheme.of(context);
-    final effectiveIconAlignment =
+    final FilledButtonThemeData buttonTheme = FilledButtonTheme.of(
+      context,
+    );
+    final IconAlignment effectiveIconAlignment =
         iconAlignment ??
-        elevatedButtonTheme.style?.iconAlignment ??
+        buttonTheme.style?.iconAlignment ??
         buttonStyle?.iconAlignment ??
         IconAlignment.start;
 
