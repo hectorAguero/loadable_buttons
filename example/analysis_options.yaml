@@ -1,4 +1,10 @@
 # The analyzer discovers this filename automatically for the example app.
+analyzer:
+  exclude:
+    - android/**
+    - ios/**
+    - web/**
+    - macos/**
 include: ../analysis_options.yaml
 
 linter:

@@ -10,7 +10,7 @@ import '../support/async_button_fixture.dart';
 
 Map<String, DiagnosticsNode> _properties(Diagnosticable target) => {
   for (final property in target.toDiagnosticsNode().getProperties())
-    if (property.name != null) property.name!: property,
+    if (property.name case final String name) name: property,
 };
 
 // Returns the property text as the inspector shows it, or null when hidden

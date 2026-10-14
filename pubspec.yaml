@@ -1,6 +1,6 @@
 name: loadable_buttons
 description: "Provides enhanced buttons with built-in loading states, async functionality and customizable transitions."
-version: 2.0.0
+version: 2.1.0
 homepage: https://hectoraguero.dev/
 repository: https://github.com/hectorAguero/loadable_buttons
 issue_tracker: https://github.com/hectorAguero/loadable_buttons/issues
@@ -28,5 +28,11 @@ dev_dependencies:
   very_good_analysis: ">=10.3.0 <12.0.0"
 
 screenshots:
-  - description: 'Loadable_buttons gif'
-    path: screenshots/preview.gif
+  - description: 'Material buttons loading'
+    path: screenshots/material.gif
+  - description: 'Cupertino buttons loading'
+    path: screenshots/cupertino.gif
+  - description: 'Adaptive buttons rendering Material and Cupertino'
+    path: screenshots/adaptive.gif
+  - description: 'Button group blocking peers during an operation'
+    path: screenshots/group.gif

@@ -228,6 +228,14 @@ checks this locally and in CI. The archive excludes maintainer instructions,
 CONTRIBUTING, release procedures, structural audits, and `tool/`. Consumer docs
 link to those resources in the repository.
 
+## README animations
+
+The GIFs in `screenshots/` are rendered from real widgets by
+`tool/screenshots/screenshots_test.dart`, which loads Roboto, Material Icons, and
+(on macOS) SF Pro, then captures each frame. Regenerate them after visual
+changes with `bash tool/screenshots/render.sh`, which needs `ffmpeg`. Output is
+deterministic, so an unchanged UI produces unchanged GIFs.
+
 ## Consumer agent skill
 
 `skills/loadable-buttons-usage/` is published with the package and installed

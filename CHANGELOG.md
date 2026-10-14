@@ -1,34 +1,17 @@
-## 2.1.0 (unreleased)
+## 2.1.0
 
-* Add an optional `AsyncButtonController` to every button constructor. Observe
-  `isPending` and `isLoading`, or request manual `loading`, through a
-  caller-owned `ChangeNotifier`. Its manual request combines with `loading` and
-  the button's pending operation; setting it to false, replacing the controller,
-  or disposing the button never unlocks unfinished work. Each operation clears
-  only its own pending state, and a pending operation keeps locking any button
-  that adopts the controller, including during animated switches and route
-  transitions.
-* Add `AsyncButtonGroup` to allow one pending operation at a time among
-  descendant async buttons. The active button shows loading; peers are disabled
-  natively for pointer, keyboard, and accessibility activation without showing
-  loading content. Activations claim the group synchronously, the nearest group
-  applies, and an operation releases only its own claim. Add
-  `excludeFromGroup` to every constructor for escape actions such as Cancel,
-  and `AsyncButtonGroup.isActiveOf` for other widgets.
-* Add `AsyncAdaptiveButton`, `.filled`, and `.tinted`, rendering
-  `AsyncTextButton`, `AsyncFilledButton`, or `AsyncFilledButton.tonal` on
-  Android, Fuchsia, Linux, and Windows, and the matching `AsyncCupertinoButton`
-  variant on iOS and macOS. The platform follows `Theme.of(context).platform`
-  or an explicit `platform`. Shared properties, including
-  `disabledBackgroundColor`, apply on both platforms; `materialStyle` and
-  `cupertinoSizeStyle` are scoped. A platform or theme change during an
-  operation keeps the newly rendered button loading and locked without
-  repeating or cancelling the work, even if the controller changes too, and a
-  focused button keeps keyboard focus.
-* Describe every button's configuration in the Flutter DevTools inspector,
-  including the async contract, Material style shortcuts, and family-specific
-  options, and report each button's runtime state: effective loading, a pending
-  operation, and blocking by an `AsyncButtonGroup` peer.
+* **Controllers:** `AsyncButtonController` lets other widgets watch a button's
+  operation (`isPending`, `isLoading`) or request loading. Clearing it, swapping
+  it, or disposing the button never unlocks work that is still running.
+* **Groups:** `AsyncButtonGroup` lets only one related button run at a time;
+  the others are disabled without a spinner. Mark escape actions such as Cancel
+  with `excludeFromGroup`, and use `AsyncButtonGroup.isActiveOf` in other widgets.
+* **Adaptive buttons:** `AsyncAdaptiveButton`, `.filled`, and `.tinted` render
+  Cupertino on iOS and macOS and Material elsewhere. A platform change during
+  an operation keeps the button loading, locked, and focused.
+* **DevTools:** the widget inspector shows every button's options and its
+  runtime state: loading, operation pending, or blocked by a group.
+* Shorter README with animated previews of each button family.
 
 ## 2.0.0
 
