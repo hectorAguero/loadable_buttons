@@ -11,6 +11,8 @@ enum _AsyncCupertinoButtonVariant { plain, filled, tinted }
 ///
 /// Effective loading is [loading], a [controller] request, or a pending
 /// [onPressed] or [onError].
+/// A pending peer in the nearest [AsyncButtonGroup] also disables it without
+/// loading content, unless [excludeFromGroup] is true.
 /// Loading disables outer activation; built-in transitions exclude inactive
 /// content from pointer input, focus, and semantics. Unhandled errors propagate
 /// with their original stack trace. Return or await all work to be tracked.

@@ -160,8 +160,10 @@ mixin AsyncButtonState<ButtonWidget extends StatefulWidget>
     _lookUpGroup();
   }
 
-  // Excluded buttons skip the dependency, so group changes do not rebuild
-  // them. Re-run when excludeFromGroup changes.
+  // Buttons excluded from the start never depend on the group, so its changes
+  // do not rebuild them. Flutter keeps dependencies registered by earlier
+  // builds, so a member that later becomes excluded still rebuilds, harmlessly.
+  // Re-run when excludeFromGroup changes.
   void _lookUpGroup() {
     _group = excludeFromGroup
         ? null
@@ -179,7 +181,7 @@ mixin AsyncButtonState<ButtonWidget extends StatefulWidget>
   ///
   /// Every family wires native `onPressed` and `onLongPress` through this, so
   /// loading and group blocking share one enablement policy.
-  VoidCallback? unlockedHandler(Object? callback, VoidCallback handler) =>
+  VoidCallback? unlockedHandler(Function? callback, VoidCallback handler) =>
       isLocked || callback == null ? null : handler;
 
   /// Locks synchronously and releases only the operation's own loading state.
